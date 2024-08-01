@@ -14,9 +14,11 @@ on:
 jobs:
 
   Commit-Message-Check:
+    name: 'Check Commit Messages'
     uses: nofusscomputing/scratchpad/.github/workflows/commit-msg-check.yaml@feature
 
   build:
+    name: Build Docker Container
     uses: nofusscomputing/scratchpad/.github/workflows/build-image.yaml@feature
     with:
       build-branch: dev
