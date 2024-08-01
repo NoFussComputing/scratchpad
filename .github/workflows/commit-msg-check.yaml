@@ -42,12 +42,18 @@ jobs:
 
       - name: Setup
         run: |
+          echo "***************************";
           git fetch --all;
+          echo "***************************";
           # git checkout --track origin/development;
           # git branch -D ${COMMIT_BRANCH_NAME}
           # git checkout --track origin/${COMMIT_BRANCH_NAME};
           git show-branch -a;
+          echo "***************************";
+          git branch;
+          echo "***************************";
           git log;
+          echo "***************************";
           target_branch=$(git show-branch -a | awk 'BEGIN { FS="\n\\s+*" } { print $1 }' | awk '{print $2}' | grep '\[' | sed 's/.*\[origin\/\(.*\)\].*/\1/' | grep -v '\[' | grep -v $(git rev-parse --abbrev-ref HEAD) | grep -vi 'HEAD' | awk 'BEGIN{ RS = "" ; FS = "\n" }{print $1}');
           echo "[DEBUG] Target Branch[$target_branch]";
           # if [ -d "gitlab-ci" ]; then ls -la gitlab-ci; fi;
