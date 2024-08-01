@@ -7,3 +7,4 @@ LABEL \
   org.opencontainers.image.documentation="https://nofusscomputing.com" \
   org.opencontainers.image.vendor="No Fuss Computing" \
   io.artifacthub.package.license="MIT"
+
