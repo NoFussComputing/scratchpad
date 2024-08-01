@@ -22,7 +22,7 @@ jobs:
 
   Commit-Message-Check:
     runs-on: ubuntu-latest
-    # name: 'Check Commits'
+    name: 'Check Commits'
     steps:
 
 
