@@ -13,7 +13,10 @@ on:
 
 jobs:
 
-  Commit-Messages:
+  Commit-Message-Check:
+    uses: nofusscomputing/scratchpad/.github/workflows/commit-msg-check.yaml@feature
+
+  build:
     uses: nofusscomputing/scratchpad/.github/workflows/build-image.yaml@feature
     with:
       build-branch: dev
