@@ -3,10 +3,21 @@
 name: 'Check Commit Messages'
 
 
+
 on:
+  # workflow_call:
   push:
     branches:
-      - development
+      - '*'         # matches every branch that doesn't contain a '/'
+      - '*/*'       # matches every branch containing a single '/'
+      - '**'        # matches every branch
+      - '!master'
+  # pull_request:
+  #     branches: [ "development" ]
+
+env:
+  # GITHUB_BASE_REF: ${{ github.base.ref }}
+  COMMIT_BRANCH_NAME: ${{ github.head_ref || github.ref_name }} 
 
 
 jobs:
@@ -34,19 +45,31 @@ jobs:
 
       - name: Setup
         run: |
-          git fetch --all;
-          git checkout --track origin/master;
-          git branch -D development
-          git checkout --track origin/development;
+          # echo "*******fetch********************";
+          # git fetch --all;
+          # echo "********checkout*******************";
+          # git checkout --track origin/development;
+          # git branch -D ${COMMIT_BRANCH_NAME}
+          # git checkout --track origin/${COMMIT_BRANCH_NAME};
+          echo "********un-shallow the git*******************";
+          git fetch --unshallow;
+          git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+          git fetch origin
+          echo "********show branch*******************";
           git show-branch -a;
-          git log;
+          # echo "************branch***************";
+          # git branch;
+          # echo "***********log****************";
+          # git log;
+          echo "*********the work******************";
           target_branch=$(git show-branch -a | awk 'BEGIN { FS="\n\\s+*" } { print $1 }' | awk '{print $2}' | grep '\[' | sed 's/.*\[origin\/\(.*\)\].*/\1/' | grep -v '\[' | grep -v $(git rev-parse --abbrev-ref HEAD) | grep -vi 'HEAD' | awk 'BEGIN{ RS = "" ; FS = "\n" }{print $1}');
           echo "[DEBUG] Target Branch[$target_branch]";
-          # if [ -d "gitlab-ci" ]; then ls -la gitlab-ci; fi;
           echo "***************************";
-          git log origin/$target_branch..development --format=format:%H;
+          echo "[DEBUG] First Commit COMMIT_BRANCH_NAME[${COMMIT_BRANCH_NAME}]";
+          git log origin/$target_branch..${COMMIT_BRANCH_NAME} --format=format:%H;
+          echo "";
           echo "***************************";
-          first_sha1=$(git log origin/$target_branch..master --format=format:%H | tail -1);
+          first_sha1=$(git log origin/$target_branch..${COMMIT_BRANCH_NAME} --format=format:%H | tail -1);
           echo "[DEBUG] First Commit SHA[$first_sha1]";
 
 

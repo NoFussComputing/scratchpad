@@ -1,7 +1,9 @@
 name: 'Test Report'
 on:
   workflow_run:
-    workflows: ['Check Commit Messages']                     # runs after CI workflow
+    workflows: #[]                     # runs after CI workflow
+      - 'Check Commit Messages'
+      - '*/Check Commit Messages'
     types:
       - completed
 permissions:
