@@ -47,7 +47,8 @@ jobs:
           echo "[DEBUG] Target Branch[$target_branch]";
           # if [ -d "gitlab-ci" ]; then ls -la gitlab-ci; fi;
           echo "***************************";
-          echo "[DEBUG] First Commit GITHUB_BASE_REF[${GITHUB_BASE_REF}]";
+          echo "[DEBUG] First Commit GITHUB_BASE_REF[$GITHUB_BASE_REF]";
+          echo "[DEBUG] First Commit GITHUB_BASE_REF[${{ github.base.ref }}]";
           git log origin/$target_branch..${GITHUB_BASE_REF} --format=format:%H;
           echo "";
           echo "***************************";
