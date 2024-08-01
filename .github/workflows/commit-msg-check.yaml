@@ -51,12 +51,18 @@ jobs:
       - name: Run
         run: |
           if [ "$(git log $first_sha1..HEAD --format=format:%H | wc -l)" -eq 0 ]; then
-            echo "[DEBUG] Single Commit"; cz_exit=0 && cz check -m "$(git log HEAD --format=format:%B -1)" > "cz_output.log" 2>&1 || cz_exit=$?; 
+            echo "[DEBUG] Single Commit";
+            cz_exit=0;
+            cz check -m "$(git log HEAD --format=format:%B -1)" > "cz_output.log" 2>&1 || cz_exit=$?; 
           fi;
 
           if [ "$(git log $first_sha1..HEAD --format=format:%H | wc -l)" -gt 0 ]; then
-            echo "[DEBUG] Commit range";  cz_exit=0 && cz check --rev-range $first_sha1..HEAD > "cz_output.log" 2>&1 || cz_exit=$?;
+            echo "[DEBUG] Commit range";
+            cz_exit=0;
+            cz check --rev-range $first_sha1..HEAD > "cz_output.log" 2>&1 || cz_exit=$?;
           fi;
+
+          export cz_exit=$cz_exit
 
 
       - name: create report
@@ -68,7 +74,12 @@ jobs:
           echo "**********************************";
           cat cz_output.log;
           echo "**********************************";
+          cat ./.github/workflows/cz_junit.sh
+          echo "**********************************";
           ./.github/workflows/cz_junit.sh > cz.junit.xml;
+          echo "**********************************";
+          ls -la;
+          echo "**********************************";
 
 
       - name: Test Report
