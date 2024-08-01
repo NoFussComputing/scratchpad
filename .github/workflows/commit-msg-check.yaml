@@ -30,6 +30,8 @@ jobs:
       #     # pip install --upgrade pip;
 
 
+      - uses: actions/setup-python@v1
+
       - name: Setup
         run: |
           git fetch --all;
@@ -41,15 +43,11 @@ jobs:
           first_sha1=$(git log origin/$target_branch..development --format=format:%H | tail -1);
           echo "[DEBUG] First Commit SHA[$first_sha1]";
 
-      - uses: actions/setup-python@v1
 
-      - name: check if cz installed
-        run: |
           pip install -r requirements.txt;
           cz version;
 
-      - name: Run
-        run: |
+
           echo "[DEBUG] First Commit SHA[$first_sha1]";
 
           if [ "$(git log $first_sha1..HEAD --format=format:%H | wc -l)" -eq 0 ]; then
