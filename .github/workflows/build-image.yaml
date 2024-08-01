@@ -4,12 +4,17 @@ name: 'Build Development Image'
 
 
 on:
-  push:
-    branches:
-      - '*'         # matches every branch that doesn't contain a '/'
-      - '*/*'       # matches every branch containing a single '/'
-      - '**'        # matches every branch
-      # - '!master'
+  workflow_call:
+    inputs:
+      build-branch:         # tag / dev
+        required: true
+        type: string
+  # push:
+  #   branches:
+  #     - '*'         # matches every branch that doesn't contain a '/'
+  #     - '*/*'       # matches every branch containing a single '/'
+  #     - '**'        # matches every branch
+  #     # - '!master'
 
 
 jobs:
@@ -62,9 +67,20 @@ jobs:
 
           DOCKER_MULTI_ARCH_IMAGES=$(docker buildx imagetools inspect "$DOCKER_BUILD_IMAGE" --format "{{ range .Manifest.Manifests }}{{ if ne (print .Platform) \"&{unknown unknown  [] }\" }}$DOCKER_BUILD_IMAGE@{{ println .Digest }}{{end}} {{end}}");
 
-          docker buildx imagetools create $DOCKER_MULTI_ARCH_IMAGES \
-            --tag ghcr.io/${{ github.repository }}:${{ github.sha }} \
-            --tag ghcr.io/${{ github.repository }}:dev;
+          if [ "${{ inputs.build-branch }}" == "dev" ]; then
+
+            docker buildx imagetools create $DOCKER_MULTI_ARCH_IMAGES \
+              --tag ghcr.io/${{ github.repository }}:${{ github.sha }} \
+              --tag ghcr.io/${{ github.repository }}:dev;
+
+          elif [ "${{ inputs.build-branch }}" == "tag" ]; then
+
+            docker buildx imagetools create $DOCKER_MULTI_ARCH_IMAGES \
+              --tag ghcr.io/${{ github.repository }}:${{ github.sha }} \
+              --tag ghcr.io/${{ github.repository }}:${{ github.ref_name }} \
+              --tag ghcr.io/${{ github.repository }}:latest;
+
+          fi;
 
 
       - name: Cleanup BuildX

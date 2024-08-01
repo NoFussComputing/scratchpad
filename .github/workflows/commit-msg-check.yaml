@@ -4,12 +4,13 @@ name: 'Check Commit Messages'
 
 
 on:
-  push:
-    branches:
-      - '*'         # matches every branch that doesn't contain a '/'
-      - '*/*'       # matches every branch containing a single '/'
-      - '**'        # matches every branch
-      - '!master'
+  workflow_call:
+  # push:
+  #   branches:
+  #     - '*'         # matches every branch that doesn't contain a '/'
+  #     - '*/*'       # matches every branch containing a single '/'
+  #     - '**'        # matches every branch
+  #     - '!master'
 
 
 env:

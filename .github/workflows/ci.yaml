@@ -1,0 +1,22 @@
+---
+
+name: 'CI'
+
+on:
+  push:
+    branches:
+      - '*'         # matches every branch that doesn't contain a '/'
+      - '*/*'       # matches every branch containing a single '/'
+      - '**'        # matches every branch
+      # - '!master'
+
+
+jobs:
+
+  Commit-Messages:
+    runs-on: ubuntu-latest
+    name: Check-commit messages
+    steps:
+
+      - name: Check commit messages
+        uses: nofusscomputing/scratchpad/.github/workflows/build-image.yaml@feature
