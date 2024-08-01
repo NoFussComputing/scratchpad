@@ -41,6 +41,9 @@ jobs:
           first_sha1=$(git log origin/$target_branch..development --format=format:%H | tail -1);
           echo "[DEBUG] First Commit SHA[$first_sha1]";
 
+      - name: check if cz installed
+        run: |
+          sudo which cz;
 
       - name: Run
         run: |
