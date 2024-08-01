@@ -54,5 +54,12 @@ jobs:
           if [ "$(git log $first_sha1..HEAD --format=format:%H | wc -l)" -eq 0 ]; then echo "[DEBUG] Single Commit"; cz_exit=0 && cz check -m "$(git log HEAD --format=format:%B -1)" > "cz_output.log" 2>&1 || cz_exit=$?; fi 
           if [ "$(git log $first_sha1..HEAD --format=format:%H | wc -l)" -gt 0 ]; then echo "[DEBUG] Commit range";  cz_exit=0 && cz check --rev-range $first_sha1..HEAD > "cz_output.log" 2>&1 || cz_exit=$?; fi
           cat cz_output.log
-      #     . $ROOT_DIR/conventional_commits/scripts/cz_junit.sh > "$CI_PROJECT_DIR/artifacts/$CI_JOB_STAGE/tests/$CI_JOB_NAME-cz.junit.xml"
+          ./.github/workflows/cz_junit.sh > "cz.junit.xml"
 
+      - name: Test Report
+        uses: dorny/test-reporter@v1
+        if: success() || failure()    # run this step even if previous step failed
+        with:
+          name: Commit Messages            # Name of the check run which will be created
+          path: cz.junit.xml    # Path to test results
+          reporter: java-junit        # Format of test results
