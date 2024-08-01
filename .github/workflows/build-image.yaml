@@ -28,22 +28,39 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
 
-      - name: build image
+      - name: Setup BuildX
         run: |
           docker buildx create --name project-v3-builder;
           docker buildx use project-v3-builder;
 
+
+      - name: build image
+        run: |
           docker buildx build --platform="linux/amd64,linux/arm64" . \
             --label org.opencontainers.image.created="$(date '+%Y-%m-%dT%H:%M:%S%:z')" \
             --label org.opencontainers.image.source="https://github.com/${{ github.repository }}" \
             --label org.opencontainers.image.revision="${{ github.sha }}" \
+            \
             --label io.artifacthub.package.readme-url="https://raw.githubusercontent.com/${{ github.repository }}/development/README.md" \
             --label io.artifacthub.package.maintainers='[{"name":"No Fuss Computing","email":"helpdesk@nofusscomputing.com"}]' \
             \
             --annotation org.opencontainers.image.description="a DESCRIPTION for multi-arch images" \
           --push \
           --file dockerfile \
-          --tag ghcr.io/${{ github.repository }}:dev \
           --tag ghcr.io/${{ github.repository }}:${{ github.sha }};
 
+
+      - name: Remove "Unknown" Image from Manifest
+        run: |
+          DOCKER_BUILD_IMAGE=ghcr.io/${{ github.repository }}:${{ github.sha }}
+
+          DOCKER_MULTI_ARCH_IMAGES=$(docker buildx imagetools inspect "$DOCKER_BUILD_IMAGE" --format "{{ range .Manifest.Manifests }}{{ if ne (print .Platform) \"&{unknown unknown  [] }\" }}$DOCKER_BUILD_IMAGE@{{ println .Digest }}{{end}} {{end}}");
+
+          docker buildx imagetools create $DOCKER_MULTI_ARCH_IMAGES \
+            --tag ghcr.io/${{ github.repository }}:${{ github.sha }} \
+            --tag ghcr.io/${{ github.repository }}:dev;
+
+
+      - name: Cleanup BuildX
+        run: |
           docker buildx rm project-v3-builder;
