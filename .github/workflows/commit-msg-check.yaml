@@ -43,8 +43,8 @@ jobs:
       - name: Setup
         run: |
           git fetch --all;
-          # git checkout --track origin/master;
-          # git branch -D development
+          git checkout --track origin/development;
+          git branch -D ${COMMIT_BRANCH_NAME}
           git checkout --track origin/${COMMIT_BRANCH_NAME};
           git show-branch -a;
           git log;
