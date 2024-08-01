@@ -44,6 +44,7 @@ jobs:
 
       - name: Run
         run: |
+          which cz;
           if [ "$(git log $first_sha1..HEAD --format=format:%H | wc -l)" -eq 0 ]; then echo "[DEBUG] Single Commit"; cz_exit=0 && cz check -m "$(git log HEAD --format=format:%B -1)" > "cz_output.log" 2>&1 || cz_exit=$?; fi 
           if [ "$(git log $first_sha1..HEAD --format=format:%H | wc -l)" -gt 0 ]; then echo "[DEBUG] Commit range";  cz_exit=0 && cz check --rev-range $first_sha1..HEAD > "cz_output.log" 2>&1 || cz_exit=$?; fi
           cat cz_output.log
