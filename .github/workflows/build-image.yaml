@@ -35,10 +35,12 @@ jobs:
 
           docker buildx build --platform="linux/amd64,linux/arm64" . \
             --label org.opencontainers.image.created="$(date '+%Y-%m-%dT%H:%M:%S%:z')" \
-            --label org.opencontainers.image.source="${{ github.server.url }}/${{ github.repository }}" \
+            --label org.opencontainers.image.source="https://github.com/${{ github.repository }}" \
             --label org.opencontainers.image.revision="${{ github.sha }}" \
             --label io.artifacthub.package.readme-url="https://raw.githubusercontent.com/${{ github.repository }}/development/README.md" \
             --label io.artifacthub.package.maintainers='[{"name":"No Fuss Computing","email":"helpdesk@nofusscomputing.com"}]' \
+            \
+            --annotation org.opencontainers.image.description="a DESCRIPTION for multi-arch images" \
           --push \
           --file dockerfile \
           --tag ghcr.io/${{ github.repository }}:dev \
