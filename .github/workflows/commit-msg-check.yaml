@@ -12,6 +12,10 @@ on:
       - '!master'
 
 
+env:
+  GITHUB_BASE_REF: ${{ github.base.ref }}
+
+
 jobs:
 
   Commit-Message-Check:
