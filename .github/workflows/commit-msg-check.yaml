@@ -6,7 +6,10 @@ name: 'Check Commit Messages'
 on:
   push:
     branches:
-      - development
+      - '*'         # matches every branch that doesn't contain a '/'
+      - '*/*'       # matches every branch containing a single '/'
+      - '**'        # matches every branch
+      - '!master'
 
 
 jobs:
