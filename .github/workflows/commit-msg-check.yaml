@@ -52,7 +52,7 @@ jobs:
           echo "[DEBUG] Target Branch[$target_branch]";
           # if [ -d "gitlab-ci" ]; then ls -la gitlab-ci; fi;
           echo "***************************";
-          echo "[DEBUG] First Commit COMMIT_BRANCH_NAME[${COMMIT_BRANCH_NAME]}";
+          echo "[DEBUG] First Commit COMMIT_BRANCH_NAME[${COMMIT_BRANCH_NAME}]";
           git log origin/$target_branch..${COMMIT_BRANCH_NAME} --format=format:%H;
           echo "";
           echo "***************************";
