@@ -15,3 +15,5 @@ jobs:
 
   Commit-Messages:
     uses: nofusscomputing/scratchpad/.github/workflows/build-image.yaml@feature
+    with:
+      build-branch: dev
