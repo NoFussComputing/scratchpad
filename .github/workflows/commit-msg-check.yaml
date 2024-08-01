@@ -1,0 +1,49 @@
+---
+
+name: Check Commit Messages
+
+
+on:
+  push:
+    branches:
+      - development
+
+
+jobs:
+
+  Commit-Message-Check:
+    runs-on: ubuntu-latest
+    name: Check Commit Format
+    steps:
+
+
+      - uses: actions/checkout@v2
+
+
+      - name: Preperation
+        run: |
+          apt update;
+          apt install --no-install-recommends -y git;
+          python3 -m venv env;
+          . env/bin/activate;
+          pip install --upgrade pip;
+          pip install -r requirements.txt
+
+
+      - name: Setup
+        run: |
+          git fetch --all;
+          git checkout --track origin/development;
+          git show-branch -a;
+          target_branch=$(git show-branch -a | awk 'BEGIN { FS="\n\s+*" } { print $1 }' | awk '{print $2}' | grep '\[' | sed 's/.*\[origin\/\(.*\)\].*/\1/' | grep -v '\[' | grep -v $(git rev-parse --abbrev-ref HEAD) | grep -vi 'HEAD' | awk 'BEGIN{ RS = "" ; FS = "\n" }{print $1}');
+          
+          if [ -d "gitlab-ci" ]; then ls -la gitlab-ci; fi;
+          first_sha1=$(git log origin/$target_branch..development --format=format:%H | tail -1);
+
+
+      # - name: Run
+      #   run: |
+      #     if [ "$(git log $first_sha1..HEAD --format=format:%H | wc -l)" -eq 0 ]; then echo "[DEBUG] Single Commit"; cz_exit=0 && cz check -m "$(git log HEAD --format=format:%B -1)" > "$CI_PROJECT_DIR/artifacts/$CI_JOB_STAGE/$CI_JOB_NAME/cz_output.log" 2>&1 || cz_exit=$?; fi 
+      #     if [ "$(git log $first_sha1..HEAD --format=format:%H | wc -l)" -gt 0 ]; then echo "[DEBUG] Commit range";  cz_exit=0 && cz check --rev-range $first_sha1..HEAD > "$CI_PROJECT_DIR/artifacts/$CI_JOB_STAGE/$CI_JOB_NAME/cz_output.log" 2>&1 || cz_exit=$?; fi
+      #     . $ROOT_DIR/conventional_commits/scripts/cz_junit.sh > "$CI_PROJECT_DIR/artifacts/$CI_JOB_STAGE/tests/$CI_JOB_NAME-cz.junit.xml"
+
