@@ -45,7 +45,7 @@ jobs:
 
       - name: check if cz installed
         run: |
-          sudo which cz;
+          cz version
 
       - name: Run
         run: |
