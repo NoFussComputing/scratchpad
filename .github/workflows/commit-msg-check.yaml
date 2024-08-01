@@ -1,6 +1,6 @@
 ---
 
-name: Check Commit Messages
+name: 'Check Commit Messages'
 
 
 on:
@@ -67,26 +67,33 @@ jobs:
           export cz_exit=$cz_exit
 
 
-          echo "**********************************";
-          ls -la;
-          echo "**********************************";
-          git status;
-          echo "**********************************";
-          cat cz_output.log;
-          echo "**********************************";
-          cat ./.github/workflows/cz_junit.sh
-          echo "**********************************";
-          echo "[DEBUG] cz_exit[$cz_exit]";
+          # echo "**********************************";
+          # ls -la;
+          # echo "**********************************";
+          # git status;
+          # echo "**********************************";
+          # cat cz_output.log;
+          # echo "**********************************";
+          # cat ./.github/workflows/cz_junit.sh
+          # echo "**********************************";
+          # echo "[DEBUG] cz_exit[$cz_exit]";
           ./.github/workflows/cz_junit.sh > cz.junit.xml;
           echo "**********************************";
           ls -la;
           echo "**********************************";
 
 
-      - name: Test Report
-        uses: dorny/test-reporter@v1
-        if: success() || failure()    # run this step even if previous step failed
+      # - name: Test Report
+      #   uses: dorny/test-reporter@v1
+      #   if: success() || failure()    # run this step even if previous step failed
+      #   with:
+      #     name: Commit Message Test Report            # Name of the check run which will be created
+      #     path: cz.junit.xml    # Path to test results
+      #     reporter: java-junit        # Format of test results
+
+      - name: Upload Test Report
+        uses: actions/upload-artifact@v4  # upload test results
+        if: success() || failure()        # run this step even if previous step failed
         with:
-          name: Commit Message Test Report            # Name of the check run which will be created
-          path: cz.junit.xml    # Path to test results
-          reporter: java-junit        # Format of test results
+          name: test-results
+          path: cz.junit.xml
