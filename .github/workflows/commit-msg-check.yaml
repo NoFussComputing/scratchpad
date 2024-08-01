@@ -50,7 +50,8 @@ jobs:
           git log origin/$target_branch..development --format=format:%H;
           echo "";
           echo "***************************";
-          first_sha1=$(git log origin/$target_branch..development --format=format:%H | tail -1);
+          echo "[DEBUG] First Commit GITHUB_BASE_REF[${GITHUB_BASE_REF}]";
+          first_sha1=$(git log origin/$target_branch..${GITHUB_BASE_REF} --format=format:%H | tail -1);
           echo "[DEBUG] First Commit SHA[$first_sha1]";
 
 
