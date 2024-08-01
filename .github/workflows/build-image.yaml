@@ -30,6 +30,10 @@ jobs:
 
       - name: build image
         run: |
+          docker buildx create --name project-v3-builder;
+
+	        docker buildx use project-v3-builder;
+
           docker buildx build --platform="linux/amd64,linux/arm64" . \
             --label org.opencontainers.image.created="$(date '+%Y-%m-%dT%H:%M:%S%:z')" \
             --label org.opencontainers.image.source="${{ github.server.url }}/${{ github.repository }}" \
@@ -40,3 +44,5 @@ jobs:
           --file dockerfile \
           --tag ghcr.io/${{ github.repository }}:dev \
           --tag ghcr.io/${{ github.repository }}:${{ github.sha }};
+
+          docker buildx rm project-v3-builder;
