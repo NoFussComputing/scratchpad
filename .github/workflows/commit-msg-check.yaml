@@ -45,8 +45,9 @@ jobs:
           # if [ -d "gitlab-ci" ]; then ls -la gitlab-ci; fi;
           echo "***************************";
           git log origin/$target_branch..development --format=format:%H;
+          echo "";
           echo "***************************";
-          first_sha1=$(git log origin/$target_branch..master --format=format:%H | tail -1);
+          first_sha1=$(git log origin/$target_branch..development --format=format:%H | tail -1);
           echo "[DEBUG] First Commit SHA[$first_sha1]";
 
 
