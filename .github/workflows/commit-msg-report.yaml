@@ -25,5 +25,6 @@ jobs:
       with:
         artifact: test-results            # artifact name
         name: Commit Message Test Report            # Name of the check run which will be created
-        path: cz.junit.xml    # Path to test results
+        # path: cz.junit.xml    # Path to test results
+        path: '*.xml'
         reporter: java-junit        # Format of test results
