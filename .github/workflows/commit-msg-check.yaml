@@ -4,14 +4,15 @@ name: 'Check Commit Messages'
 
 
 on:
-  workflow_call:
-  # push:
-  #   branches:
-  #     - '*'         # matches every branch that doesn't contain a '/'
-  #     - '*/*'       # matches every branch containing a single '/'
-  #     - '**'        # matches every branch
-  #     - '!master'
-
+  # workflow_call:
+  push:
+    branches:
+      - '*'         # matches every branch that doesn't contain a '/'
+      - '*/*'       # matches every branch containing a single '/'
+      - '**'        # matches every branch
+      - '!master'
+  pull_request:
+      branches: [ "development" ]
 
 env:
   # GITHUB_BASE_REF: ${{ github.base.ref }}
