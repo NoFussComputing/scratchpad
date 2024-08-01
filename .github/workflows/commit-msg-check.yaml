@@ -45,9 +45,10 @@ jobs:
           echo "*******fetch********************";
           git fetch --all;
           echo "********checkout*******************";
-          # git checkout --track origin/development;
-          # git branch -D ${COMMIT_BRANCH_NAME}
-          # git checkout --track origin/${COMMIT_BRANCH_NAME};
+          git checkout --track origin/development;
+          git branch -D ${COMMIT_BRANCH_NAME}
+          git checkout --track origin/${COMMIT_BRANCH_NAME};
+          echo "********show branch*******************";
           git show-branch -a;
           echo "************branch***************";
           git branch;
