@@ -11,8 +11,8 @@ on:
       - '*/*'       # matches every branch containing a single '/'
       - '**'        # matches every branch
       - '!master'
-  pull_request:
-      branches: [ "development" ]
+  # pull_request:
+  #     branches: [ "development" ]
 
 env:
   # GITHUB_BASE_REF: ${{ github.base.ref }}
