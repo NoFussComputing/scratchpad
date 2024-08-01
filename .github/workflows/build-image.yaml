@@ -37,14 +37,17 @@ jobs:
       - name: build image
         run: |
           docker buildx build --platform="linux/amd64,linux/arm64" . \
-            --label org.opencontainers.image.created="$(date '+%Y-%m-%dT%H:%M:%S%:z')" \
-            --label org.opencontainers.image.source="https://github.com/${{ github.repository }}" \
-            --label org.opencontainers.image.revision="${{ github.sha }}" \
+            --label "org.opencontainers.image.created=$(date '+%Y-%m-%dT%H:%M:%S%:z')" \
+            --label "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
+            --label "org.opencontainers.image.revision=${{ github.sha }}" \
             \
-            --label io.artifacthub.package.readme-url="https://raw.githubusercontent.com/${{ github.repository }}/development/README.md" \
-            --label io.artifacthub.package.maintainers='[{"name":"No Fuss Computing","email":"helpdesk@nofusscomputing.com"}]' \
+            --label "io.artifacthub.package.readme-url=https://raw.githubusercontent.com/${{ github.repository }}/development/README.md" \
+            --label 'io.artifacthub.package.maintainers=[{"name":"No Fuss Computing","email":"helpdesk@nofusscomputing.com"}]' \
             \
-            --annotation org.opencontainers.image.description="a DESCRIPTION for multi-arch images" \
+            --annotation "org.opencontainers.image.description=a DESCRIPTION for multi-arch images" \
+            --annotation "org.opencontainers.image.created=$(date '+%Y-%m-%dT%H:%M:%S%:z')" \
+            --annotation "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
+            --annotation "org.opencontainers.image.revision=${{ github.sha }}" \
           --push \
           --file dockerfile \
           --tag ghcr.io/${{ github.repository }}:${{ github.sha }};
