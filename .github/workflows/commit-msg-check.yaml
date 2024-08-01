@@ -22,8 +22,8 @@ jobs:
 
       - name: Preperation
         run: |
-          apt update;
-          apt install --no-install-recommends -y git;
+          sudo apt update;
+          sudo apt install --no-install-recommends -y git;
           python3 -m venv env;
           . env/bin/activate;
           pip install --upgrade pip;
