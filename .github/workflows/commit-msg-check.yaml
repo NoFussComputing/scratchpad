@@ -13,11 +13,11 @@ jobs:
 
   Commit-Message-Check:
     runs-on: ubuntu-latest
-    name: Check Commit Messages
+    name: 'Check Commits'
     steps:
 
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
 
 
