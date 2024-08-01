@@ -50,6 +50,8 @@ jobs:
 
       - name: Run
         run: |
+          echo "[DEBUG] First Commit SHA[$first_sha1]";
+
           if [ "$(git log $first_sha1..HEAD --format=format:%H | wc -l)" -eq 0 ]; then
             echo "[DEBUG] Single Commit";
             cz_exit=0;
@@ -61,6 +63,8 @@ jobs:
             cz_exit=0;
             cz check --rev-range $first_sha1..HEAD > "cz_output.log" 2>&1 || cz_exit=$?;
           fi;
+
+          echo "[DEBUG] cz_exit[$cz_exit]";
 
           export cz_exit=$cz_exit
 
@@ -74,6 +78,7 @@ jobs:
           echo "**********************************";
           cat ./.github/workflows/cz_junit.sh
           echo "**********************************";
+          echo "[DEBUG] cz_exit[$cz_exit]";
           ./.github/workflows/cz_junit.sh > cz.junit.xml;
           echo "**********************************";
           ls -la;
