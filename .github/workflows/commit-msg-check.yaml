@@ -45,7 +45,7 @@ jobs:
           git fetch --all;
           # git checkout --track origin/master;
           # git branch -D development
-          # git checkout --track origin/development;
+          git checkout --track origin/development;
           git show-branch -a;
           git log;
           target_branch=$(git show-branch -a | awk 'BEGIN { FS="\n\\s+*" } { print $1 }' | awk '{print $2}' | grep '\[' | sed 's/.*\[origin\/\(.*\)\].*/\1/' | grep -v '\[' | grep -v $(git rev-parse --abbrev-ref HEAD) | grep -vi 'HEAD' | awk 'BEGIN{ RS = "" ; FS = "\n" }{print $1}');
