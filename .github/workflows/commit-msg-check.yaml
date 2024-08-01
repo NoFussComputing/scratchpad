@@ -35,9 +35,9 @@ jobs:
           git fetch --all;
           # git checkout --track origin/development;
           git show-branch -a;
-          target_branch=$(git show-branch -a | awk 'BEGIN { FS="\n\s+*" } { print $1 }' | awk '{print $2}' | grep '\[' | sed 's/.*\[origin\/\(.*\)\].*/\1/' | grep -v '\[' | grep -v $(git rev-parse --abbrev-ref HEAD) | grep -vi 'HEAD' | awk 'BEGIN{ RS = "" ; FS = "\n" }{print $1}');
-          
-          if [ -d "gitlab-ci" ]; then ls -la gitlab-ci; fi;
+          target_branch=$(git show-branch -a | awk 'BEGIN { FS="\n\\s+*" } { print $1 }' | awk '{print $2}' | grep '\[' | sed 's/.*\[origin\/\(.*\)\].*/\1/' | grep -v '\[' | grep -v $(git rev-parse --abbrev-ref HEAD) | grep -vi 'HEAD' | awk 'BEGIN{ RS = "" ; FS = "\n" }{print $1}');
+          echo "[DEBUG] Target Branch[$target_branch]";
+          # if [ -d "gitlab-ci" ]; then ls -la gitlab-ci; fi;
           first_sha1=$(git log origin/$target_branch..development --format=format:%H | tail -1);
 
 
