@@ -19,7 +19,6 @@ jobs:
 
       - uses: actions/checkout@v2
 
-      - uses: actions/setup-python@v1
 
 
       - name: Preperation
@@ -29,7 +28,6 @@ jobs:
           python3 -m venv env;
           . env/bin/activate;
           pip install --upgrade pip;
-          pip install -r requirements.txt
 
 
       - name: Setup
@@ -43,8 +41,11 @@ jobs:
           first_sha1=$(git log origin/$target_branch..development --format=format:%H | tail -1);
           echo "[DEBUG] First Commit SHA[$first_sha1]";
 
+      - uses: actions/setup-python@v1
+
       - name: check if cz installed
         run: |
+          pip install -r requirements.txt
           cz version
 
       - name: Run
