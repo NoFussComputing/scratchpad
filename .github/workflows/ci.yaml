@@ -14,9 +14,4 @@ on:
 jobs:
 
   Commit-Messages:
-    runs-on: ubuntu-latest
-    name: Check-commit messages
-    steps:
-
-      - name: Check commit messages
-        uses: nofusscomputing/scratchpad/.github/workflows/build-image.yaml@feature
+    uses: nofusscomputing/scratchpad/.github/workflows/build-image.yaml@feature
