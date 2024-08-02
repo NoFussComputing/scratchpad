@@ -209,7 +209,7 @@ jobs:
           if [ "$not_empty" ]; then
             jq -r '
             def hr(severity):
-            if severity == "HIGH" or severity == "CRITICAL" then true else true end;
+            if severity == "HIGH" or severity == "CRITICAL" then true else false end;
             def to_md:
             "| " + (.VulnerabilityID // "") + " | " + (.PkgName // "") + " | " + (.InstalledVersion // "") + " | " + (.Severity // "") + " | " + (.Title // "") + " |";
             [
