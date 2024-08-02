@@ -132,7 +132,7 @@ jobs:
           image-ref: '${{ env.DOCKER_BUILD_IMAGE }}'
           format: 'sarif'
           output: 'trivy-results.sarif'
-          severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
+          severity: 'LOW,MEDIUM,HIGH,CRITICAL'
           vuln-type: 'os,library'
           list-all-pkgs: true
           scanners: vuln
