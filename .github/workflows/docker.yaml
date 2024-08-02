@@ -193,6 +193,8 @@ jobs:
       - name: Extract high and critical vulnerabilities
         id: extract_vulnerabilities_orig
         run: |
+          not_empty="$(jq -r '.Results[] | .Vulnerabilities[]' results.json)"
+
           jq -r '
           [
           "# Image Scan Results",
@@ -204,7 +206,7 @@ jobs:
           ] | join("\n")
           ' scan-results.json > vulnerability-report.md
 
-          if [ "$(jq .Vulnerabilities[]? scan-results.json)" ]; then
+          if [ "$not_empty" ]; then
             jq -r '
             def hr(severity):
             if severity == "HIGH" or severity == "CRITICAL" then true else true end;
