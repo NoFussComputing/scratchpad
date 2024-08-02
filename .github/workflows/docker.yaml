@@ -197,7 +197,7 @@ jobs:
           def to_md:
           "| " + (.VulnerabilityID // "") + " | " + (.PkgName // "") + " | " + (.InstalledVersion // "") + " | " + (.Severity // "") + " | " + (.Class // "") + " | " + (.Title // "") + " |";
           [
-          "# Docker Image Scan Results",
+          "# Image Scan Results",
           "",
           "**Scan Date:** _" + ( .CreatedAt // "" ) + "_",
           "**Image:** _" + ( .ArtifactName // "" ) + "_",
@@ -206,7 +206,7 @@ jobs:
           "## High and Critical Vulnerabilities",
           "",
           "| Vulnerability ID | Package | Version | Severity | Class | Description |",
-          "| --------- | -----| -----| ----- | -------|",
+          "| --------- | ----- | ----- | ----- | ----- | -------|",
           (.Results[] | .Vulnerabilities[] | select(hr(.Severity)) | to_md),
           ""
           ] | join("\n")
