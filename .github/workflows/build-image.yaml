@@ -118,11 +118,11 @@ jobs:
           image-ref: '${{ env.DOCKER_BUILD_IMAGE }}'
           format: 'sarif'
           output: 'trivy-results.sarif'
-
           severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
           vuln-type: 'os,library'
-          list-all-pkgs: 'true'
-          # format: 'sarif,table,github'
+          list-all-pkgs: true
+          scanners: vuln
+          trivy-config: .trivy.yaml
 
 
       - name: Upload Trivy scan results to GitHub Security tab
