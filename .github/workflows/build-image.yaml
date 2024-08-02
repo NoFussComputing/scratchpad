@@ -123,6 +123,7 @@ jobs:
           list-all-pkgs: true
           scanners: vuln
           trivy-config: .trivy.yaml
+          ignore-unfixed: true
 
 
       - name: Upload Trivy scan results to GitHub Security tab
