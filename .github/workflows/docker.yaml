@@ -167,7 +167,7 @@ jobs:
           (.Results[] | .Vulnerabilities[] | select(hr(.Severity)) | to_md),
           ""
           ] | join("\n")
-          'scan-results.json > vulnerability-report.md
+          ' scan-results.json > vulnerability-report.md
 
 
 
