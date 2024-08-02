@@ -1,7 +1,8 @@
 
 # FROM debian:bookworm-slim
 # FROM debian:11.10-slim
-FROM debian:10.1
+# FROM debian:10.1
+FROM ubuntu:13.10
 
 
 LABEL \
