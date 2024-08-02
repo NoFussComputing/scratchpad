@@ -195,7 +195,7 @@ jobs:
           def hr(severity):
           if severity == "HIGH" or severity == "CRITICAL" then true else false end;
           def to_md:
-          "| " + (.VulnerabilityID // "") + " | " + (.PkgName // "") + " | " + (.InstalledVersion // "") + " | " + (.Severity // "") + " | "+ " | " + (.Class // "") + " | " + (.Title // "") + " |";
+          "| " + (.VulnerabilityID // "") + " | " + (.PkgName // "") + " | " + (.InstalledVersion // "") + " | " + (.Severity // "") + " | " + (.Class // "") + " | " + (.Title // "") + " |";
           [
           "# Docker Image Scan Results",
           "",
