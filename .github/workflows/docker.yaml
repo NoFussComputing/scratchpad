@@ -134,7 +134,7 @@ jobs:
           output: 'trivy-results.sarif'
           severity: 'LOW,MEDIUM,HIGH,CRITICAL'
           vuln-type: 'os,library'
-          list-all-pkgs: true
+          # list-all-pkgs: true
           scanners: vuln
           # trivy-config: .trivy.yaml
           ignore-unfixed: true
@@ -153,7 +153,7 @@ jobs:
           output: 'scan-results.json'
           severity: 'HIGH,CRITICAL'
           vuln-type: 'os,library'
-          list-all-pkgs: true
+          # list-all-pkgs: true
           scanners: vuln
           # trivy-config: .trivy.yaml
           ignore-unfixed: false
@@ -214,8 +214,6 @@ jobs:
           ] | join("\n")
           ' scan-results.json > vulnerability-report.md
 
-
-     
 
       - name: Upload scan results
         uses: actions/upload-artifact@v4
