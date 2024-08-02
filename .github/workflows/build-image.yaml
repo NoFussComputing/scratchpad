@@ -95,7 +95,8 @@ jobs:
 
   docker-scan:
     needs: docker-build
-    runs-on: aquasec/trivy:latest
+    runs-on: ubuntu-latest
+    container: aquasec/trivy:latest
     name: Custom scan
     steps:
       - uses: actions/checkout@v4
