@@ -224,7 +224,7 @@ jobs:
 
           cat <<'EOF' >> vulnerability-report.md
           **Nothing Found**
-
+          
           EOF;
 
           fi;
