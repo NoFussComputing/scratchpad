@@ -195,7 +195,7 @@ jobs:
           def hr(severity):
           if severity == "HIGH" or severity == "CRITICAL" then true else false end;
           def to_md:
-          "| " + (.VulnerabilityID // "") + " | " + (.PkgName // "") + " | " + (.InstalledVersion // "") + " | " + (.Severity // "") + " | " + (.Title // "") + " |";
+          "| " + (.VulnerabilityID // "") + " | " + (.PkgName // "") + " | " + (.InstalledVersion // "") + " | " + (.Severity // "") + " | "+ " | " + (.Class // "") + " | " + (.Title // "") + " |";
           [
           "# Docker Image Scan Results",
           "",
@@ -205,7 +205,7 @@ jobs:
           "",
           "## High and Critical Vulnerabilities",
           "",
-          "| Vulnerability ID | Package | Version | Severity | Description |",
+          "| Vulnerability ID | Package | Version | Severity | Class | Description |",
           "| --------- | -----| -----| ----- | -------|",
           (.Results[] | .Vulnerabilities[] | select(hr(.Severity)) | to_md),
           ""
@@ -256,9 +256,8 @@ jobs:
       - name: Comment scan results on PR
         uses: marocchino/sticky-pull-request-comment@v2
         with:
-          header: Docker Image Scan Results
+          header: Image Scan Results
           message: |
-            Trivy scan report:
             ${{ env.report }}
 
 
