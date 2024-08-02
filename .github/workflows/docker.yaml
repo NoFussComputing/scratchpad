@@ -241,7 +241,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: vulnerability-report
-          path: vulnerability-report.md
+          # path: vulnerability-report.md
 
 
       - name: Capture scan results
