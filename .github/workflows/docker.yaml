@@ -222,10 +222,7 @@ jobs:
 
           else
 
-          cat <<'EOF' >> vulnerability-report.md
-          **Nothing Found**
-          
-          EOF;
+            echo "**Nothing Found**" >> vulnerability-report.md
 
           fi;
 
