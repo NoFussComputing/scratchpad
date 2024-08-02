@@ -151,7 +151,7 @@ jobs:
           image-ref: '${{ env.DOCKER_BUILD_IMAGE }}'
           format: 'json'
           output: 'scan-results.json'
-          severity: 'HIGH,CRITICAL'
+          severity: 'LOW,MEDIUM,HIGH,CRITICALL'
           vuln-type: 'os,library'
           # list-all-pkgs: true
           scanners: vuln
@@ -207,7 +207,7 @@ jobs:
           if [ "$(jq .Vulnerabilities[]? scan-results.json)" ]; then
             jq -r '
             def hr(severity):
-            if severity == "HIGH" or severity == "CRITICAL" then true else false end;
+            if severity == "HIGH" or severity == "CRITICAL" then true else true end;
             def to_md:
             "| " + (.VulnerabilityID // "") + " | " + (.PkgName // "") + " | " + (.InstalledVersion // "") + " | " + (.Severity // "") + " | " + (.Title // "") + " |";
             [
