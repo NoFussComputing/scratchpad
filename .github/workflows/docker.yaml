@@ -193,7 +193,7 @@ jobs:
       - name: Extract high and critical vulnerabilities
         id: extract_vulnerabilities_orig
         run: |
-          not_empty="$(jq -r '.Results[] | .Vulnerabilities[]' results.json)"
+          not_empty="$(jq -r '.Results[] | .Vulnerabilities[]' scan-results.json)"
 
           jq -r '
           [
