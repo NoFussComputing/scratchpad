@@ -27,6 +27,7 @@ permissions:
   actions: read
   checks: write
   packages: write
+  security-events: write
 
 
 jobs:
