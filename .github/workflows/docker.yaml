@@ -120,7 +120,7 @@ jobs:
           vuln-type: 'os,library'
           list-all-pkgs: true
           scanners: vuln
-          trivy-config: .trivy.yaml
+          # trivy-config: .trivy.yaml
           ignore-unfixed: true
 
 
@@ -129,6 +129,63 @@ jobs:
         with:
           sarif_file: 'trivy-results.sarif'
 
+      - name: Generate json for PR comment
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          image-ref: '${{ env.DOCKER_BUILD_IMAGE }}'
+          format: 'json'
+          output: 'scan-results.json'
+          severity: 'HIGH,CRITICAL'
+          vuln-type: 'os,library'
+          list-all-pkgs: true
+          scanners: vuln
+          # trivy-config: .trivy.yaml
+          ignore-unfixed: false
+
+
+      - name: Extract high and critical vulnerabilities
+        id: extract_vulnerabilities
+        run: |
+          jq -r '
+          def hr(severity):
+          if severity == "HIGH" or severity == "CRITICAL" then true else false end;
+          def to_md:
+          "| " + (.VulnerabilityID // "") + " | " + (.PkgName // "") + " | " + (.InstalledVersion // "") + " | " + (.Severity // "") + " | " + (.Title // "") + " |";
+          [
+          "# Docker Image Scan Results",
+          "",
+          "## High and Critical Vulnerabilities",
+          "",
+          "| Vulnerability ID | Package | Version | Severity | Description |",
+          "| — — — — — — — — — | — — — — -| — — — — -| — — — — — | — — — — — — -|",
+          (.Results[] | .Vulnerabilities[] | select(hr(.Severity)) | to_md),
+          ""
+          ] | join("\n")
+          'scan-results.json > vulnerability-report.md
+
+
+      - name: Capture scan results
+        id: capture_results
+        run: |
+          content=$(cat vulnerability-report.md | head -c 65000)
+          echo "report<<EOF" >> $GITHUB_ENV
+          echo "$content" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Upload scan results
+        uses: actions/upload-artifact@v3
+        with:
+          name: vulnerability-report
+          path: vulnerability-report.md
+
+      - name: Comment scan results on PR
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: Docker Image Scan Results
+          message: |
+            Trivy scan report:
+            ${{ env.report }}
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # - run: |
       #     trivy convert --format sarif --severity CRITICAL,HIGH output.json
