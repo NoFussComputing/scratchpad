@@ -17,6 +17,8 @@ on:
       # - '!master'
   # pull_request:
   #     branches: [ "development" ]
+env:
+  DOCKER_BUILD_IMAGE: "ghcr.io/${{ github.repository }}:${{ github.sha }}"
 
 jobs:
 
@@ -64,7 +66,6 @@ jobs:
 
       - name: Remove "Unknown" Image from Manifest
         run: |
-          DOCKER_BUILD_IMAGE=ghcr.io/${{ github.repository }}:${{ github.sha }}
 
           DOCKER_MULTI_ARCH_IMAGES=$(docker buildx imagetools inspect "$DOCKER_BUILD_IMAGE" --format "{{ range .Manifest.Manifests }}{{ if ne (print .Platform) \"&{unknown unknown  [] }\" }}$DOCKER_BUILD_IMAGE@{{ println .Digest }}{{end}} {{end}}");
 
@@ -84,10 +85,18 @@ jobs:
           # fi;
 
           docker buildx imagetools create $DOCKER_MULTI_ARCH_IMAGES \
-            --tag ghcr.io/${{ github.repository }}:${{ github.sha }} \
+            --tag ${{ env.DOCKER_BUILD_IMAGE }} \
             --tag ghcr.io/${{ github.repository }}:dev;
 
 
       - name: Cleanup BuildX
         run: |
           docker buildx rm project-v3-builder;
+
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          image-ref: '${{ env.DOCKER_BUILD_IMAGE }}'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
