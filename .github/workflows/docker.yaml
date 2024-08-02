@@ -199,9 +199,10 @@ jobs:
           [
           "# Docker Image Scan Results",
           "",
-          "**Scan Date:** _( .CreatedAt // "" )_",
-          "**Image:** _( .ArtifactName // "" )_",
-          "**OS:** _( .Metadata.OS.Family // "" ) ( .Metadata.OS.Name // "" )_",
+          "**Scan Date:** _" + ( .CreatedAt // "" ) + "_",
+          "**Image:** _" + ( .ArtifactName // "" ) + "_",
+          "**OS:** _" + ( .Metadata.OS.Family // "" ) + " " + ( .Metadata.OS.Name // "" ) + "_",
+          "",
           "## High and Critical Vulnerabilities",
           "",
           "| Vulnerability ID | Package | Version | Severity | Description |",
