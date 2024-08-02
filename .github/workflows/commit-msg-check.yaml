@@ -1,128 +1,130 @@
----
+# ---
 
-name: 'Check Commit Messages'
-
-
-
-on:
-  # workflow_call:
-  push:
-    branches:
-      - '*'         # matches every branch that doesn't contain a '/'
-      - '*/*'       # matches every branch containing a single '/'
-      - '**'        # matches every branch
-      - '!master'
-  # pull_request:
-  #     branches: [ "development" ]
-
-env:
-  # GITHUB_BASE_REF: ${{ github.base.ref }}
-  COMMIT_BRANCH_NAME: ${{ github.head_ref || github.ref_name }} 
-
-
-jobs:
-
-  Commit-Message-Check:
-    runs-on: ubuntu-latest
-    name: 'Check Commits'
-    steps:
-
-
-      - uses: actions/checkout@v4
+# name: 'Check Commit Messages'
 
 
 
-      # - name: Preperation
-      #   run: |
-      #     sudo apt update;
-      #     sudo apt install --no-install-recommends -y git;
-      #     # python3 -m venv env;
-      #     # . env/bin/activate;
-      #     # pip install --upgrade pip;
 
 
-      - uses: actions/setup-python@v5
+# on:
+#   # workflow_call:
+#   push:
+#     branches:
+#       - '*'         # matches every branch that doesn't contain a '/'
+#       - '*/*'       # matches every branch containing a single '/'
+#       - '**'        # matches every branch
+#       - '!master'
+#   # pull_request:
+#   #     branches: [ "development" ]
 
-      - name: Setup
-        run: |
-          # echo "*******fetch********************";
-          # git fetch --all;
-          # echo "********checkout*******************";
-          # git checkout --track origin/development;
-          # git branch -D ${COMMIT_BRANCH_NAME}
-          # git checkout --track origin/${COMMIT_BRANCH_NAME};
-          echo "********un-shallow the git*******************";
-          git fetch --unshallow;
-          git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
-          git fetch origin
-          echo "********show branch*******************";
-          git show-branch -a;
-          # echo "************branch***************";
-          # git branch;
-          # echo "***********log****************";
-          # git log;
-          echo "*********the work******************";
-          target_branch=$(git show-branch -a | awk 'BEGIN { FS="\n\\s+*" } { print $1 }' | awk '{print $2}' | grep '\[' | sed 's/.*\[origin\/\(.*\)\].*/\1/' | grep -v '\[' | grep -v $(git rev-parse --abbrev-ref HEAD) | grep -vi 'HEAD' | awk 'BEGIN{ RS = "" ; FS = "\n" }{print $1}');
-          echo "[DEBUG] Target Branch[$target_branch]";
-          echo "***************************";
-          echo "[DEBUG] First Commit COMMIT_BRANCH_NAME[${COMMIT_BRANCH_NAME}]";
-          git log origin/$target_branch..${COMMIT_BRANCH_NAME} --format=format:%H;
-          echo "";
-          echo "***************************";
-          first_sha1=$(git log origin/$target_branch..${COMMIT_BRANCH_NAME} --format=format:%H | tail -1);
-          echo "[DEBUG] First Commit SHA[$first_sha1]";
+# env:
+#   # GITHUB_BASE_REF: ${{ github.base.ref }}
+#   COMMIT_BRANCH_NAME: ${{ github.head_ref || github.ref_name }} 
 
 
-          pip install -r requirements.txt;
-          cz version;
+# jobs:
+
+#   Commit-Message-Check:
+#     runs-on: ubuntu-latest
+#     name: 'Check Commits'
+#     steps:
 
 
-          echo "[DEBUG] First Commit SHA[$first_sha1]";
-
-          if [ "$(git log $first_sha1..HEAD --format=format:%H | wc -l)" -eq 0 ]; then
-            echo "[DEBUG] Single Commit";
-            cz_exit=0;
-            cz check -m "$(git log HEAD --format=format:%B -1)" > "cz_output.log" 2>&1 || cz_exit=$?; 
-          fi;
-
-          if [ "$(git log $first_sha1..HEAD --format=format:%H | wc -l)" -gt 0 ]; then
-            echo "[DEBUG] Commit range";
-            cz_exit=0;
-            cz check --rev-range $first_sha1..HEAD > "cz_output.log" 2>&1 || cz_exit=$?;
-          fi;
-
-          echo "[DEBUG] cz_exit[$cz_exit]";
-
-          export cz_exit=$cz_exit
+#       - uses: actions/checkout@v4
 
 
-          # echo "**********************************";
-          # ls -la;
-          # echo "**********************************";
-          # git status;
-          # echo "**********************************";
-          # cat cz_output.log;
-          # echo "**********************************";
-          # cat ./.github/workflows/cz_junit.sh
-          # echo "**********************************";
-          # echo "[DEBUG] cz_exit[$cz_exit]";
-          ./.github/workflows/cz_junit.sh > cz.junit.xml;
-          echo "**********************************";
-          ls -la;
-          echo "**********************************";
+
+#       # - name: Preperation
+#       #   run: |
+#       #     sudo apt update;
+#       #     sudo apt install --no-install-recommends -y git;
+#       #     # python3 -m venv env;
+#       #     # . env/bin/activate;
+#       #     # pip install --upgrade pip;
 
 
-      # - name: Test Report
-      #   uses: dorny/test-reporter@v1
-      #   if: success() || failure()    # run this step even if previous step failed
-      #   with:
-      #     name: Commit Message Test Report            # Name of the check run which will be created
-      #     path: cz.junit.xml    # Path to test results
-      #     reporter: java-junit        # Format of test results
+#       - uses: actions/setup-python@v5
 
-      - name: Upload Test Report
-        uses: actions/upload-artifact@v4  # upload test results
-        if: success() || failure()        # run this step even if previous step failed
-        with:
-          name: test-results
-          path: cz.junit.xml
+#       - name: Setup
+#         run: |
+#           # echo "*******fetch********************";
+#           # git fetch --all;
+#           # echo "********checkout*******************";
+#           # git checkout --track origin/development;
+#           # git branch -D ${COMMIT_BRANCH_NAME}
+#           # git checkout --track origin/${COMMIT_BRANCH_NAME};
+#           echo "********un-shallow the git*******************";
+#           git fetch --unshallow;
+#           git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+#           git fetch origin
+#           echo "********show branch*******************";
+#           git show-branch -a;
+#           # echo "************branch***************";
+#           # git branch;
+#           # echo "***********log****************";
+#           # git log;
+#           echo "*********the work******************";
+#           target_branch=$(git show-branch -a | awk 'BEGIN { FS="\n\\s+*" } { print $1 }' | awk '{print $2}' | grep '\[' | sed 's/.*\[origin\/\(.*\)\].*/\1/' | grep -v '\[' | grep -v $(git rev-parse --abbrev-ref HEAD) | grep -vi 'HEAD' | awk 'BEGIN{ RS = "" ; FS = "\n" }{print $1}');
+#           echo "[DEBUG] Target Branch[$target_branch]";
+#           echo "***************************";
+#           echo "[DEBUG] First Commit COMMIT_BRANCH_NAME[${COMMIT_BRANCH_NAME}]";
+#           git log origin/$target_branch..${COMMIT_BRANCH_NAME} --format=format:%H;
+#           echo "";
+#           echo "***************************";
+#           first_sha1=$(git log origin/$target_branch..${COMMIT_BRANCH_NAME} --format=format:%H | tail -1);
+#           echo "[DEBUG] First Commit SHA[$first_sha1]";
+
+
+#           pip install -r requirements.txt;
+#           cz version;
+
+
+#           echo "[DEBUG] First Commit SHA[$first_sha1]";
+
+#           if [ "$(git log $first_sha1..HEAD --format=format:%H | wc -l)" -eq 0 ]; then
+#             echo "[DEBUG] Single Commit";
+#             cz_exit=0;
+#             cz check -m "$(git log HEAD --format=format:%B -1)" > "cz_output.log" 2>&1 || cz_exit=$?; 
+#           fi;
+
+#           if [ "$(git log $first_sha1..HEAD --format=format:%H | wc -l)" -gt 0 ]; then
+#             echo "[DEBUG] Commit range";
+#             cz_exit=0;
+#             cz check --rev-range $first_sha1..HEAD > "cz_output.log" 2>&1 || cz_exit=$?;
+#           fi;
+
+#           echo "[DEBUG] cz_exit[$cz_exit]";
+
+#           export cz_exit=$cz_exit
+
+
+#           # echo "**********************************";
+#           # ls -la;
+#           # echo "**********************************";
+#           # git status;
+#           # echo "**********************************";
+#           # cat cz_output.log;
+#           # echo "**********************************";
+#           # cat ./.github/workflows/cz_junit.sh
+#           # echo "**********************************";
+#           # echo "[DEBUG] cz_exit[$cz_exit]";
+#           ./.github/workflows/cz_junit.sh > cz.junit.xml;
+#           echo "**********************************";
+#           ls -la;
+#           echo "**********************************";
+
+
+#       # - name: Test Report
+#       #   uses: dorny/test-reporter@v1
+#       #   if: success() || failure()    # run this step even if previous step failed
+#       #   with:
+#       #     name: Commit Message Test Report            # Name of the check run which will be created
+#       #     path: cz.junit.xml    # Path to test results
+#       #     reporter: java-junit        # Format of test results
+
+#       - name: Upload Test Report
+#         uses: actions/upload-artifact@v4  # upload test results
+#         if: success() || failure()        # run this step even if previous step failed
+#         with:
+#           name: test-results
+#           path: cz.junit.xml

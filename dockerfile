@@ -1,5 +1,7 @@
 
-FROM debian:bookworm-slim
+# FROM debian:bookworm-slim
+FROM debian:11.10-slim
+
 
 LABEL \
   org.opencontainers.image.title="Test" \
