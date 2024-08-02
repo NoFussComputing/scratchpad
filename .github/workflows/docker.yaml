@@ -177,7 +177,7 @@ jobs:
           "## High and Critical Vulnerabilities",
           "",
           "| Vulnerability ID | Package | Version | Severity | Description |",
-          "| - - - - - - - - - | - - - - -| - - - - -| - - - - - | - - - - - - -|",
+          "| --------- | -----| -----| ----- | -------|",
           (.Results[] | .Vulnerabilities[] | select(hr(.Severity)) | to_md),
           ""
           ] | join("\n")
@@ -186,26 +186,26 @@ jobs:
 
 
 
-      - name: Extract high and critical vulnerabilities
-        if: success() || failure()
-        id: extract_vulnerabilities_1
-        run: |
-          jq -r '
-          def hr(severity):
-          if severity == "HIGH" or severity == "CRITICAL" then true else false end;
-          def to_md:
-          "| " + (.VulnerabilityID // "") + " | " + (.PkgName // "") + " | " + (.InstalledVersion // "") + " | " + (.Severity // "") + " | " + (.Title // "") + " |";
-          [
-          "# Docker Image Scan Results",
-          "",
-          "## High and Critical Vulnerabilities",
-          "",
-          "| Vulnerability ID | Package | Version | Severity | Description |",
-          "| - - - - - - - - - | - - - - -| - - - - -| - - - - - | - - - - - - -|",
-          (.Results[] | .Vulnerabilities[] | select(hr(.Severity)) | to_md),
-          ""
-          ] | join("\n")
-          '
+      # - name: Extract high and critical vulnerabilities
+      #   if: success() || failure()
+      #   id: extract_vulnerabilities_1
+      #   run: |
+      #     jq -r '
+      #     def hr(severity):
+      #     if severity == "HIGH" or severity == "CRITICAL" then true else false end;
+      #     def to_md:
+      #     "| " + (.VulnerabilityID // "") + " | " + (.PkgName // "") + " | " + (.InstalledVersion // "") + " | " + (.Severity // "") + " | " + (.Title // "") + " |";
+      #     [
+      #     "# Docker Image Scan Results",
+      #     "",
+      #     "## High and Critical Vulnerabilities",
+      #     "",
+      #     "| Vulnerability ID | Package | Version | Severity | Description |",
+      #     "| - - - - - - - - - | - - - - -| - - - - -| - - - - - | - - - - - - -|",
+      #     (.Results[] | .Vulnerabilities[] | select(hr(.Severity)) | to_md),
+      #     ""
+      #     ] | join("\n")
+      #     '
 
 
 
@@ -230,7 +230,7 @@ jobs:
           message: |
             Trivy scan report:
             ${{ env.report }}
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
       # - run: |
       #     trivy convert --format sarif --severity CRITICAL,HIGH output.json
