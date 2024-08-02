@@ -195,7 +195,7 @@ jobs:
           def hr(severity):
           if severity == "HIGH" or severity == "CRITICAL" then true else false end;
           def to_md:
-          "| " + (.VulnerabilityID // "") + " | " + (.PkgName // "") + " | " + (.InstalledVersion // "") + " | " + (.Severity // "") + " | " + (.Class // "") + " | " + (.Title // "") + " |";
+          "| " + (.VulnerabilityID // "") + " | " + (.PkgName // "") + " | " + (.InstalledVersion // "") + " | " + (.Severity // "") + " | " + (.Title // "") + " |";
           [
           "# Image Scan Results",
           "",
@@ -205,8 +205,8 @@ jobs:
           "",
           "## High and Critical Vulnerabilities",
           "",
-          "| Vulnerability ID | Package | Version | Severity | Class | Description |",
-          "| --------- | ----- | ----- | ----- | ----- | -------|",
+          "| Vulnerability ID | Package | Version | Severity | Description |",
+          "| --------- | ----- | ----- | ----- | -------|",
           (.Results[] | .Vulnerabilities[] | select(hr(.Severity)) | to_md),
           ""
           ] | join("\n")
