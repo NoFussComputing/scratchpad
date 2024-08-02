@@ -194,25 +194,40 @@ jobs:
         id: extract_vulnerabilities_orig
         run: |
           jq -r '
-          def hr(severity):
-          if severity == "HIGH" or severity == "CRITICAL" then true else false end;
-          def to_md:
-          "| " + (.VulnerabilityID // "") + " | " + (.PkgName // "") + " | " + (.InstalledVersion // "") + " | " + (.Severity // "") + " | " + (.Title // "") + " |";
           [
           "# Image Scan Results",
           "",
           "**Scan Date:** _" + ( .CreatedAt // "" ) + "_",
           "**Image:** _" + ( .ArtifactName // "" ) + "_",
           "**OS:** _" + ( .Metadata.OS.Family // "" ) + " " + ( .Metadata.OS.Name // "" ) + "_",
-          "",
-          "## High and Critical Vulnerabilities",
-          "",
-          "| Vulnerability ID | Package | Version | Severity | Description |",
-          "| --------- | ----- | ----- | ----- | -------|",
-          (.Results[] | .Vulnerabilities[] | select(hr(.Severity)) | to_md),
           ""
           ] | join("\n")
           ' scan-results.json > vulnerability-report.md
+
+          if [ "$(jq .Vulnerabilities[]? scan-results.json)" ]; then
+            jq -r '
+            def hr(severity):
+            if severity == "HIGH" or severity == "CRITICAL" then true else false end;
+            def to_md:
+            "| " + (.VulnerabilityID // "") + " | " + (.PkgName // "") + " | " + (.InstalledVersion // "") + " | " + (.Severity // "") + " | " + (.Title // "") + " |";
+            [
+            "## High and Critical Vulnerabilities",
+            "",
+            "| Vulnerability ID | Package | Version | Severity | Description |",
+            "| --------- | ----- | ----- | ----- | -------|",
+            (.Results[] | .Vulnerabilities[] | select(hr(.Severity)) | to_md),
+            ""
+            ] | join("\n")
+            ' scan-results.json >> vulnerability-report.md
+
+          else
+
+          cat <<'EOF' >> vulnerability-report.md
+          **Nothing Found**
+
+          EOF;
+
+          fi;
 
 
       - name: Upload scan results
