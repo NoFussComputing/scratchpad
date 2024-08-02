@@ -148,19 +148,19 @@ jobs:
         run: |
           jq -r '
           def hr(severity):
-          if severity == “HIGH” or severity == “CRITICAL” then true else false end;
+          if severity == "HIGH” or severity == "CRITICAL” then true else false end;
           def to_md:
-          “| “ + (.VulnerabilityID // “”) + “ | “ + (.PkgName // “”) + “ | “ + (.InstalledVersion // “”) + “ | “ + (.Severity // “”) + “ | “ + (.Title // “”) + “ |”;
+          "| " + (.VulnerabilityID // "”) + " | " + (.PkgName // "”) + " | " + (.InstalledVersion // "”) + " | " + (.Severity // "”) + " | " + (.Title // "”) + " |”;
           [
-          “# Docker Image Scan Results”,
-          “”,
-          “## High and Critical Vulnerabilities”,
-          “”,
-          “| Vulnerability ID | Package | Version | Severity | Description |”,
-          “| — — — — — — — — — | — — — — -| — — — — -| — — — — — | — — — — — — -|”,
+          "# Docker Image Scan Results”,
+          "”,
+          "## High and Critical Vulnerabilities”,
+          "”,
+          "| Vulnerability ID | Package | Version | Severity | Description |”,
+          "| — — — — — — — — — | — — — — -| — — — — -| — — — — — | — — — — — — -|”,
           (.Results[] | .Vulnerabilities[] | select(hr(.Severity)) | to_md),
-          “”
-          ] | join(“\n”)
+          "”
+          ] | join("\n”)
           'scan-results.json > vulnerability-report.md
 
 
@@ -168,9 +168,9 @@ jobs:
         id: capture_results
         run: |
           content=$(cat vulnerability-report.md | head -c 65000)
-          echo “report<<EOF” >> $GITHUB_ENV
-          echo “$content” >> $GITHUB_ENV
-          echo “EOF” >> $GITHUB_ENV
+          echo "report<<EOF” >> $GITHUB_ENV
+          echo "$content” >> $GITHUB_ENV
+          echo "EOF” >> $GITHUB_ENV
 
       - name: Upload scan results
         uses: actions/upload-artifact@v3
