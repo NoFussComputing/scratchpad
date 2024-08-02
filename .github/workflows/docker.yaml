@@ -187,6 +187,8 @@ jobs:
       #     ' scan-results.json > vulnerability-report.md
 
 
+      - run: |
+          ls -la
 
       - name: Extract high and critical vulnerabilities
         id: extract_vulnerabilities_orig
