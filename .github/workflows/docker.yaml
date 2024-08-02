@@ -159,11 +159,33 @@ jobs:
           ignore-unfixed: false
 
       - name: Upload scan results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         # if: success() || failure()
         with:
           name: container-scan-results-json
           path: scan-results.json
+
+
+      # - name: Extract high and critical vulnerabilities
+      #   id: extract_vulnerabilities_orig
+      #   run: |
+      #     jq -r '
+      #     def hr(severity):
+      #     if severity == "HIGH" or severity == "CRITICAL" then true else false end;
+      #     def to_md:
+      #     "| " + (.VulnerabilityID // "") + " | " + (.PkgName // "") + " | " + (.InstalledVersion // "") + " | " + (.Severity // "") + " | " + (.Title // "") + " |";
+      #     [
+      #     "# Docker Image Scan Results",
+      #     "",
+      #     "## High and Critical Vulnerabilities",
+      #     "",
+      #     "| Vulnerability ID | Package | Version | Severity | Description |",
+      #     "| --------- | -----| -----| ----- | -------|",
+      #     (.Results[] | .Vulnerabilities[] | select(hr(.Severity)) | to_md),
+      #     ""
+      #     ] | join("\n")
+      #     ' scan-results.json > vulnerability-report.md
+
 
 
       - name: Extract high and critical vulnerabilities
@@ -177,6 +199,9 @@ jobs:
           [
           "# Docker Image Scan Results",
           "",
+          "**Scan Date:** _( .CreatedAt // "" )_",
+          "**Image:** _( .ArtifactName // "" )_",
+          "**OS:** _( .Metadata.OS.Family // "" ) ( .Metadata.OS.Name // "" )_",
           "## High and Critical Vulnerabilities",
           "",
           "| Vulnerability ID | Package | Version | Severity | Description |",
@@ -187,35 +212,10 @@ jobs:
           ' scan-results.json > vulnerability-report.md
 
 
-
-
-      # - name: Extract high and critical vulnerabilities
-      #   if: success() || failure()
-      #   id: extract_vulnerabilities_1
-      #   run: |
-      #     jq -r '
-      #     def hr(severity):
-      #     if severity == "HIGH" or severity == "CRITICAL" then true else false end;
-      #     def to_md:
-      #     "| " + (.VulnerabilityID // "") + " | " + (.PkgName // "") + " | " + (.InstalledVersion // "") + " | " + (.Severity // "") + " | " + (.Title // "") + " |";
-      #     [
-      #     "# Docker Image Scan Results",
-      #     "",
-      #     "## High and Critical Vulnerabilities",
-      #     "",
-      #     "| Vulnerability ID | Package | Version | Severity | Description |",
-      #     "| - - - - - - - - - | - - - - -| - - - - -| - - - - - | - - - - - - -|",
-      #     (.Results[] | .Vulnerabilities[] | select(hr(.Severity)) | to_md),
-      #     ""
-      #     ] | join("\n")
-      #     '
-
-
-
      
 
       - name: Upload scan results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: vulnerability-report
           path: vulnerability-report.md
@@ -238,10 +238,9 @@ jobs:
 
 
       - name: Fetch scan results
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: vulnerability-report
-          # path: vulnerability-report.md
 
 
       - name: Capture scan results
