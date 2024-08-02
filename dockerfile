@@ -2,7 +2,8 @@
 # FROM debian:bookworm-slim
 # FROM debian:11.10-slim
 # FROM debian:10.1
-FROM ubuntu:13.10
+# FROM ubuntu:13.10
+FROM python:3.6.15-slim
 
 
 LABEL \
