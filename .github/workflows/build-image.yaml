@@ -97,7 +97,7 @@ jobs:
   docker-scan:
     needs: docker-build
     runs-on: ubuntu-latest
-    name: Build Current Commit
+    name: Scan Container
     steps:
 
 
@@ -116,8 +116,14 @@ jobs:
         uses: aquasecurity/trivy-action@0.20.0
         with:
           image-ref: '${{ env.DOCKER_BUILD_IMAGE }}'
-          format: 'sarif'
+          # format: 'sarif'
           output: 'trivy-results.sarif'
+
+          severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
+          vuln-type: 'os,library'
+          list-all-pkgs: 'true'
+          format: 'sarif,table,github'
+
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
