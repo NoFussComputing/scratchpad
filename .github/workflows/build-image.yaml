@@ -93,14 +93,11 @@ jobs:
         run: |
           docker buildx rm project-v3-builder;
 
-
   docker-scan:
     needs: docker-build
-    runs-on: ubuntu-latest
-    name: Scan Container
+    runs-on: aquasec/trivy:latest
+    name: Custom scan
     steps:
-
-
       - uses: actions/checkout@v4
 
 
@@ -112,44 +109,93 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
 
-      # - name: Run Trivy vulnerability scanner
-      #   uses: aquasecurity/trivy-action@0.20.0
-      #   with:
-      #     image-ref: '${{ env.DOCKER_BUILD_IMAGE }}'
-      #     format: 'sarif'
-      #     output: 'trivy-results.sarif'
-      #     severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
-      #     vuln-type: 'os,library'
-      #     list-all-pkgs: true
-      #     scanners: vuln
-      #     trivy-config: .trivy.yaml
-      #     ignore-unfixed: true
-
-
-      # - name: Upload Trivy scan results to GitHub Security tab
-      #   uses: github/codeql-action/upload-sarif@v3
-      #   if: always()
-      #   with:
-      #     sarif_file: 'trivy-results.sarif'
-
-      - name: Run Trivy vulnerability scanner in repo mode
-        uses: aquasecurity/trivy-action@master
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.20.0
         with:
-          scan-type: 'fs'
-          ignore-unfixed: true
+          image-ref: '${{ env.DOCKER_BUILD_IMAGE }}'
           format: 'sarif'
           output: 'trivy-results.sarif'
-          severity: 'HIGH,CRITICAL'
+          severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
+          vuln-type: 'os,library'
+          list-all-pkgs: true
+          scanners: vuln
+          trivy-config: .trivy.yaml
+          ignore-unfixed: true
+
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: 'trivy-results.sarif'
 
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: '${{ env.DOCKER_BUILD_IMAGE }}'
-          format: 'table'
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+
+      - run: |
+          trivy convert --format sarif --severity CRITICAL,HIGH output.json
+
+      - run: |
+          ls -la
+
+      - run: |
+          cat output.json
+
+
+
+  # docker-scan:
+  #   needs: docker-build
+  #   runs-on: ubuntu-latest
+  #   name: Scan Container
+  #   steps:
+
+
+  #     - uses: actions/checkout@v4
+
+
+  #     - name: Log into registry ghcr.io
+  #       uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+  #       with:
+  #         registry: ghcr.io
+  #         username: ${{ github.actor }}
+  #         password: ${{ secrets.GITHUB_TOKEN }}
+
+
+  #     # - name: Run Trivy vulnerability scanner
+  #     #   uses: aquasecurity/trivy-action@0.20.0
+  #     #   with:
+  #     #     image-ref: '${{ env.DOCKER_BUILD_IMAGE }}'
+  #     #     format: 'sarif'
+  #     #     output: 'trivy-results.sarif'
+  #     #     severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
+  #     #     vuln-type: 'os,library'
+  #     #     list-all-pkgs: true
+  #     #     scanners: vuln
+  #     #     trivy-config: .trivy.yaml
+  #     #     ignore-unfixed: true
+
+
+  #     # - name: Upload Trivy scan results to GitHub Security tab
+  #     #   uses: github/codeql-action/upload-sarif@v3
+  #     #   if: always()
+  #     #   with:
+  #     #     sarif_file: 'trivy-results.sarif'
+
+  #     - name: Run Trivy vulnerability scanner in repo mode
+  #       uses: aquasecurity/trivy-action@master
+  #       with:
+  #         scan-type: 'fs'
+  #         ignore-unfixed: true
+  #         format: 'sarif'
+  #         output: 'trivy-results.sarif'
+  #         severity: 'HIGH,CRITICAL'
+
+  #     - name: Upload Trivy scan results to GitHub Security tab
+  #       uses: github/codeql-action/upload-sarif@v3
+  #       with:
+  #         sarif_file: 'trivy-results.sarif'
+
+  #     - name: Run Trivy vulnerability scanner
+  #       uses: aquasecurity/trivy-action@master
+  #       with:
+  #         image-ref: '${{ env.DOCKER_BUILD_IMAGE }}'
+  #         format: 'table'
+  #         vuln-type: 'os,library'
+  #         severity: 'CRITICAL,HIGH'
