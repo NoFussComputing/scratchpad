@@ -160,6 +160,15 @@ jobs:
           echo "value-out=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }} | cut -d '@' -f 2)" >> $GITHUB_OUTPUT
 
 
+      - name: Attest
+        uses: actions/attest-build-provenance@v1
+        id: attest
+        with:
+          subject-name: ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}
+          subject-digest: ${{ steps.image-digest.outputs.value-out }}
+          push-to-registry: true
+
+
       - name: Cleanup BuildX
         if: 
           (
@@ -435,7 +444,7 @@ jobs:
       - name: Generate SBOM attestation
         uses: actions/attest-sbom@v1
         with:
-          subject-name: '${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}'
+          subject-name: '${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}'
           subject-digest: ${{ needs.docker-build.outputs.build-image-digest }}
           sbom-path: 'dependency-results.sbom.json'
           push-to-registry: true
