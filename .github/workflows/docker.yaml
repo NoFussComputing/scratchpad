@@ -402,7 +402,7 @@ jobs:
       - name: Fetch Scan Results
         if:
           (
-            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY == false
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
           )
         uses: actions/download-artifact@v4
         with:
@@ -412,7 +412,7 @@ jobs:
       - uses: dtinth/markdown-report-action@v1
         if:
           (
-            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY == false
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
           )
         with:
           name: Docker Vulnerability Report
