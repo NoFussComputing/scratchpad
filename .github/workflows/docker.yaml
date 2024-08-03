@@ -519,10 +519,7 @@ jobs:
 
 
   docker-tagged:
-    if: 
-      (${{
-        github.ref_type == 'tag'
-      }})
+    if: ${{ github.ref_type == 'tag' }}
     needs: 
       - docker-scan-vulnerability
       - docker-reports
@@ -538,10 +535,7 @@ jobs:
 
 
       - name: Create Image Tag 'latest'
-        if:
-          (${{
-            inputs.DOCKER_TAG_IMAGE_TAG_LATEST
-          }})
+        if: ${{ inputs.DOCKER_TAG_IMAGE_TAG_LATEST }}
         run: |
           docker buildx imagetools create ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_TAG_IMAGE_TAG_SOURCE }} \
             --tag ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:latest;
@@ -597,10 +591,7 @@ jobs:
 
 
   docker-publish:
-    if: 
-      (${{
-        github.ref_type == 'tag'
-      }})
+    if: ${{ github.ref_type == 'tag' }}
     needs: 
       - docker-scan-vulnerability
       - docker-reports
@@ -617,10 +608,7 @@ jobs:
 
 
       - name: Create Image Tag 'latest'
-        if:
-          (${{
-            inputs.DOCKER_TAG_IMAGE_TAG_LATEST
-          }})
+        if: ${{ inputs.DOCKER_TAG_IMAGE_TAG_LATEST }}
         run: |
           docker buildx imagetools create ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_TAG_IMAGE_TAG_SOURCE }} \
             --tag ${{ inputs.DOCKER_PUBLISH_REGISTRY }}/${{ inputs.DOCKER_PUBLISH_IMAGE_NAME }}:latest;
@@ -628,10 +616,7 @@ jobs:
 
 
   docker-release-files:
-    if: 
-      (${{
-        github.ref_type == 'tag'
-      }})
+    if: ${{ github.ref_type == 'tag' }}
     needs: 
       - docker-build
       - docker-sbom
