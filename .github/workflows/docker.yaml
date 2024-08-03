@@ -636,7 +636,7 @@ jobs:
       - docker-build
       - docker-sbom
     runs-on: ubuntu-latest
-    name: Publish
+    name: Release Files
     steps:
 
 
