@@ -148,10 +148,16 @@ jobs:
             --tag ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:dev;
 
 
+      - name: Fetch image
+        run: |
+          docker pull ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }} >> /dev/null;
+
+
       - name: Fetch Manifest digest
         id: image-digest
         run: |
           docker inspect --format='{{index .RepoDigests 0}}' ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}
+
 
       - name: Cleanup BuildX
         if: 
