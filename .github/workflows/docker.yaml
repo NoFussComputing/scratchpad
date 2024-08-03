@@ -447,7 +447,7 @@ jobs:
       - name: Generate SBOM Attestation
         uses: actions/attest-sbom@v1
         with:
-          subject-name: '${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}'
+          subject-name: '${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}'
           subject-digest: ${{ needs.docker-build.outputs.build-image-digest }}
           sbom-path: 'dependency-results.sbom.json'
           push-to-registry: true
