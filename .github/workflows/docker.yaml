@@ -526,7 +526,19 @@ jobs:
     runs-on: ubuntu-latest
     name: Tagged Image
     steps:
-    
+
+
+      - name: Log into registry ghcr.io
+        if: 
+          (${{
+            github.ref_type != 'tag'
+          }})
+        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
 
       - name: Create Image Tag '${{ github.ref_name }}'
         run: |
