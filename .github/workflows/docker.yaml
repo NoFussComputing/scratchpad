@@ -165,11 +165,18 @@ jobs:
             github.ref_type != 'tag'
           )
         uses: actions/attest-build-provenance@v1
-        id: attest
+        id: image-attest
         with:
           subject-name: ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}
           subject-digest: ${{ steps.image-digest.outputs.value-out }}
           push-to-registry: true
+
+
+      - name: Upload Image Attestation Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image-attestation
+          path: ${{ steps.outputs.image-attest.bundle-path }}
 
 
       - name: Cleanup BuildX
@@ -445,6 +452,7 @@ jobs:
 
 
       - name: Generate SBOM Attestation
+        id: sbom
         uses: actions/attest-sbom@v1
         with:
           subject-name: '${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}'
@@ -452,11 +460,12 @@ jobs:
           sbom-path: 'dependency-results.sbom.json'
           push-to-registry: true
 
+
       - name: Upload SBOM Attestation Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: sbom-attestation
-          path: '/tmp/attestation.jsonl'
+          name: docker-image-attestation-sbom
+          path: ${{ steps.outputs.sbom.bundle-path }}
 
 
   docker-reports:
