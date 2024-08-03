@@ -130,24 +130,9 @@ jobs:
 
           DOCKER_MULTI_ARCH_IMAGES=$(docker buildx imagetools inspect "${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}" --format "{{ range .Manifest.Manifests }}{{ if ne (print .Platform) \"&{unknown unknown  [] }\" }}${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}@{{ println .Digest }}{{end}} {{end}}");
 
-          # if [ "${{ inputs.build-branch }}" == "dev" ]; then
-
-          #   docker buildx imagetools create $DOCKER_MULTI_ARCH_IMAGES \
-          #     --tag ghcr.io/${{ github.repository }}:${{ github.sha }} \
-          #     --tag ghcr.io/${{ github.repository }}:dev;
-
-          # elif [ "${{ inputs.build-branch }}" == "tag" ]; then
-
-          #   docker buildx imagetools create $DOCKER_MULTI_ARCH_IMAGES \
-          #     --tag ghcr.io/${{ github.repository }}:${{ github.sha }} \
-          #     --tag ghcr.io/${{ github.repository }}:${{ github.ref_name }} \
-          #     --tag ghcr.io/${{ github.repository }}:latest;
-
-          # fi;
-
           docker buildx imagetools create $DOCKER_MULTI_ARCH_IMAGES \
             --tag ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }} \
-            --tag ghcr.io/${{ github.repository }}:dev;
+            --tag ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ github.repository }}:dev;
 
 
       - name: Cleanup BuildX
@@ -437,7 +422,7 @@ jobs:
       - name: Create Image Tag '${{ github.ref_name }}'
         run: |
           docker buildx imagetools create ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_TAG_IMAGE_TAG_SOURCE }} \
-            --tag ghcr.io/${{ github.repository }}:${{ github.ref_name }};
+            --tag ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ github.repository }}:${{ github.ref_name }};
 
 
       - name: Create Image Tag 'latest'
@@ -447,8 +432,7 @@ jobs:
           )
         run: |
           docker buildx imagetools create ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_TAG_IMAGE_TAG_SOURCE }} \
-            --tag ghcr.io/${{ github.repository }}:latest;
-
+            --tag ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ github.repository }}:latest;
 
 
   docker-pr-comment:
@@ -496,3 +480,34 @@ jobs:
           header: Image Scan Results
           message: |
             ${{ env.report }}
+
+
+  docker-publish:
+    if: 
+      (
+        github.ref_type == 'tag'
+      )
+    needs: 
+      - docker-scan-vulnerability
+      - docker-reports
+      - docker-tagged
+    runs-on: ubuntu-latest
+    name: Docker Tagged Release
+    steps:
+
+
+      - name: Create Image Tag '${{ github.ref_name }}'
+        run: |
+          docker buildx imagetools create ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_TAG_IMAGE_TAG_SOURCE }} \
+            --tag ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ github.repository }}:${{ github.ref_name }};
+
+
+      - name: Create Image Tag 'latest'
+        if:
+          (
+            inputs.DOCKER_TAG_IMAGE_TAG_LATEST
+          )
+        run: |
+          docker buildx imagetools create ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_TAG_IMAGE_TAG_SOURCE }} \
+            --tag ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ github.repository }}:latest;
+

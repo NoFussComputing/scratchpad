@@ -44,7 +44,7 @@ jobs:
 
 
   release:
-    # name: 'Release'
+    name: 'Release'
     uses: nofusscomputing/scratchpad/.github/workflows/release.yaml@further-testing
     # with:
     #   DOCKER_BUILD_IMAGE_NAME: "${{ github.repository }}"
