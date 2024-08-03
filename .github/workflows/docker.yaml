@@ -56,7 +56,8 @@ permissions:
   packages: write
   security-events: write
   statuses: write
-
+  id-token: write
+  attestations: write
 
 jobs:
 
