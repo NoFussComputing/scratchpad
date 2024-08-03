@@ -502,7 +502,7 @@ jobs:
       - docker-reports
       - docker-tagged
     runs-on: ubuntu-latest
-    name: Docker Tagged Release
+    name: Docker Publish
     steps:
 
 
