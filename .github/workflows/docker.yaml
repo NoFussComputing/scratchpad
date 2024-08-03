@@ -62,10 +62,7 @@ permissions:
 jobs:
 
   docker-build:
-    if:
-      (
-        github.event.push
-      )
+    if: github.event.push
     runs-on: ubuntu-latest
     name: Build Image
     outputs:
