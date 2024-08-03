@@ -272,7 +272,7 @@ jobs:
 
       - uses: dtinth/markdown-report-action@v1
         with:
-          name: Vulnerability Report
+          name: Docker Vulnerability Report
           title: Vulnerability Report
           body-file: full-vulnerability-report.md
 
