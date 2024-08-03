@@ -26,6 +26,16 @@ on:
         description: Scan Image with Trivy
         required: false
         type: boolean
+      DOCKER_TAG_IMAGE_TAG_SOURCE:
+        default: "${{ github.sha }}"
+        description: Docker image tag Used for source Image to tag
+        required: false
+        type: string
+      DOCKER_TAG_IMAGE_TAG_LATEST:
+        default: true
+        description: Create image with tag 'Latest'
+        required: false
+        type: boolean
 
 
 permissions:
@@ -41,7 +51,12 @@ permissions:
 jobs:
 
   docker-build:
-    if: github.event.pull_request || github.event.push
+    if:
+      (
+        (github.event.pull_request || github.event.push)
+          &&
+        github.ref_type != 'tag'
+      )
     runs-on: ubuntu-latest
     name: Build Current Commit
     steps:
@@ -117,9 +132,9 @@ jobs:
   docker-scan:
     if:
       (
-      (github.event.pull_request || github.event.push)
-        &&
-      inputs.DOCKER_SCAN_IMAGE
+        (github.event.pull_request || github.event.push)
+          &&
+        inputs.DOCKER_SCAN_IMAGE
       )
 
     needs:
@@ -277,9 +292,9 @@ jobs:
   docker-reports:
     if:
       (
-      (github.event.pull_request || github.event.push)
-        &&
-      inputs.DOCKER_SCAN_IMAGE
+        (github.event.pull_request || github.event.push)
+          &&
+        inputs.DOCKER_SCAN_IMAGE
       )
     needs: 
       - docker-build
@@ -301,6 +316,33 @@ jobs:
           title: Vulnerability Report
           body-file: full-vulnerability-report.md
 
+
+  docker-tagged:
+    if: 
+      (
+        github.ref_type == 'tag'
+      )
+    needs: 
+      - docker-scan
+      - docker-reports
+    runs-on: ubuntu-latest
+    name: Docker Tagged Release
+    steps:
+
+      - name: Create Image Tag '${{ github.ref_name }}'
+        run: |
+          docker buildx imagetools create ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_TAG_IMAGE_TAG_SOURCE }} \
+            --tag ghcr.io/${{ github.repository }}:${{ github.ref_name }};
+
+
+      - name: Create Image Tag 'latest'
+        if:
+          (
+            inputs.DOCKER_TAG_IMAGE_TAG_LATEST
+          )
+        run: |
+          docker buildx imagetools create ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_TAG_IMAGE_TAG_SOURCE }} \
+            --tag ghcr.io/${{ github.repository }}:latest;
 
 
   docker-pr-comment:
