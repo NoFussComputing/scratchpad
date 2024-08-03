@@ -60,7 +60,7 @@ jobs:
         github.ref_type == 'tag'
       )
     runs-on: ubuntu-latest
-    name: Build Current Commit
+    name: Build Image
     steps:
 
 
@@ -393,7 +393,7 @@ jobs:
       - name: Dummy Task
         if:
           (
-            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY == false
           )
         run: |
           echo "Scanning image turned off.This Job does nothing however as 'docker-scan-vulnerability' is a dependency job, must do something.";
@@ -454,9 +454,7 @@ jobs:
   docker-pr-comment:
     if: 
       (
-      github.event.pull_request
-        &&
-      inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
+        github.event.pull_request
       )
     needs:
       - docker-scan-vulnerability
@@ -465,7 +463,7 @@ jobs:
     steps:
 
 
-      - name: Fetch scan results
+      - name: Fetch Vulnerability Report
         if:
           (
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
