@@ -281,12 +281,82 @@ jobs:
           name: vulnerability-report-full
           path: full-vulnerability-report.md
 
+      # - uses: dtinth/markdown-report-action@v1
+      #   with:
+      #     name: Vulnerability Report
+      #     title: Vulnerability Report
+      #     body-file: full-vulnerability-report.md
+
+
+
+
+
+
+
+
+
+
+  docker-reports:
+    if: github.event.pull_request || github.event.push
+    needs: 
+      - docker-build
+      - docker-scan
+    runs-on: ubuntu-latest
+    name: Custom scan
+    steps:
+      - uses: actions/checkout@v4
+
+
+      - name: Fetch Scan Results
+        uses: actions/download-artifact@v4
+        with:
+          name: vulnerability-report-full
+          # path: full-vulnerability-report.md
+
+
+      - name: Create Vulnerabilities Report
+        run: |
+          not_empty="$(jq -r '.Results[] | .Vulnerabilities[]' scan-results.json)"
+
+          jq -r '
+          [
+          "# Full Image Scan Results",
+          "",
+          "**Scan Date:** _" + ( .CreatedAt // "" ) + "_",
+          "**Image:** _" + ( .ArtifactName // "" ) + "_",
+          "**OS:** _" + ( .Metadata.OS.Family // "" ) + " " + ( .Metadata.OS.Name // "" ) + "_",
+          ""
+          ] | join("\n")
+          ' scan-results.json > full-vulnerability-report.md
+
+          if [ "$not_empty" ]; then
+            jq -r '
+            def hr(severity):
+            if severity == "HIGH" or severity == "CRITICAL" then true else false end;
+            def to_md:
+            "| " + (.VulnerabilityID // "") + " | " + (.PkgName // "") + " | " + (.InstalledVersion // "") + " | " + (.Severity // "") + " | " + (.Title // "") + " |";
+            [
+            "## Vulnerabilities",
+            "",
+            "| Vulnerability ID | Package | Version | Severity | Description |",
+            "| --------- | ----- | ----- | ----- | -------|",
+            (.Results[] | .Vulnerabilities[] | select(.Severity) | to_md),
+            ""
+            ] | join("\n")
+            ' scan-results.json >> full-vulnerability-report.md
+
+          else
+
+            echo "**Nothing Found**" >> full-vulnerability-report.md
+
+          fi;
+
+
       - uses: dtinth/markdown-report-action@v1
         with:
           name: Vulnerability Report
           title: Vulnerability Report
           body-file: full-vulnerability-report.md
-
 
 
 
