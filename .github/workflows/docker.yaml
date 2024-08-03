@@ -402,14 +402,23 @@ jobs:
       - name: Scan Image
         uses: aquasecurity/trivy-action@0.20.0
         with:
-          image-ref: '${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}'
+          # image-ref: '${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}'
+          # scan-type: image
+          # format: 'github'
+          # output: 'dependency-results.sbom.json'
+          # github-pat: ${{ secrets.GITHUB_TOKEN }} # or ${{ secrets.github_pat_name }} if you're using a PAT
+          # severity: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
+          # scanners: "vuln"
+          # list-all-pkgs: true
           scan-type: image
-          format: 'github'
-          output: 'dependency-results.sbom.json'
-          github-pat: ${{ secrets.GITHUB_TOKEN }} # or ${{ secrets.github_pat_name }} if you're using a PAT
-          severity: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
-          scanners: "vuln"
-          list-all-pkgs: true
+          format: cyclonedx
+          output: dependency-results.sbom.json
+          image-ref: ghcr.io/nofusscomputing/scratchpad@sha256:3d67e256599f6dd61cef7762e90d6a1694839b07037d7b4d9a311c09fe3d5583
+          scan-ref: .
+          ignore-unfixed: false
+          vuln-type: os,library
+          severity: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
+          list-all-pkgs: false
         # env:
         #   TRIVY_USERNAME: "image_registry_admin_username"
         #   TRIVY_PASSWORD: "image_registry_admin_password"
@@ -430,10 +439,10 @@ jobs:
       #     sbom-path: 'dependency-results.sbom.json'
       #     push-to-registry: true
 
-      - name: "Attest and sign"
-        uses: 'nais/attest-sign@v1'
-        with:
-          image_ref: '${{ needs.docker-build.outputs.build-image-name-digest }}'
+      # - name: "Attest and sign"
+      #   uses: 'nais/attest-sign@v1'
+      #   with:
+      #     image_ref: '${{ needs.docker-build.outputs.build-image-name-digest }}'
 
 
 
