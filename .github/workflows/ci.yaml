@@ -11,28 +11,26 @@ on:
   #       type: string
   push:
     branches:
-      - '*'         # matches every branch that doesn't contain a '/'
-      - '*/*'       # matches every branch containing a single '/'
-      - '**'        # matches every branch
-      # - '!master'
+      - '**'
+    tags:
+      - '*'
   pull_request:
     branches:
-      - '*'         # matches every branch that doesn't contain a '/'
-      - '*/*'       # matches every branch containing a single '/'
-      - '**'        # matches every branch
-  #     branches: [ "development" ]
+      - '**'
+
+
 env:
-  DOCKER_BUILD_IMAGE: "ghcr.io/${{ github.repository }}:${{ github.sha }}"
+  DOCKER_BUILD_IMAGE: "ghcr.io/${{ github.repository }}-fred:${{ github.sha }}"
 
 
-permissions:
-  pull-requests: write
-  contents: read
-  actions: read
-  checks: write
-  packages: write
-  security-events: write
-  statuses: write
+# permissions:
+#   pull-requests: write
+#   contents: read
+#   actions: read
+#   checks: write
+#   packages: write
+#   security-events: write
+#   statuses: write
 
 
 
