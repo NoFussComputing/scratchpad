@@ -378,7 +378,7 @@ jobs:
         )
       )
     needs: 
-      - docker-scan-vulnerability
+      # - docker-scan-vulnerability
       - docker-build
     runs-on: ubuntu-latest
     name: Create Image SBOM
@@ -419,7 +419,7 @@ jobs:
       - name: "Attest and sign"
         uses: 'nais/attest-sign@v1'
         with:
-          image_ref: '${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}'
+          image_ref: '${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}@${{ needs.dockerbuild.outputs.digest }}'
 
 
 
