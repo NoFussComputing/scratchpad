@@ -543,10 +543,7 @@ jobs:
 
 
   docker-pr-comment:
-    if: 
-      (${{
-        github.event.pull_request
-      }})
+    if: ${{ github.event.pull_request}}
     needs:
       - docker-scan-vulnerability
     runs-on: ubuntu-latest
@@ -555,20 +552,14 @@ jobs:
 
 
       - name: Fetch Vulnerability Report
-        if:
-          (${{
-            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          }})
+        if: ${{ inputs.DOCKER_SCAN_IMAGE_VULNERABILITY }}
         uses: actions/download-artifact@v4
         with:
           name: vulnerability-report
 
 
       - name: Capture scan results
-        if:
-          (${{
-            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          }})
+        if: ${{ inputs.DOCKER_SCAN_IMAGE_VULNERABILITY }}
         # id: capture_results
         run: |
           content=$(cat vulnerability-report.md | head -c 65000)
@@ -578,10 +569,7 @@ jobs:
 
 
       - name: Comment scan results on PR
-        if:
-          (${{
-            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          }})
+        if: ${{ inputs.DOCKER_SCAN_IMAGE_VULNERABILITY }}
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: Image Scan Results
