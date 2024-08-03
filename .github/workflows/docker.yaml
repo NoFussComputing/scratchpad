@@ -5,9 +5,14 @@ name: 'Docker'
 
 on:
   workflow_call:
+    inputs:
+      DOCKER_BUILD_IMAGE:
+        default: "ghcr.io/${{ github.repository }}:${{ github.sha }}"
+        required: false
+        type: string
 
-env:
-  DOCKER_BUILD_IMAGE: "ghcr.io/${{ github.repository }}:${{ github.sha }}"
+# env:
+#   DOCKER_BUILD_IMAGE: 
 
 
 permissions:
