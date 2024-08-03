@@ -62,8 +62,8 @@ permissions:
 jobs:
 
   docker-build:
-    if:
-      ${{ (
+    if: ${{
+      (
         github.event.pull_request
           ||
         github.event.push
