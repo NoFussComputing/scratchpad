@@ -62,7 +62,14 @@ permissions:
 jobs:
 
   docker-build:
-    if: github.event.push
+    if:
+      (
+        github.event.pull_request
+          ||
+        github.event.push
+          ||
+        github.ref_type == 'tag'
+      )
     runs-on: ubuntu-latest
     name: Build Image
     outputs:
@@ -186,6 +193,8 @@ jobs:
     if:
       (
         (
+          github.event.pull_request
+            ||
           github.event.push
             ||
           github.ref_type == 'tag'
@@ -395,6 +404,8 @@ jobs:
     if:
       (
         (
+          github.event.pull_request
+            ||
           github.event.push
             ||
           github.ref_type == 'tag'
@@ -461,6 +472,8 @@ jobs:
     if:
       (
         (
+          github.event.pull_request
+            ||
           github.event.push
             ||
           github.ref_type == 'tag'
@@ -536,10 +549,10 @@ jobs:
 
 
   docker-pr-comment:
-    # if: 
-    #   (
-    #     github.event.pull_request
-    #   )
+    if: 
+      (
+        github.event.pull_request
+      )
     needs:
       - docker-scan-vulnerability
     runs-on: ubuntu-latest

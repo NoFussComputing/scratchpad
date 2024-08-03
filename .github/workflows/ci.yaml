@@ -11,19 +11,19 @@ on:
   #       type: string
   push:
     branches:
-      - '*'         # matches every branch that doesn't contain a '/'
-      - '*/*'       # matches every branch containing a single '/'
+      # - '*'         # matches every branch that doesn't contain a '/'
+      # - '*/*'       # matches every branch containing a single '/'
       - '**'        # matches every branch
     tags:
       - '*'
-  # pull_request:
-  #   branches:
-  #     - '**'
-  #   types:
-  #     - opened
-  #     - synchronize
-  #     - closed
-  #     - reopened
+  pull_request:
+    branches:
+      - '**'
+    types:
+      - opened
+      - synchronize
+      - closed
+      - reopened
 
 
 # env:
@@ -45,13 +45,13 @@ jobs:
 
   docker:
     name: 'Docker'
-    uses: nofusscomputing/scratchpad/.github/workflows/docker.yaml@further-testing
+    uses: ./.github/workflows/docker.yaml
     with:
       DOCKER_BUILD_IMAGE_NAME: "${{ github.repository }}"
 
 
   release:
     name: 'Release'
-    uses: nofusscomputing/scratchpad/.github/workflows/release.yaml@further-testing
+    uses: ./.github/workflows/release.yaml
     # with:
     #   DOCKER_BUILD_IMAGE_NAME: "${{ github.repository }}"
