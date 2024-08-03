@@ -366,6 +366,57 @@ jobs:
 
 
 
+  docker-sbom:
+    if:
+      (
+        (
+          github.event.pull_request
+            ||
+          github.event.push
+            ||
+          github.ref_type == 'tag'
+        )
+      )
+    needs: 
+      - docker-scan-vulnerability
+      - docker-build
+    runs-on: ubuntu-latest
+    name: Create Image SBOM
+    steps:
+
+
+      - name: Scan Image
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          image-ref: '${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}'
+          scan-type: image
+          format: 'github'
+          output: 'dependency-results.sbom.json'
+          github-pat: ${{ secrets.GITHUB_TOKEN }} # or ${{ secrets.github_pat_name }} if you're using a PAT
+          severity: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
+          scanners: "vuln"
+          list-all-pkgs: true
+        # env:
+        #   TRIVY_USERNAME: "image_registry_admin_username"
+        #   TRIVY_PASSWORD: "image_registry_admin_password"
+
+
+      - name: Upload trivy report as a Github artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-sbom-report
+          path: '${{ github.workspace }}/dependency-results.sbom.json'
+
+
+      - name: Generate SBOM attestation
+        uses: actions/attest-sbom@v1
+        with:
+          subject-name: '${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}'
+          subject-digest: ${{ needs.dockerbuild.outputs.digest }}
+          sbom-path: 'dependency-results.sbom.json'
+          push-to-registry: true
+
+
   docker-reports:
     if:
       (
@@ -381,7 +432,7 @@ jobs:
       - docker-scan-vulnerability
       - docker-build
     runs-on: ubuntu-latest
-    name: Docker Reports
+    name: Create Reports
     steps:
 
 
@@ -425,7 +476,7 @@ jobs:
       - docker-scan-vulnerability
       - docker-reports
     runs-on: ubuntu-latest
-    name: Docker Tagged Release
+    name: Tagged Image
     steps:
     
 
@@ -502,7 +553,7 @@ jobs:
       - docker-reports
       - docker-tagged
     runs-on: ubuntu-latest
-    name: Docker Publish
+    name: Publish
     steps:
 
 
