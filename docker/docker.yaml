@@ -127,7 +127,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
 
-      - name: Run Trivy vulnerability scanner
+      - name: Run Trivy vulnerability scanner (Reports)
         uses: aquasecurity/trivy-action@0.20.0
         with:
           image-ref: '${{ env.DOCKER_BUILD_IMAGE }}'
@@ -146,7 +146,8 @@ jobs:
         with:
           sarif_file: 'trivy-results.sarif'
 
-      - name: Generate json for PR comment
+
+      - name: Run Trivy vulnerability scanner (PR comment)
         uses: aquasecurity/trivy-action@0.20.0
         with:
           image-ref: '${{ env.DOCKER_BUILD_IMAGE }}'
