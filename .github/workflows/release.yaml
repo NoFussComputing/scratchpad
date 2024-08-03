@@ -8,7 +8,7 @@ on:
 
 jobs:
   release:
-    # name: Release
+    name: Release
     if:
       (
         github.ref_type == 'tag'
