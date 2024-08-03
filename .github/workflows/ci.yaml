@@ -40,4 +40,4 @@ jobs:
 
   docker:
     name: 'Docker'
-    uses: nofusscomputing/scratchpad/.github/workflows/docker/docker.yaml@further-testing
+    uses: nofusscomputing/scratchpad/.github/workflows/docker.yaml@further-testing
