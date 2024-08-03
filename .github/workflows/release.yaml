@@ -10,9 +10,9 @@ jobs:
   release:
     name: Release
     if:
-      (
+      (${{
         github.ref_type == 'tag'
-      )
+      }})
     runs-on: ubuntu-latest
     steps:
       # - name: Checkout
@@ -28,9 +28,9 @@ jobs:
       
       - name: Create GH Release
         if:
-          (
+          (${{
             github.ref_type == 'tag'
-          )
+          }})
         uses: softprops/action-gh-release@v2
         with:
           files: |
