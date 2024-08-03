@@ -547,6 +547,7 @@ jobs:
             --tag ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:latest;
 
 
+
   docker-pr-comment:
     if: 
       (
@@ -594,6 +595,7 @@ jobs:
             ${{ env.report }}
 
 
+
   docker-publish:
     if: 
       (
@@ -623,3 +625,56 @@ jobs:
           docker buildx imagetools create ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_TAG_IMAGE_TAG_SOURCE }} \
             --tag ${{ inputs.DOCKER_PUBLISH_REGISTRY }}/${{ inputs.DOCKER_PUBLISH_IMAGE_NAME }}:latest;
 
+
+
+  docker-release-files:
+    if: 
+      (
+        github.ref_type == 'tag'
+      )
+    needs: 
+      - docker-build
+      - docker-sbom
+    runs-on: ubuntu-latest
+    name: Publish
+    steps:
+
+
+      - name: Upload Image Attestation Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image-attestation
+          path: attestation-image/
+
+
+      - run: |
+          mv attestation-image/attestation.jsonl attestation-image.jsonl
+
+
+      - name: Upload SBOM Attestation Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image-attestation-sbom
+          path: attestation-sbom/
+
+
+      - run: |
+          mv attestation-image/attestation.jsonl attestation-sbom.jsonl
+
+
+      - name: Upload multiple assets to release
+        uses: csexton/release-asset-action@v3
+        with:
+          files: |
+            attestation-image.jsonl
+            attestation-sbom.jsonl
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # - name: Update Release
+      #   uses: nicovince/manage-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     files: <list of files>
+      #     release: ${{ github.ref_name }}
+      #     tag: ${{ github.ref_name }}
