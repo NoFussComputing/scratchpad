@@ -655,6 +655,7 @@ jobs:
             attestation-image.jsonl
             attestation-sbom.jsonl
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          release-url: https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }}
 
       # - name: Update Release
       #   uses: nicovince/manage-release@v1
