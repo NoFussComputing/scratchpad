@@ -72,7 +72,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Build Image
     outputs:
-      build-digest: ${{ steps.build.outputs.digest }}
+      build-digest: ${{ steps.image-digest.outputs.digest }}
     steps:
 
 
@@ -147,6 +147,11 @@ jobs:
             --tag ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }} \
             --tag ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:dev;
 
+
+      - name: Fetch Manifest digest
+        id: image-digest
+        run: |
+          docker inspect --format='{{index .RepoDigests 0}}' ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}
 
       - name: Cleanup BuildX
         if: 
