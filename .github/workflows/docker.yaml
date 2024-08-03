@@ -21,7 +21,7 @@ on:
         description: Docker image tag for building image
         required: false
         type: string
-      DOCKER_SCAN_IMAGE:
+      DOCKER_SCAN_IMAGE_VULNERABILITY:
         default: true
         description: Scan Image with Trivy
         required: false
@@ -66,7 +66,7 @@ jobs:
 
       - uses: actions/checkout@v4
 
-      - name: Tagged Build
+      - name: Dummy Task
         if: 
           (
             github.ref_type == 'tag'
@@ -160,7 +160,7 @@ jobs:
 
 
 
-  docker-scan:
+  docker-scan-vulnerability:
     if:
       (
         (
@@ -171,7 +171,7 @@ jobs:
           github.ref_type == 'tag'
         )
           &&
-        inputs.DOCKER_SCAN_IMAGE
+        inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
       )
 
     needs:
@@ -182,7 +182,20 @@ jobs:
       - uses: actions/checkout@v4
 
 
+      - name: Dummy Task
+        if:
+          (
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
+          )
+        run: |
+          echo "Scanning image turned off.This Job does nothing however as 'docker-scan-vulnerability' is a dependency job, must do something.";
+
+
       - name: Log into registry ghcr.io
+        if:
+          (
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY == false
+          )
         uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
         with:
           registry: ghcr.io
@@ -191,6 +204,10 @@ jobs:
 
 
       - name: Run Trivy vulnerability scanner (Reports)
+        if:
+          (
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY == false
+          )
         uses: aquasecurity/trivy-action@0.20.0
         with:
           image-ref: '${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}'
@@ -205,12 +222,20 @@ jobs:
 
 
       - name: Upload Trivy scan results to GitHub Security tab
+        if:
+          (
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY == false
+          )
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: 'trivy-results.sarif'
 
 
       - name: Run Trivy vulnerability scanner (PR comment)
+        if:
+          (
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY == false
+          )
         uses: aquasecurity/trivy-action@0.20.0
         with:
           image-ref: '${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}'
@@ -224,6 +249,10 @@ jobs:
           ignore-unfixed: false
 
       - name: Upload scan results
+        if:
+          (
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY == false
+          )
         uses: actions/upload-artifact@v4
         # if: success() || failure()
         with:
@@ -235,7 +264,11 @@ jobs:
           ls -la
 
       - name: Create Vulnerabilities (Critical/High)
-        id: extract_vulnerabilities_orig
+        if:
+          (
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY == false
+          )
+        # id: extract_vulnerabilities_orig
         run: |
           not_empty="$(jq -r '.Results[] | .Vulnerabilities[]' scan-results.json)"
 
@@ -275,6 +308,10 @@ jobs:
 
 
       - name: Create Full Vulnerabilities
+        if:
+          (
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY == false
+          )
         run: |
           not_empty="$(jq -r '.Results[] | .Vulnerabilities[]' scan-results.json)"
 
@@ -313,12 +350,20 @@ jobs:
 
 
       - name: Upload scan results
+        if:
+          (
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY == false
+          )
         uses: actions/upload-artifact@v4
         with:
           name: vulnerability-report
           path: vulnerability-report.md
 
       - name: Upload scan results
+        if:
+          (
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY == false
+          )
         uses: actions/upload-artifact@v4
         with:
           name: vulnerability-report-full
@@ -336,28 +381,44 @@ jobs:
             ||
           github.ref_type == 'tag'
         )
-          &&
-        inputs.DOCKER_SCAN_IMAGE
       )
     needs: 
       - docker-build
-      - docker-scan
+      - docker-scan-vulnerability
     runs-on: ubuntu-latest
     name: Docker Reports
     steps:
 
 
+      - name: Dummy Task
+        if:
+          (
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
+          )
+        run: |
+          echo "Scanning image turned off.This Job does nothing however as 'docker-scan-vulnerability' is a dependency job, must do something.";
+
+
       - name: Fetch Scan Results
+        if:
+          (
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY == false
+          )
         uses: actions/download-artifact@v4
         with:
           name: vulnerability-report-full
 
 
       - uses: dtinth/markdown-report-action@v1
+        if:
+          (
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY == false
+          )
         with:
           name: Docker Vulnerability Report
           title: Vulnerability Report
           body-file: full-vulnerability-report.md
+
 
 
   docker-tagged:
@@ -366,11 +427,12 @@ jobs:
         github.ref_type == 'tag'
       )
     needs: 
-      - docker-scan
+      - docker-scan-vulnerability
       - docker-reports
     runs-on: ubuntu-latest
     name: Docker Tagged Release
     steps:
+    
 
       - name: Create Image Tag '${{ github.ref_name }}'
         run: |
@@ -388,12 +450,13 @@ jobs:
             --tag ghcr.io/${{ github.repository }}:latest;
 
 
+
   docker-pr-comment:
     if: 
       (
       github.event.pull_request
         &&
-      inputs.DOCKER_SCAN_IMAGE
+      inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
       )
     needs: 
       - docker-build
@@ -404,13 +467,21 @@ jobs:
 
 
       - name: Fetch scan results
+        if:
+          (
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
+          )
         uses: actions/download-artifact@v4
         with:
           name: vulnerability-report
 
 
       - name: Capture scan results
-        id: capture_results
+        if:
+          (
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
+          )
+        # id: capture_results
         run: |
           content=$(cat vulnerability-report.md | head -c 65000)
           echo "report<<EOF" >> $GITHUB_ENV
@@ -419,6 +490,10 @@ jobs:
 
 
       - name: Comment scan results on PR
+        if:
+          (
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
+          )
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: Image Scan Results
