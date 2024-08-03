@@ -460,7 +460,6 @@ jobs:
       )
     needs:
       - docker-scan-vulnerability
-      - docker-reports
     runs-on: ubuntu-latest
     name: PR Comment (Vulnerability)
     steps:
