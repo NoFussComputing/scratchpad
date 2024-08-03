@@ -257,7 +257,7 @@ jobs:
             "",
             "| Vulnerability ID | Package | Version | Severity | Description |",
             "| --------- | ----- | ----- | ----- | -------|",
-            (.Results[] | .Vulnerabilities[] | .Severity | to_md),
+            (.Results[] | .Vulnerabilities[] | select(.Severity) | to_md),
             ""
             ] | join("\n")
             ' scan-results.json >> full-vulnerability-report.md
