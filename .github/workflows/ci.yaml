@@ -2,23 +2,42 @@
 
 name: 'CI'
 
+
 on:
+  # workflow_call:
+  #   inputs:
+  #     build-branch:         # tag / dev
+  #       required: true
+  #       type: string
   push:
     branches:
       - '*'         # matches every branch that doesn't contain a '/'
       - '*/*'       # matches every branch containing a single '/'
       - '**'        # matches every branch
       # - '!master'
+  pull_request:
+    branches:
+      - '*'         # matches every branch that doesn't contain a '/'
+      - '*/*'       # matches every branch containing a single '/'
+      - '**'        # matches every branch
+  #     branches: [ "development" ]
+env:
+  DOCKER_BUILD_IMAGE: "ghcr.io/${{ github.repository }}:${{ github.sha }}"
+
+
+permissions:
+  pull-requests: write
+  contents: read
+  actions: read
+  checks: write
+  packages: write
+  security-events: write
+  statuses: write
+
 
 
 jobs:
 
-#   Commit-Message-Check:
-#     name: 'Check Commit Messages'
-#     uses: nofusscomputing/scratchpad/.github/workflows/commit-msg-check.yaml@feature
-
-#   build:
-#     name: Build Docker Container
-#     uses: nofusscomputing/scratchpad/.github/workflows/build-image.yaml@feature
-#     with:
-#       build-branch: dev
+  docker:
+    name: 'Docker'
+    uses: nofusscomputing/scratchpad/docker/docker.yaml@feature
