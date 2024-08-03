@@ -20,7 +20,7 @@ on:
 
 
 env:
-  DOCKER_BUILD_IMAGE: "ghcr.io/${{ github.repository }}-fred:${{ github.sha }}"
+  # DOCKER_BUILD_IMAGE: "ghcr.io/${{ github.repository }}-fred:${{ github.sha }}"
 
 
 # permissions:
@@ -39,3 +39,5 @@ jobs:
   docker:
     name: 'Docker'
     uses: nofusscomputing/scratchpad/.github/workflows/docker.yaml@further-testing
+    with:
+      DOCKER_BUILD_IMAGE: "ghcr.io/${{ github.repository }}-fred:${{ github.sha }}"
