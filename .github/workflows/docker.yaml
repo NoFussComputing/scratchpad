@@ -263,111 +263,111 @@ jobs:
       - run: |
           ls -la
 
-      # - name: Create Vulnerabilities (Critical/High)
-      #   if:
-      #     (
-      #       inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-      #     )
-      #   # id: extract_vulnerabilities_orig
-      #   run: |
-      #     not_empty="$(jq -r '.Results[] | .Vulnerabilities[]' scan-results.json)"
+      - name: Create Vulnerabilities (Critical/High)
+        if:
+          (
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
+          )
+        # id: extract_vulnerabilities_orig
+        run: |
+          not_empty="$(jq -r '.Results[] | .Vulnerabilities[]' scan-results.json)"
 
-      #     jq -r '
-      #     [
-      #     "# Image Scan Results",
-      #     "",
-      #     "**Scan Date:** _" + ( .CreatedAt // "" ) + "_",
-      #     "**Image:** _" + ( .ArtifactName // "" ) + "_",
-      #     "**OS:** _" + ( .Metadata.OS.Family // "" ) + " " + ( .Metadata.OS.Name // "" ) + "_",
-      #     ""
-      #     ] | join("\n")
-      #     ' scan-results.json > vulnerability-report.md
+          jq -r '
+          [
+          "# Image Scan Results",
+          "",
+          "**Scan Date:** _" + ( .CreatedAt // "" ) + "_",
+          "**Image:** _" + ( .ArtifactName // "" ) + "_",
+          "**OS:** _" + ( .Metadata.OS.Family // "" ) + " " + ( .Metadata.OS.Name // "" ) + "_",
+          ""
+          ] | join("\n")
+          ' scan-results.json > vulnerability-report.md
 
-      #     if [ "$not_empty" ]; then
-      #       jq -r '
-      #       def hr(severity):
-      #       if severity == "HIGH" or severity == "CRITICAL" then true else false end;
-      #       def to_md:
-      #       "| " + (.VulnerabilityID // "") + " | " + (.PkgName // "") + " | " + (.InstalledVersion // "") + " | " + (.Severity // "") + " | " + (.Title // "") + " |";
-      #       [
-      #       "## High and Critical Vulnerabilities",
-      #       "",
-      #       "| Vulnerability ID | Package | Version | Severity | Description |",
-      #       "| --------- | ----- | ----- | ----- | -------|",
-      #       (.Results[] | .Vulnerabilities[] | select(hr(.Severity)) | to_md),
-      #       ""
-      #       ] | join("\n")
-      #       ' scan-results.json >> vulnerability-report.md
+          if [ "$not_empty" ]; then
+            jq -r '
+            def hr(severity):
+            if severity == "HIGH" or severity == "CRITICAL" then true else false end;
+            def to_md:
+            "| " + (.VulnerabilityID // "") + " | " + (.PkgName // "") + " | " + (.InstalledVersion // "") + " | " + (.Severity // "") + " | " + (.Title // "") + " |";
+            [
+            "## High and Critical Vulnerabilities",
+            "",
+            "| Vulnerability ID | Package | Version | Severity | Description |",
+            "| --------- | ----- | ----- | ----- | -------|",
+            (.Results[] | .Vulnerabilities[] | select(hr(.Severity)) | to_md),
+            ""
+            ] | join("\n")
+            ' scan-results.json >> vulnerability-report.md
 
-      #     else
+          else
 
-      #       echo "**Nothing Found**" >> vulnerability-report.md
+            echo "**Nothing Found**" >> vulnerability-report.md
 
-      #     fi;
-
-
-
-      # - name: Create Full Vulnerabilities
-      #   if:
-      #     (
-      #       inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-      #     )
-      #   run: |
-      #     not_empty="$(jq -r '.Results[] | .Vulnerabilities[]' scan-results.json)"
-
-      #     jq -r '
-      #     [
-      #     "# Full Image Scan Results",
-      #     "",
-      #     "**Scan Date:** _" + ( .CreatedAt // "" ) + "_",
-      #     "**Image:** _" + ( .ArtifactName // "" ) + "_",
-      #     "**OS:** _" + ( .Metadata.OS.Family // "" ) + " " + ( .Metadata.OS.Name // "" ) + "_",
-      #     ""
-      #     ] | join("\n")
-      #     ' scan-results.json > full-vulnerability-report.md
-
-      #     if [ "$not_empty" ]; then
-      #       jq -r '
-      #       def hr(severity):
-      #       if severity == "HIGH" or severity == "CRITICAL" then true else false end;
-      #       def to_md:
-      #       "| " + (.VulnerabilityID // "") + " | " + (.PkgName // "") + " | " + (.InstalledVersion // "") + " | " + (.Severity // "") + " | " + (.Title // "") + " |";
-      #       [
-      #       "## Vulnerabilities",
-      #       "",
-      #       "| Vulnerability ID | Package | Version | Severity | Description |",
-      #       "| --------- | ----- | ----- | ----- | -------|",
-      #       (.Results[] | .Vulnerabilities[] | select(.Severity) | to_md),
-      #       ""
-      #       ] | join("\n")
-      #       ' scan-results.json >> full-vulnerability-report.md
-
-      #     else
-
-      #       echo "**Nothing Found**" >> full-vulnerability-report.md
-
-      #     fi;
+          fi;
 
 
-      # - name: Upload scan results
-      #   if:
-      #     (
-      #       inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-      #     )
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: vulnerability-report
-      #     path: vulnerability-report.md
 
-      # - name: Upload scan results
-      #   if:
-      #     (
-      #       inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-      #     )
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: vulnerability-report-full
-      #     path: full-vulnerability-report.md
+      - name: Create Full Vulnerabilities
+        if:
+          (
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
+          )
+        run: |
+          not_empty="$(jq -r '.Results[] | .Vulnerabilities[]' scan-results.json)"
+
+          jq -r '
+          [
+          "# Full Image Scan Results",
+          "",
+          "**Scan Date:** _" + ( .CreatedAt // "" ) + "_",
+          "**Image:** _" + ( .ArtifactName // "" ) + "_",
+          "**OS:** _" + ( .Metadata.OS.Family // "" ) + " " + ( .Metadata.OS.Name // "" ) + "_",
+          ""
+          ] | join("\n")
+          ' scan-results.json > full-vulnerability-report.md
+
+          if [ "$not_empty" ]; then
+            jq -r '
+            def hr(severity):
+            if severity == "HIGH" or severity == "CRITICAL" then true else false end;
+            def to_md:
+            "| " + (.VulnerabilityID // "") + " | " + (.PkgName // "") + " | " + (.InstalledVersion // "") + " | " + (.Severity // "") + " | " + (.Title // "") + " |";
+            [
+            "## Vulnerabilities",
+            "",
+            "| Vulnerability ID | Package | Version | Severity | Description |",
+            "| --------- | ----- | ----- | ----- | -------|",
+            (.Results[] | .Vulnerabilities[] | select(.Severity) | to_md),
+            ""
+            ] | join("\n")
+            ' scan-results.json >> full-vulnerability-report.md
+
+          else
+
+            echo "**Nothing Found**" >> full-vulnerability-report.md
+
+          fi;
+
+
+      - name: Upload scan results
+        if:
+          (
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
+          )
+        uses: actions/upload-artifact@v4
+        with:
+          name: vulnerability-report
+          path: vulnerability-report.md
+
+      - name: Upload scan results
+        if:
+          (
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
+          )
+        uses: actions/upload-artifact@v4
+        with:
+          name: vulnerability-report-full
+          path: full-vulnerability-report.md
 
 
 
