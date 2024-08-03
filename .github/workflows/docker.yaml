@@ -462,7 +462,7 @@ jobs:
       - docker-build
       - docker-scan-vulnerability
     runs-on: ubuntu-latest
-    name: PR Comment
+    name: PR Comment (Vulnerability)
     steps:
 
 
