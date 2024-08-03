@@ -1,6 +1,7 @@
 
-# FROM debian:bookworm-slim
-FROM debian:11.10-slim
+FROM debian:bookworm-slim
+# FROM debian:11.10-slim
+# FROM ubuntu:mantic-20231128
 
 
 LABEL \
