@@ -112,7 +112,6 @@ jobs:
 
 
       - name: build image
-        id: build
         if: 
           (
             github.ref_type != 'tag'
@@ -402,7 +401,6 @@ jobs:
         )
       )
     needs: 
-      # - docker-scan-vulnerability
       - docker-build
     runs-on: ubuntu-latest
     name: Image SBOM
