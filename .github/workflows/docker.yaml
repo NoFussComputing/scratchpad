@@ -177,7 +177,7 @@ jobs:
     needs:
       - docker-build
     runs-on: ubuntu-latest
-    name: Scans
+    name: Vulnerability Scan
     steps:
       - uses: actions/checkout@v4
 
@@ -185,7 +185,7 @@ jobs:
       - name: Dummy Task
         if:
           (
-            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY == false
           )
         run: |
           echo "Scanning image turned off.This Job does nothing however as 'docker-scan-vulnerability' is a dependency job, must do something.";
@@ -194,7 +194,7 @@ jobs:
       - name: Log into registry ghcr.io
         if:
           (
-            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY == false
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
           )
         uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
         with:
@@ -206,7 +206,7 @@ jobs:
       - name: Run Trivy vulnerability scanner (Reports)
         if:
           (
-            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY == false
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
           )
         uses: aquasecurity/trivy-action@0.20.0
         with:
@@ -224,7 +224,7 @@ jobs:
       - name: Upload Trivy scan results to GitHub Security tab
         if:
           (
-            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY == false
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
           )
         uses: github/codeql-action/upload-sarif@v3
         with:
@@ -234,7 +234,7 @@ jobs:
       - name: Run Trivy vulnerability scanner (PR comment)
         if:
           (
-            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY == false
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
           )
         uses: aquasecurity/trivy-action@0.20.0
         with:
@@ -251,7 +251,7 @@ jobs:
       - name: Upload scan results
         if:
           (
-            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY == false
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
           )
         uses: actions/upload-artifact@v4
         # if: success() || failure()
@@ -266,7 +266,7 @@ jobs:
       - name: Create Vulnerabilities (Critical/High)
         if:
           (
-            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY == false
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
           )
         # id: extract_vulnerabilities_orig
         run: |
@@ -310,7 +310,7 @@ jobs:
       - name: Create Full Vulnerabilities
         if:
           (
-            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY == false
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
           )
         run: |
           not_empty="$(jq -r '.Results[] | .Vulnerabilities[]' scan-results.json)"
@@ -352,7 +352,7 @@ jobs:
       - name: Upload scan results
         if:
           (
-            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY == false
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
           )
         uses: actions/upload-artifact@v4
         with:
@@ -362,7 +362,7 @@ jobs:
       - name: Upload scan results
         if:
           (
-            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY == false
+            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
           )
         uses: actions/upload-artifact@v4
         with:
@@ -383,8 +383,8 @@ jobs:
         )
       )
     needs: 
-      - docker-build
       - docker-scan-vulnerability
+      - docker-build
     runs-on: ubuntu-latest
     name: Docker Reports
     steps:
@@ -458,9 +458,9 @@ jobs:
         &&
       inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
       )
-    needs: 
-      - docker-build
+    needs:
       - docker-scan-vulnerability
+      - docker-build
     runs-on: ubuntu-latest
     name: PR Comment (Vulnerability)
     steps:
