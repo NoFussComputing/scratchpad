@@ -56,6 +56,8 @@ jobs:
         github.event.pull_request
           ||
         github.event.push
+          ||
+        github.ref_type == 'tag'
       )
     runs-on: ubuntu-latest
     name: Build Current Commit
@@ -161,7 +163,13 @@ jobs:
   docker-scan:
     if:
       (
-        (github.event.pull_request || github.event.push)
+        (
+          github.event.pull_request
+            ||
+          github.event.push
+            ||
+          github.ref_type == 'tag'
+        )
           &&
         inputs.DOCKER_SCAN_IMAGE
       )
@@ -321,7 +329,13 @@ jobs:
   docker-reports:
     if:
       (
-        (github.event.pull_request || github.event.push)
+        (
+          github.event.pull_request
+            ||
+          github.event.push
+            ||
+          github.ref_type == 'tag'
+        )
           &&
         inputs.DOCKER_SCAN_IMAGE
       )
