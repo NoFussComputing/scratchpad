@@ -433,7 +433,7 @@ jobs:
       - name: "Attest and sign"
         uses: 'nais/attest-sign@v1'
         with:
-          image_ref: '${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}@${{ needs.docker-build.outputs.build-image-name-digest }}'
+          image_ref: '${{ needs.docker-build.outputs.build-image-name-digest }}'
 
 
 
