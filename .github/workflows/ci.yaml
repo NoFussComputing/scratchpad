@@ -10,10 +10,10 @@ on:
   #       required: true
   #       type: string
   push:
-    branches:
-      # - '*'         # matches every branch that doesn't contain a '/'
-      # - '*/*'       # matches every branch containing a single '/'
-      - '**'        # matches every branch
+    # branches:
+    #   # - '*'         # matches every branch that doesn't contain a '/'
+    #   # - '*/*'       # matches every branch containing a single '/'
+    #   - '**'        # matches every branch
     # tags:
     #   - '*'
   # pull_request:
