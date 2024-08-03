@@ -176,7 +176,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: docker-image-attestation
-          path: ${{ steps.outputs.image-attest.bundle-path }}
+          path: ${{ steps.image-attest.outputs.bundle-path }}
 
 
       - name: Cleanup BuildX
@@ -452,7 +452,7 @@ jobs:
 
 
       - name: Generate SBOM Attestation
-        id: sbom
+        id: sbom-attest
         uses: actions/attest-sbom@v1
         with:
           subject-name: '${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}'
@@ -465,7 +465,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: docker-image-attestation-sbom
-          path: ${{ steps.outputs.sbom.bundle-path }}
+          path: ${{ steps.sbom-attest.outputs.bundle-path }}
 
 
   docker-reports:
