@@ -32,6 +32,7 @@ permissions:
   checks: write
   packages: write
   security-events: write
+  statuses: write
 
 
 jobs:
