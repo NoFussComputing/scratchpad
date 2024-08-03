@@ -73,7 +73,7 @@ jobs:
       - name: Remove "Unknown" Image from Manifest
         run: |
 
-          DOCKER_MULTI_ARCH_IMAGES=$(docker buildx imagetools inspect "${{ inputs.DOCKER_BUILD_IMAGE }}" --format "{{ range .Manifest.Manifests }}{{ if ne (print .Platform) \"&{unknown unknown  [] }\" }}$DOCKER_BUILD_IMAGE@{{ println .Digest }}{{end}} {{end}}");
+          DOCKER_MULTI_ARCH_IMAGES=$(docker buildx imagetools inspect "${{ inputs.DOCKER_BUILD_IMAGE }}" --format "{{ range .Manifest.Manifests }}{{ if ne (print .Platform) \"&{unknown unknown  [] }\" }}${{ inputs.DOCKER_BUILD_IMAGE }}@{{ println .Digest }}{{end}} {{end}}");
 
           # if [ "${{ inputs.build-branch }}" == "dev" ]; then
 
