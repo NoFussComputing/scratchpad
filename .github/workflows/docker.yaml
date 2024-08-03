@@ -460,7 +460,7 @@ jobs:
       )
     needs: 
       - docker-build
-      - docker-scan
+      - docker-scan-vulnerability
     runs-on: ubuntu-latest
     name: PR Comment
     steps:
