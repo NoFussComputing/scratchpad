@@ -72,7 +72,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Build Image
     outputs:
-      build-image-name-digest: ${{ steps.image-digest.outputs.value-out }}
+      build-image-digest: ${{ steps.image-digest.outputs.value-out }}
     steps:
 
 
@@ -156,7 +156,7 @@ jobs:
       - name: Fetch Manifest digest
         id: image-digest
         run: |
-          echo "value-out=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }})" >> $GITHUB_OUTPUT
+          echo "value-out=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }})" | cut -d '@' -f 2 >> $GITHUB_OUTPUT
 
 
       - name: Cleanup BuildX
@@ -431,13 +431,13 @@ jobs:
           path: '${{ github.workspace }}/dependency-results.sbom.json'
 
 
-      # - name: Generate SBOM attestation
-      #   uses: actions/attest-sbom@v1
-      #   with:
-      #     subject-name: '${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}'
-      #     subject-digest: ${{ needs.dockerbuild.outputs.digest }}
-      #     sbom-path: 'dependency-results.sbom.json'
-      #     push-to-registry: true
+      - name: Generate SBOM attestation
+        uses: actions/attest-sbom@v1
+        with:
+          subject-name: '${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}'
+          subject-digest: ${{ needs.docker-build.outputs.build-image-digest }}
+          sbom-path: 'dependency-results.sbom.json'
+          push-to-registry: true
 
       # - name: "Attest and sign"
       #   uses: 'nais/attest-sign@v1'
