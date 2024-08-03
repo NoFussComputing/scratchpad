@@ -81,9 +81,9 @@ jobs:
 
       - name: Dummy Task
         if: 
-          (
+          (${{
             github.ref_type == 'tag'
-          )
+          }})
         run: |
           echo "This Job does nothing however as 'docker-build' is a dependency job, must do something.";
 
@@ -91,9 +91,9 @@ jobs:
 
       - name: Log into registry ghcr.io
         if: 
-          (
+          (${{
             github.ref_type != 'tag'
-          )
+          }})
         uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
         with:
           registry: ghcr.io
@@ -103,9 +103,9 @@ jobs:
 
       - name: Setup BuildX
         if: 
-          (
+          (${{
             github.ref_type != 'tag'
-          )
+          }})
         run: |
           docker buildx create --name project-v3-builder;
           docker buildx use project-v3-builder;
@@ -113,9 +113,9 @@ jobs:
 
       - name: build image
         if: 
-          (
+          (${{
             github.ref_type != 'tag'
-          )
+          }})
         run: |
           docker buildx build --platform="linux/amd64,linux/arm64" . \
             --label "org.opencontainers.image.created=$(date '+%Y-%m-%dT%H:%M:%S%:z')" \
@@ -136,9 +136,9 @@ jobs:
 
       - name: Remove "Unknown" Image from Manifest
         if: 
-          (
+          (${{
             github.ref_type != 'tag'
-          )
+          }})
         run: |
 
           DOCKER_MULTI_ARCH_IMAGES=$(docker buildx imagetools inspect "${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}" --format "{{ range .Manifest.Manifests }}{{ if ne (print .Platform) \"&{unknown unknown  [] }\" }}${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}@{{ println .Digest }}{{end}} {{end}}");
@@ -161,9 +161,9 @@ jobs:
 
       - name: Attest
         if: 
-          (
+          (${{
             github.ref_type != 'tag'
-          )
+          }})
         uses: actions/attest-build-provenance@v1
         id: image-attest
         with:
@@ -181,9 +181,9 @@ jobs:
 
       - name: Cleanup BuildX
         if: 
-          (
+          (${{
             github.ref_type != 'tag'
-          )
+          }})
         run: |
           docker buildx rm project-v3-builder;
 
@@ -191,7 +191,7 @@ jobs:
 
   docker-scan-vulnerability:
     if:
-      (
+      (${{
         (
           github.event.pull_request
             ||
@@ -201,7 +201,7 @@ jobs:
         )
           &&
         inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-      )
+      }})
 
     needs:
       - docker-build
@@ -213,18 +213,18 @@ jobs:
 
       - name: Dummy Task
         if:
-          (
+          (${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY == false
-          )
+          }})
         run: |
           echo "Scanning image turned off.This Job does nothing however as 'docker-scan-vulnerability' is a dependency job, must do something.";
 
 
       - name: Log into registry ghcr.io
         if:
-          (
+          (${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          )
+          }})
         uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
         with:
           registry: ghcr.io
@@ -234,9 +234,9 @@ jobs:
 
       - name: Run Trivy vulnerability scanner (sarif Report)
         if:
-          (
+          (${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          )
+          }})
         uses: aquasecurity/trivy-action@0.20.0
         with:
           image-ref: '${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}'
@@ -252,9 +252,9 @@ jobs:
 
       - name: Upload Trivy scan results to GitHub Security tab
         if:
-          (
+          (${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          )
+          }})
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: 'trivy-results.sarif'
@@ -262,9 +262,9 @@ jobs:
 
       - name: Run Trivy vulnerability scanner (json Report)
         if:
-          (
+          (${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          )
+          }})
         uses: aquasecurity/trivy-action@0.20.0
         with:
           image-ref: '${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}'
@@ -279,9 +279,9 @@ jobs:
 
       - name: Upload scan results
         if:
-          (
+          (${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          )
+          }})
         uses: actions/upload-artifact@v4
         # if: success() || failure()
         with:
@@ -294,9 +294,9 @@ jobs:
 
       - name: Create Vulnerabilities (Critical/High)
         if:
-          (
+          (${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          )
+          }})
         # id: extract_vulnerabilities_orig
         run: |
           not_empty="$(jq -r '.Results[] | .Vulnerabilities[]' scan-results.json)"
@@ -338,9 +338,9 @@ jobs:
 
       - name: Create Full Vulnerabilities
         if:
-          (
+          (${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          )
+          }})
         run: |
           not_empty="$(jq -r '.Results[] | .Vulnerabilities[]' scan-results.json)"
 
@@ -380,9 +380,9 @@ jobs:
 
       - name: Upload scan results
         if:
-          (
+          (${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          )
+          }})
         uses: actions/upload-artifact@v4
         with:
           name: vulnerability-report
@@ -390,9 +390,9 @@ jobs:
 
       - name: Upload scan results
         if:
-          (
+          (${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          )
+          }})
         uses: actions/upload-artifact@v4
         with:
           name: vulnerability-report-full
@@ -402,7 +402,7 @@ jobs:
 
   docker-sbom:
     if:
-      (
+      (${{
         (
           github.event.pull_request
             ||
@@ -410,7 +410,7 @@ jobs:
             ||
           github.ref_type == 'tag'
         )
-      )
+      }})
     needs: 
       - docker-build
     runs-on: ubuntu-latest
@@ -441,9 +441,9 @@ jobs:
 
       - name: Log into registry ghcr.io
         if: 
-          (
+          (${{
             github.ref_type != 'tag'
-          )
+          }})
         uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
         with:
           registry: ghcr.io
@@ -470,7 +470,7 @@ jobs:
 
   docker-reports:
     if:
-      (
+      (${{
         (
           github.event.pull_request
             ||
@@ -478,7 +478,7 @@ jobs:
             ||
           github.ref_type == 'tag'
         )
-      )
+      }})
     needs: 
       - docker-scan-vulnerability
       - docker-build
@@ -489,18 +489,18 @@ jobs:
 
       - name: Dummy Task
         if:
-          (
+          (${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY == false
-          )
+          }})
         run: |
           echo "Scanning image turned off.This Job does nothing however as 'docker-scan-vulnerability' is a dependency job, must do something.";
 
 
       - name: Fetch Scan Results
         if:
-          (
+          (${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          )
+          }})
         uses: actions/download-artifact@v4
         with:
           name: vulnerability-report-full
@@ -508,9 +508,9 @@ jobs:
 
       - uses: dtinth/markdown-report-action@v1
         if:
-          (
+          (${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          )
+          }})
         with:
           name: Docker Vulnerability Report
           title: Vulnerability Report
@@ -550,9 +550,9 @@ jobs:
 
   docker-pr-comment:
     if: 
-      (
+      (${{
         github.event.pull_request
-      )
+      }})
     needs:
       - docker-scan-vulnerability
     runs-on: ubuntu-latest
@@ -562,9 +562,9 @@ jobs:
 
       - name: Fetch Vulnerability Report
         if:
-          (
+          (${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          )
+          }})
         uses: actions/download-artifact@v4
         with:
           name: vulnerability-report
@@ -572,9 +572,9 @@ jobs:
 
       - name: Capture scan results
         if:
-          (
+          (${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          )
+          }})
         # id: capture_results
         run: |
           content=$(cat vulnerability-report.md | head -c 65000)
@@ -585,9 +585,9 @@ jobs:
 
       - name: Comment scan results on PR
         if:
-          (
+          (${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          )
+          }})
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: Image Scan Results
@@ -598,9 +598,9 @@ jobs:
 
   docker-publish:
     if: 
-      (
+      (${{
         github.ref_type == 'tag'
-      )
+      }})
     needs: 
       - docker-scan-vulnerability
       - docker-reports
@@ -618,9 +618,9 @@ jobs:
 
       - name: Create Image Tag 'latest'
         if:
-          (
+          (${{
             inputs.DOCKER_TAG_IMAGE_TAG_LATEST
-          )
+          }})
         run: |
           docker buildx imagetools create ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_TAG_IMAGE_TAG_SOURCE }} \
             --tag ${{ inputs.DOCKER_PUBLISH_REGISTRY }}/${{ inputs.DOCKER_PUBLISH_IMAGE_NAME }}:latest;
@@ -629,9 +629,9 @@ jobs:
 
   docker-release-files:
     if: 
-      (
+      (${{
         github.ref_type == 'tag'
-      )
+      }})
     needs: 
       - docker-build
       - docker-sbom
