@@ -543,7 +543,8 @@ jobs:
 
 
   docker-pr-comment:
-    if: ${{ github.event.pull_request}}
+    # if: ${{ github.event.pull_request}}
+    if: ${{ inputs.DOCKER_SCAN_IMAGE_VULNERABILITY }}
     needs:
       - docker-scan-vulnerability
     runs-on: ubuntu-latest
