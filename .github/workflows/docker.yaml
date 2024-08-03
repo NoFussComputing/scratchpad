@@ -8,8 +8,14 @@ on:
     inputs:
       DOCKER_BUILD_IMAGE:
         default: "ghcr.io/${{ github.repository }}:${{ github.sha }}"
+        description: Full Docker image name
         required: false
         type: string
+      DOCKER_SCAN_IMAGE:
+        default: true
+        description: Scan Image with Trivy
+        required: false
+        type: boolean
 
 # env:
 #   DOCKER_BUILD_IMAGE: 
@@ -102,8 +108,15 @@ jobs:
 
 
   docker-scan:
-    if: github.event.pull_request || github.event.push
-    needs: docker-build
+    if:
+      (
+      (github.event.pull_request || github.event.push)
+        &&
+      inputs.DOCKER_SCAN_IMAGE
+      )
+
+    needs:
+      - docker-build
     runs-on: ubuntu-latest
     name: Scans
     steps:
@@ -255,7 +268,12 @@ jobs:
 
 
   docker-reports:
-    if: github.event.pull_request || github.event.push
+    if:
+      (
+      (github.event.pull_request || github.event.push)
+        &&
+      inputs.DOCKER_SCAN_IMAGE
+      )
     needs: 
       - docker-build
       - docker-scan
@@ -279,7 +297,12 @@ jobs:
 
 
   docker-pr-comment:
-    if: github.event.pull_request
+    if: 
+      (
+      github.event.pull_request
+        &&
+      inputs.DOCKER_SCAN_IMAGE
+      )
     needs: 
       - docker-build
       - docker-scan
