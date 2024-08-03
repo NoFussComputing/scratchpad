@@ -444,13 +444,19 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
 
-      - name: Generate SBOM attestation
+      - name: Generate SBOM Attestation
         uses: actions/attest-sbom@v1
         with:
           subject-name: '${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}'
           subject-digest: ${{ needs.docker-build.outputs.build-image-digest }}
           sbom-path: 'dependency-results.sbom.json'
           push-to-registry: true
+
+      - name: Upload SBOM Attestation Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-attestation
+          path: '/tmp/attestation.jsonl'
 
 
   docker-reports:
