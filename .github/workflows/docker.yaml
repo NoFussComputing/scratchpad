@@ -6,9 +6,19 @@ name: 'Docker'
 on:
   workflow_call:
     inputs:
-      DOCKER_BUILD_IMAGE:
-        default: "ghcr.io/${{ github.repository }}:${{ github.sha }}"
-        description: Full Docker image name
+      DOCKER_BUILD_REGISTRY:
+        default: "ghcr.io"
+        description: Registry where build image will live
+        required: false
+        type: string
+      DOCKER_BUILD_IMAGE_NAME:
+        default: "${{ github.repository }}"
+        description: Docker image name for building image
+        required: false
+        type: string
+      DOCKER_BUILD_IMAGE_TAG:
+        default: "${{ github.sha }}"
+        description: Docker image tag for building image
         required: false
         type: string
       DOCKER_SCAN_IMAGE:
@@ -16,9 +26,6 @@ on:
         description: Scan Image with Trivy
         required: false
         type: boolean
-
-# env:
-#   DOCKER_BUILD_IMAGE: 
 
 
 permissions:
@@ -73,13 +80,13 @@ jobs:
             --annotation "org.opencontainers.image.revision=${{ github.sha }}" \
           --push \
           --file dockerfile \
-          --tag ${{ inputs.DOCKER_BUILD_IMAGE }};
+          --tag inputs.DO${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }};
 
 
       - name: Remove "Unknown" Image from Manifest
         run: |
 
-          DOCKER_MULTI_ARCH_IMAGES=$(docker buildx imagetools inspect "${{ inputs.DOCKER_BUILD_IMAGE }}" --format "{{ range .Manifest.Manifests }}{{ if ne (print .Platform) \"&{unknown unknown  [] }\" }}${{ inputs.DOCKER_BUILD_IMAGE }}@{{ println .Digest }}{{end}} {{end}}");
+          DOCKER_MULTI_ARCH_IMAGES=$(docker buildx imagetools inspect "inputs.DO${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}" --format "{{ range .Manifest.Manifests }}{{ if ne (print .Platform) \"&{unknown unknown  [] }\" }}inputs.DO${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}@{{ println .Digest }}{{end}} {{end}}");
 
           # if [ "${{ inputs.build-branch }}" == "dev" ]; then
 
@@ -97,7 +104,7 @@ jobs:
           # fi;
 
           docker buildx imagetools create $DOCKER_MULTI_ARCH_IMAGES \
-            --tag ${{ inputs.DOCKER_BUILD_IMAGE }} \
+            --tag inputs.DO${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }} \
             --tag ghcr.io/${{ github.repository }}:dev;
 
 
@@ -134,7 +141,7 @@ jobs:
       - name: Run Trivy vulnerability scanner (Reports)
         uses: aquasecurity/trivy-action@0.20.0
         with:
-          image-ref: '${{ inputs.DOCKER_BUILD_IMAGE }}'
+          image-ref: 'inputs.DO${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}'
           format: 'sarif'
           output: 'trivy-results.sarif'
           severity: 'LOW,MEDIUM,HIGH,CRITICAL'
@@ -154,7 +161,7 @@ jobs:
       - name: Run Trivy vulnerability scanner (PR comment)
         uses: aquasecurity/trivy-action@0.20.0
         with:
-          image-ref: '${{ inputs.DOCKER_BUILD_IMAGE }}'
+          image-ref: 'inputs.DO${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}'
           format: 'json'
           output: 'scan-results.json'
           severity: 'LOW,MEDIUM,HIGH,CRITICAL'
