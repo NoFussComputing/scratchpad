@@ -37,19 +37,6 @@ permissions:
 
 jobs:
 
-  status-test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Run the action # You would run your tests before this using the output to set state/desc
-        uses: billyjbryant/create-status-check@v2
-        with:
-          authToken: ${{secrets.GITHUB_TOKEN}}
-          context: 'Test run'
-          description: 'Passed'
-          state: 'success'
-          sha: ${{github.event.pull_request.head.sha || github.sha}}
-
   docker-build:
     if: github.event.pull_request
     runs-on: ubuntu-latest
@@ -243,17 +230,62 @@ jobs:
           fi;
 
 
+
+      - name: Extract All vulnerabilities
+        run: |
+          not_empty="$(jq -r '.Results[] | .Vulnerabilities[]' scan-results.json)"
+
+          jq -r '
+          [
+          "# Full Image Scan Results",
+          "",
+          "**Scan Date:** _" + ( .CreatedAt // "" ) + "_",
+          "**Image:** _" + ( .ArtifactName // "" ) + "_",
+          "**OS:** _" + ( .Metadata.OS.Family // "" ) + " " + ( .Metadata.OS.Name // "" ) + "_",
+          ""
+          ] | join("\n")
+          ' scan-results.json > full-vulnerability-report.md
+
+          if [ "$not_empty" ]; then
+            jq -r '
+            def hr(severity):
+            if severity == "HIGH" or severity == "CRITICAL" then true else false end;
+            def to_md:
+            "| " + (.VulnerabilityID // "") + " | " + (.PkgName // "") + " | " + (.InstalledVersion // "") + " | " + (.Severity // "") + " | " + (.Title // "") + " |";
+            [
+            "## Vulnerabilities",
+            "",
+            "| Vulnerability ID | Package | Version | Severity | Description |",
+            "| --------- | ----- | ----- | ----- | -------|",
+            (.Results[] | .Vulnerabilities[] | .Severity) | to_md),
+            ""
+            ] | join("\n")
+            ' scan-results.json >> full-vulnerability-report.md
+
+          else
+
+            echo "**Nothing Found**" >> full-vulnerability-report.md
+
+          fi;
+
+
       - name: Upload scan results
         uses: actions/upload-artifact@v4
         with:
           name: vulnerability-report
           path: vulnerability-report.md
 
+      - name: Upload scan results
+        uses: actions/upload-artifact@v4
+        with:
+          name: vulnerability-report-full
+          path: full-vulnerability-report.md
+
       - uses: dtinth/markdown-report-action@v1
         with:
-          name: vulnerability-report
+          name: Vulnerability Report
           title: Vulnerability Report
-          body-file: vulnerability-report.md
+          body-file: full-vulnerability-report.md
 
 
 
