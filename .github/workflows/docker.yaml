@@ -408,13 +408,19 @@ jobs:
           path: '${{ github.workspace }}/dependency-results.sbom.json'
 
 
-      - name: Generate SBOM attestation
-        uses: actions/attest-sbom@v1
+      # - name: Generate SBOM attestation
+      #   uses: actions/attest-sbom@v1
+      #   with:
+      #     subject-name: '${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}'
+      #     subject-digest: ${{ needs.dockerbuild.outputs.digest }}
+      #     sbom-path: 'dependency-results.sbom.json'
+      #     push-to-registry: true
+
+      - name: "Attest and sign"
+        uses: 'nais/attest-sign@v1'
         with:
-          subject-name: '${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}'
-          subject-digest: ${{ needs.dockerbuild.outputs.digest }}
-          sbom-path: 'dependency-results.sbom.json'
-          push-to-registry: true
+          image_ref: '${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}'
+
 
 
   docker-reports:
