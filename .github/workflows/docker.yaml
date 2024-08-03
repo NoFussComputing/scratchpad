@@ -36,6 +36,19 @@ permissions:
 
 jobs:
 
+  status-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run the action # You would run your tests before this using the output to set state/desc
+        uses: mapbox/create-status-check@v1
+        with:
+          authToken: ${{secrets.GITHUB_TOKEN}}
+          context: 'Test run'
+          description: 'Passed'
+          state: 'success'
+          sha: ${{github.event.pull_request.head.sha || github.sha}}
+
   docker-build:
     if: github.event.pull_request
     runs-on: ubuntu-latest
@@ -235,7 +248,11 @@ jobs:
           name: vulnerability-report
           path: vulnerability-report.md
 
-
+      - uses: dtinth/markdown-report-action@v1
+        with:
+          name: vulnerability-report
+          title: Vulnerability Report
+          body-file: vulnerability-report.md
 
 
 
