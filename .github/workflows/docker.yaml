@@ -156,7 +156,7 @@ jobs:
       - name: Fetch Manifest digest
         id: image-digest
         run: |
-          echo "value-out=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }})" | cut -d '@' -f 2 >> $GITHUB_OUTPUT
+          echo "value-out=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }} | cut -d '@' -f 2)" >> $GITHUB_OUTPUT
 
 
       - name: Cleanup BuildX
