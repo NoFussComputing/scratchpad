@@ -9,7 +9,6 @@ on:
   #     build-branch:         # tag / dev
   #       required: true
   #       type: string
-  workflow_call:
   push:
     branches:
       - '*'         # matches every branch that doesn't contain a '/'
