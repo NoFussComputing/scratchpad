@@ -72,7 +72,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Build Image
     outputs:
-      build-digest: ${{ steps.image-digest.outputs.digest }}
+      build-image-name-digest: ${{ steps.image-digest.outputs }}
     steps:
 
 
@@ -433,7 +433,7 @@ jobs:
       - name: "Attest and sign"
         uses: 'nais/attest-sign@v1'
         with:
-          image_ref: '${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}@${{ needs.docker-build.outputs.build-digest }}'
+          image_ref: '${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}@${{ needs.docker-build.outputs.build-image-name-digest }}'
 
 
 
