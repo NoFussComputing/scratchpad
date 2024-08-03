@@ -63,13 +63,13 @@ jobs:
 
   docker-build:
     if:
-      (
-        ${{ github.event.pull_request
+      ${{ (
+        github.event.pull_request
           ||
         github.event.push
           ||
-        github.ref_type == 'tag' }}
-      )
+        github.ref_type == 'tag'
+      ) }}
     runs-on: ubuntu-latest
     name: Build Image
     outputs:
