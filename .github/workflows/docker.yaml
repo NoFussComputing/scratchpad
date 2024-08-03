@@ -21,6 +21,16 @@ on:
         description: Docker image tag for building image
         required: false
         type: string
+      DOCKER_PUBLISH_REGISTRY:
+        default: "docker.io"
+        description: Registry where image will be published to
+        required: false
+        type: string
+      DOCKER_PUBLISH_IMAGE_NAME:
+        default: "${{ github.repository }}"
+        description: Docker image name for publishing the image
+        required: false
+        type: string
       DOCKER_SCAN_IMAGE_VULNERABILITY:
         default: true
         description: Scan Image with Trivy
@@ -132,7 +142,7 @@ jobs:
 
           docker buildx imagetools create $DOCKER_MULTI_ARCH_IMAGES \
             --tag ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }} \
-            --tag ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ github.repository }}:dev;
+            --tag ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:dev;
 
 
       - name: Cleanup BuildX
@@ -422,7 +432,7 @@ jobs:
       - name: Create Image Tag '${{ github.ref_name }}'
         run: |
           docker buildx imagetools create ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_TAG_IMAGE_TAG_SOURCE }} \
-            --tag ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ github.repository }}:${{ github.ref_name }};
+            --tag ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ github.ref_name }};
 
 
       - name: Create Image Tag 'latest'
@@ -432,7 +442,7 @@ jobs:
           )
         run: |
           docker buildx imagetools create ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_TAG_IMAGE_TAG_SOURCE }} \
-            --tag ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ github.repository }}:latest;
+            --tag ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:latest;
 
 
   docker-pr-comment:
@@ -499,7 +509,7 @@ jobs:
       - name: Create Image Tag '${{ github.ref_name }}'
         run: |
           docker buildx imagetools create ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_TAG_IMAGE_TAG_SOURCE }} \
-            --tag ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ github.repository }}:${{ github.ref_name }};
+            --tag ${{ inputs.DOCKER_PUBLISH_REGISTRY }}/${{ inputs.DOCKER_PUBLISH_IMAGE_NAME }}:${{ github.ref_name }};
 
 
       - name: Create Image Tag 'latest'
@@ -509,5 +519,5 @@ jobs:
           )
         run: |
           docker buildx imagetools create ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_TAG_IMAGE_TAG_SOURCE }} \
-            --tag ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ github.repository }}:latest;
+            --tag ${{ inputs.DOCKER_PUBLISH_REGISTRY }}/${{ inputs.DOCKER_PUBLISH_IMAGE_NAME }}:latest;
 
