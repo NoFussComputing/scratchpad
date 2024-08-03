@@ -41,3 +41,10 @@ jobs:
     uses: nofusscomputing/scratchpad/.github/workflows/docker.yaml@further-testing
     with:
       DOCKER_BUILD_IMAGE_NAME: "${{ github.repository }}"
+
+
+  release:
+    name: 'Release'
+    uses: nofusscomputing/scratchpad/.github/workflows/release.yaml@further-testing
+    # with:
+    #   DOCKER_BUILD_IMAGE_NAME: "${{ github.repository }}"
