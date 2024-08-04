@@ -657,6 +657,53 @@ jobs:
             attestation-sbom.jsonl
 
 
+      - name: Upload created artifact to release assets
+        if: failure()
+        # id: upload-assets
+        uses: mkatanski/release-files-action@v1.0.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release-tag: ${{ github.ref_name }}
+          file-path: |
+            attestation-image.jsonl
+            attestation-sbom.jsonl
+
+
+      - name: Upload created artifact to release assets
+        if: failure()
+        # id: upload-assets
+        uses: mkatanski/release-files-action@v1.0.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release-tag: ${{ github.ref_name }}
+          file-path: attestation-image.jsonl,attestation-sbom.jsonl
+
+
+
+      - name: Upload created artifact to release assets
+        if: failure()
+        # id: upload-assets
+        uses: mkatanski/release-files-action@v1.0.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release-tag: ${{ github.ref_name }}
+          file-path: attestation-image.jsonl
+
+
+
+      - name: Upload created artifact to release assets
+        if: success()
+        # id: upload-assets
+        uses: mkatanski/release-files-action@v1.0.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release-tag: ${{ github.ref_name }}
+          file-path: attestation-sbom.jsonl
+
+
+
+
+
       # - name: Update Release
       #   uses: nicovince/manage-release@v1
       #   env:
