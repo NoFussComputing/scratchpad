@@ -28,18 +28,24 @@ jobs:
         id: release
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            Release.txt
-            LICENSE
+          # files: |
+          #   Release.txt
+          #   LICENSE
+          body: |
+            # A title block
+
+            Some release text
+
+            A [link](https://nofusscomputing.com) does render as markdown works.
 
 
       - run: | # Use to create env var for use in uploading files
           echo "${{ steps.release.outputs.upload_url }}" > release-url.txt
 
 
-      - name: Upload Release URL
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-URL
-          path: release-url.txt
+      # - name: Upload Release URL
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: release-URL
+      #     path: release-url.txt
 
