@@ -61,7 +61,7 @@ jobs:
           format: 'sarif'
           output: 'trivy-results.sarif'
           severity: 'LOW,MEDIUM,HIGH,CRITICAL'
-          vuln-type: 'os,library'
+          vuln-type: 'library'
           scanners: vuln
           ignore-unfixed: true
 
@@ -131,7 +131,6 @@ jobs:
           "",
           "**Scan Date:** _" + ( .CreatedAt // "" ) + "_",
           "**Image:** _" + ( .ArtifactName // "" ) + "_",
-          "**OS:** _" + ( .Metadata.OS.Family // "" ) + " " + ( .Metadata.OS.Name // "" ) + "_",
           ""
           ] | join("\n")
           ' scan-results.json > vulnerability-report.md
@@ -174,7 +173,6 @@ jobs:
           "",
           "**Scan Date:** _" + ( .CreatedAt // "" ) + "_",
           "**Image:** _" + ( .ArtifactName // "" ) + "_",
-          "**OS:** _" + ( .Metadata.OS.Family // "" ) + " " + ( .Metadata.OS.Name // "" ) + "_",
           ""
           ] | join("\n")
           ' scan-results.json > full-vulnerability-report.md
@@ -260,4 +258,48 @@ jobs:
           header: PIP File Scan Results
           message: |
             ${{ env.report }}
+
+
+
+
+  python-reports:
+    if: ${{
+        (
+          github.event.push
+            ||
+          github.ref_type == 'tag'
+        )
+      }}
+    needs: 
+      - requirements-scan-vulnerability
+    runs-on: ubuntu-latest
+    name: Create Reports
+    steps:
+
+
+      # - name: Dummy Task
+      #   # if: ${{
+      #   #     inputs.DOCKER_SCAN_IMAGE_VULNERABILITY == false
+      #   #   }}
+      #   run: |
+      #     echo "Scanning image turned off.This Job does nothing however as 'docker-scan-vulnerability' is a dependency job, must do something.";
+
+
+      - name: Fetch Scan Results
+        # if: ${{
+        #     inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
+        #   }}
+        uses: actions/download-artifact@v4
+        with:
+          name: vulnerability-report-full
+
+
+      - uses: dtinth/markdown-report-action@v1
+        # if: ${{
+        #     inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
+        #   }}
+        with:
+          name: PIP File Vulnerability Report
+          title: Vulnerability Report
+          body-file: full-vulnerability-report.md
 
