@@ -21,6 +21,21 @@ on:
         description: Docker image tag for building image
         required: false
         type: string
+      DOCKER_FILE:
+        default: "dockerfile"
+        description: Path to the dockerfile
+        required: false
+        type: string
+      DOCKER_LABEL_ARTIFACTHUB_MAINTAINER:
+        default: '[{"name":"No Fuss Computing","email":"helpdesk@nofusscomputing.com"}]'
+        description: Artifact hub Maintainer
+        required: false
+        type: string
+      DOCKER_LABEL_ARTIFACTHUB_README:
+        default: 'https://raw.githubusercontent.com/${{ github.repository }}/development/README.md'
+        description: Artifact hub ReadMe
+        required: false
+        type: string
       DOCKER_PUBLISH_REGISTRY:
         default: "docker.io"
         description: Registry where image will be published to
@@ -125,15 +140,15 @@ jobs:
             --label "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
             --label "org.opencontainers.image.revision=${{ github.sha }}" \
             \
-            --label "io.artifacthub.package.readme-url=https://raw.githubusercontent.com/${{ github.repository }}/development/README.md" \
-            --label 'io.artifacthub.package.maintainers=[{"name":"No Fuss Computing","email":"helpdesk@nofusscomputing.com"}]' \
+            --label "io.artifacthub.package.readme-url=${{ DOCKER_LABEL_ARTIFACTHUB_README }}" \
+            --label 'io.artifacthub.package.maintainers=${{ DOCKER_LABEL_ARTIFACTHUB_MAINTAINER }}' \
             \
             --annotation "org.opencontainers.image.description=a DESCRIPTION for multi-arch images" \
             --annotation "org.opencontainers.image.created=$(date '+%Y-%m-%dT%H:%M:%S%:z')" \
             --annotation "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
             --annotation "org.opencontainers.image.revision=${{ github.sha }}" \
           --push \
-          --file dockerfile \
+          --file ${{ inputs.DOCKER_FILE }} \
           --tag ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }};
 
 
