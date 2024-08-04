@@ -646,7 +646,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ github.ref_name }}
-          # name: "image-attestation.jsonl"
+          name: "image-attestation.jsonl"
           label: "Image Attestation"
           file-path: attestation-image.jsonl
 
@@ -659,7 +659,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ github.ref_name }}
-          # name: "image-attestation-sbom.jsonl"
+          name: "image-attestation-sbom.jsonl"
           label: "Image Attestation SBOM"
           file-path: attestation-sbom.jsonl
 
