@@ -80,6 +80,8 @@ jobs:
 
   unit-report:
     runs-on: ubuntu-latest
+    needs:
+      - test
     # strategy:
     #   max-parallel: 4
     #   matrix:
@@ -158,6 +160,8 @@ jobs:
 
 
   test-report:
+    needs:
+      - unit-report
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
