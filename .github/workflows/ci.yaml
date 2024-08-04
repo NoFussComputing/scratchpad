@@ -48,6 +48,8 @@ jobs:
     uses: ./.github/workflows/docker.yaml
     with:
       DOCKER_BUILD_IMAGE_NAME: "${{ github.repository }}"
+      DOCKER_PUBLISH_REGISTRY: "ghcr.io"
+      DOCKER_PUBLISH_IMAGE_NAME: "nofusscomputing/image-publish"
 
 
   release:
