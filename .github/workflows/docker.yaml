@@ -641,7 +641,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ github.ref_name }}
-          file-path:  |
+          file-path: |
             attestation-image.jsonl
             attestation-sbom.jsonl
 
