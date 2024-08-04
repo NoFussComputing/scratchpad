@@ -160,14 +160,13 @@ jobs:
 
 
       - name: Attest
-        if:
-          (${{
-            github.ref_name == "development"
+        if: ${{
+            github.ref_name == 'development'
               ||
-            github.ref_name == "master"
+            github.ref_name == 'master'
               ||
-            github.ref_type == "tag"
-          }})
+            github.ref_type == 'tag'
+          }}
         uses: actions/attest-build-provenance@v1
         id: image-attest
         with:
