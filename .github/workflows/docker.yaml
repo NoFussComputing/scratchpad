@@ -682,57 +682,40 @@ jobs:
 
 
       - name: Fetch Image Attestation Artifact
-        if:
-          (${{
-            inputs.DOCKER_PUBLISH_REGISTRY != inputs.DOCKER_BUILD_REGISTRY
-          }})
+        if: ${{ inputs.DOCKER_PUBLISH_REGISTRY != inputs.DOCKER_BUILD_REGISTRY }}
         uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-image-published
           path: attestation-image/
 
 
-      - if:
-          (${{
-            inputs.DOCKER_PUBLISH_REGISTRY != inputs.DOCKER_BUILD_REGISTRY
-          }})
+      - 
+        if: ${{ inputs.DOCKER_PUBLISH_REGISTRY != inputs.DOCKER_BUILD_REGISTRY }}
         run: |
           mv attestation-image/attestation.jsonl ${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-image.jsonl
 
 
       - name: Fetch SBOM Attestation Artifact
-        if:
-          (${{
-            inputs.DOCKER_PUBLISH_REGISTRY != inputs.DOCKER_BUILD_REGISTRY
-          }})
+        if: ${{ inputs.DOCKER_PUBLISH_REGISTRY != inputs.DOCKER_BUILD_REGISTRY }}
         uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-image-sbom-published
           path: attestation-sbom/
 
 
-      - if:
-          (${{
-            inputs.DOCKER_PUBLISH_REGISTRY != inputs.DOCKER_BUILD_REGISTRY
-          }})
+      - if: ${{ inputs.DOCKER_PUBLISH_REGISTRY != inputs.DOCKER_BUILD_REGISTRY }}
         run: |
           mv attestation-sbom/attestation.jsonl ${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-sbom.jsonl
 
 
-      - if:
-          (${{
-            inputs.DOCKER_PUBLISH_REGISTRY != inputs.DOCKER_BUILD_REGISTRY
-          }})
+      - if: ${{ inputs.DOCKER_PUBLISH_REGISTRY != inputs.DOCKER_BUILD_REGISTRY }}
         run: |
           ls -la;
 
 
 
       - name: Upload created artifact to release assets
-        if:
-          (${{
-            inputs.DOCKER_PUBLISH_REGISTRY != inputs.DOCKER_BUILD_REGISTRY
-          }})
+        if: ${{ inputs.DOCKER_PUBLISH_REGISTRY != inputs.DOCKER_BUILD_REGISTRY }}
         # if: failure()
         # id: upload-assets
         uses: mkatanski/release-files-action@v1.0.1
@@ -746,10 +729,7 @@ jobs:
 
 
       - name: Upload created artifact to release assets
-        if:
-          (${{
-            inputs.DOCKER_PUBLISH_REGISTRY != inputs.DOCKER_BUILD_REGISTRY
-          }})
+        if: ${{ inputs.DOCKER_PUBLISH_REGISTRY != inputs.DOCKER_BUILD_REGISTRY }}
         # if: success()
         # id: upload-assets
         uses: mkatanski/release-files-action@v1.0.1
