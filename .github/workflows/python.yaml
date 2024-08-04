@@ -123,14 +123,22 @@ jobs:
         #     inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
         #   }})
         run: |
-          not_empty="$(jq -r '.Results[] | .Vulnerabilities[]' scan-results.json)"
+          if [ "$(jq -r '.Results'" ]; then
+
+            not_empty="$(jq -r '.Results[] | .Vulnerabilities[]' scan-results.json)";
+
+          else
+
+            not_empty="";
+
+          fi
 
           jq -r '
           [
           "# PIP File Scan Results",
           "",
           "**Scan Date:** _" + ( .CreatedAt // "" ) + "_",
-          "**Image:** _" + ( .ArtifactName // "" ) + "_",
+          "**File:** _" + ( .ArtifactName // "" ) + "_",
           ""
           ] | join("\n")
           ' scan-results.json > vulnerability-report.md
@@ -165,14 +173,23 @@ jobs:
         #     inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
         #   }})
         run: |
-          not_empty="$(jq -r '.Results[] | .Vulnerabilities[]' scan-results.json)"
+          if [ "$(jq -r '.Results'" ]; then
+
+            not_empty="$(jq -r '.Results[] | .Vulnerabilities[]' scan-results.json)";
+
+          else
+
+            not_empty="";
+
+          fi
+
 
           jq -r '
           [
           "# Full PIP File Scan Results",
           "",
           "**Scan Date:** _" + ( .CreatedAt // "" ) + "_",
-          "**Image:** _" + ( .ArtifactName // "" ) + "_",
+          "**File:** _" + ( .ArtifactName // "" ) + "_",
           ""
           ] | join("\n")
           ' scan-results.json > full-vulnerability-report.md
