@@ -237,7 +237,7 @@ jobs:
         if: ${{ github.ref_type == 'tag' }}
         # if: success()
         # id: upload-assets
-        uses: mkatanski/release-files-action@v1.0.1
+        uses: mkatanski/release-files-action@v1.1.3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ github.ref_name }}
@@ -439,7 +439,7 @@ jobs:
         if: ${{ github.ref_type == 'tag' }}
         # if: success()
         # id: upload-assets
-        uses: mkatanski/release-files-action@v1.0.1
+        uses: mkatanski/release-files-action@v1.1.3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ github.ref_name }}
@@ -564,7 +564,7 @@ jobs:
 
 
   docker-pr-comment:
-    if: ${{ github.event.pull_request}}
+    if: ${{ github.event.pull_request }}
     # if: ${{ inputs.DOCKER_SCAN_IMAGE_VULNERABILITY }}
     needs:
       - docker-scan-vulnerability
@@ -760,7 +760,7 @@ jobs:
         if: ${{ inputs.DOCKER_PUBLISH_REGISTRY != inputs.DOCKER_BUILD_REGISTRY }}
         # if: failure()
         # id: upload-assets
-        uses: mkatanski/release-files-action@v1.0.1
+        uses: mkatanski/release-files-action@v1.1.3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ github.ref_name }}
@@ -774,7 +774,7 @@ jobs:
         if: ${{ inputs.DOCKER_PUBLISH_REGISTRY != inputs.DOCKER_BUILD_REGISTRY }}
         # if: success()
         # id: upload-assets
-        uses: mkatanski/release-files-action@v1.0.1
+        uses: mkatanski/release-files-action@v1.1.3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ github.ref_name }}
@@ -812,7 +812,7 @@ jobs:
       - name: Upload created artifact to release assets - ${{ inputs.DOCKER_BUILD_REGISTRY }}
         # if: failure()
         # id: upload-assets
-        uses: mkatanski/release-files-action@v1.0.1
+        uses: mkatanski/release-files-action@v1.1.3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ github.ref_name }}
@@ -825,7 +825,7 @@ jobs:
       - name: Upload created artifact to release assets - ${{ inputs.DOCKER_BUILD_REGISTRY }}
         # if: success()
         # id: upload-assets
-        uses: mkatanski/release-files-action@v1.0.1
+        uses: mkatanski/release-files-action@v1.1.3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ github.ref_name }}
