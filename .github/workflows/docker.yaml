@@ -626,7 +626,7 @@ jobs:
           mv attestation-sbom/attestation.jsonl attestation-sbom.jsonl
 
 
-        run: |
+      - run: |
           ls -la;
 
       # - name: Add assets to release
