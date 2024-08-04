@@ -636,6 +636,7 @@ jobs:
     needs: 
       - docker-build
       - docker-sbom
+      - docker-tagged
     runs-on: ubuntu-latest
     name: Release Files
     steps:
