@@ -253,7 +253,7 @@ jobs:
         # if: ${{ inputs.DOCKER_SCAN_IMAGE_VULNERABILITY }}
         uses: actions/download-artifact@v4
         with:
-          name: vulnerability-report
+          name: python-vulnerability-report
 
 
       - name: Capture scan results
@@ -318,5 +318,5 @@ jobs:
         with:
           name: PIP File Vulnerability Report
           title: Vulnerability Report
-          body-file: python-full-vulnerability-report.md
+          body-file: full-vulnerability-report.md
 
