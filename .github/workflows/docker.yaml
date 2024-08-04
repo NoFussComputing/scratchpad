@@ -536,13 +536,13 @@ jobs:
 
 
   docker-reports:
-    if: ${{
-        (
-          github.event.push
-            ||
-          github.ref_type == 'tag'
-        )
-      }}
+    # if: ${{
+    #     (
+    #       github.event.push
+    #         ||
+    #       github.ref_type == 'tag'
+    #     )
+    #   }}
     needs: 
       - docker-scan-vulnerability
       - docker-build
