@@ -640,7 +640,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: trivy-sbom-report
-          path: '${{ github.workspace }}/dependency-results.sbom.json'
+          # path: '${{ github.workspace }}/dependency-results.sbom.json'
 
 
       - name: Generate SBOM Attestation (publish)
