@@ -41,12 +41,26 @@ jobs:
           ignore-unfixed: true
           format: 'sarif'
           output: 'trivy-results.sarif'
-          severity: 'CRITICAL'
+          severity: 'LOW,MEDIUM,HIGH,CRITICAL'
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: 'trivy-results.sarif'
+
+
+      
+      - name: Upload scan results
+        # if:
+        #   (${{
+        #     inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
+        #   }})
+        uses: actions/upload-artifact@v4
+        with:
+          name: tester-scan-results-json
+          path: trivy-results.sarif
+
+
 
 
   requirements-scan-vulnerability:
