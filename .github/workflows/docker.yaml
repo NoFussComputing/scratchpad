@@ -694,6 +694,22 @@ jobs:
             --tag ${{ inputs.DOCKER_PUBLISH_REGISTRY }}/${{ inputs.DOCKER_PUBLISH_IMAGE_NAME }}:latest;
 
 
+      - name: Append GH Release Body
+        if: ${{ github.ref_type == 'tag' }}
+        id: release
+        uses: softprops/action-gh-release@v2
+        with:
+          append_body: true
+          body: |
+            ## Images
+
+            - `docker pull ${{ inputs.DOCKER_PUBLISH_REGISTRY }}/${{ inputs.DOCKER_PUBLISH_IMAGE_NAME }}:latest`
+            - `docker pull ${{ inputs.DOCKER_PUBLISH_REGISTRY }}/${{ inputs.DOCKER_PUBLISH_IMAGE_NAME }}:${{ inputs.DOCKER_TAG_IMAGE_TAG_SOURCE }}`
+            - `docker pull ${{ inputs.DOCKER_PUBLISH_REGISTRY }}/${{ inputs.DOCKER_PUBLISH_IMAGE_NAME }}:${{ github.ref_name }}`
+
+            [another link](https://nofusscomputing.com) does render as markdown works.
+
+
 
   docker-release-files:
     if: ${{ github.ref_type == 'tag' }}
