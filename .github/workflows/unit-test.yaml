@@ -98,8 +98,8 @@ jobs:
         with:
           name: coverage-report-3.12
           # path: coverage.xml
-          run-id: ${{ github.event.workflow_run.id }}
-          github-token: ${{ github.token }}
+          # run-id: ${{ github.event.workflow_run.id }}
+          # github-token: ${{ github.token }}
 
       - name: ls
         if: success() || failure()
