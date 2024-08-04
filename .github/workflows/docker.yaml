@@ -632,7 +632,7 @@ jobs:
       - name: Upload Image Attestation Artifact ${{ github.ref_name }}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-image
+          name: ${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-image-published
           path: ${{ steps.image-attest.outputs.bundle-path }}
 
 
@@ -649,7 +649,7 @@ jobs:
       - name: Upload SBOM Attestation Artifact (publish)
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-image-sbom
+          name: ${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-image-sbom-published
           path: ${{ steps.sbom-attest.outputs.bundle-path }}
 
 
@@ -677,7 +677,7 @@ jobs:
       - name: Fetch Image Attestation Artifact
         uses: actions/download-artifact@v4
         with:
-          name: ${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-image
+          name: ${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-image-published
           path: attestation-image/
 
 
@@ -688,7 +688,7 @@ jobs:
       - name: Fetch SBOM Attestation Artifact
         uses: actions/download-artifact@v4
         with:
-          name: ${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-image-sbom
+          name: ${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-image-sbom-published
           path: attestation-sbom/
 
 
