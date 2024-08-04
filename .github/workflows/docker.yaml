@@ -447,7 +447,7 @@ jobs:
       - name: Upload SBOM Attestation Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-sbom-image
+          name: ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image-sbom
           path: ${{ steps.sbom-attest.outputs.bundle-path }}
 
 
