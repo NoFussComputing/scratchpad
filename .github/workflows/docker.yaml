@@ -581,11 +581,14 @@ jobs:
           echo "$content" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
+      - uses: jwalton/gh-find-current-pr@v1
+        id: finder
 
       - name: Comment scan results on PR
         if: ${{ inputs.DOCKER_SCAN_IMAGE_VULNERABILITY }}
         uses: marocchino/sticky-pull-request-comment@v2
         with:
+          number: ${{ steps.finder.outputs.pr }}
           header: Image Scan Results
           message: |
             ${{ env.report }}
