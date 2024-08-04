@@ -637,6 +637,7 @@ jobs:
       - docker-build
       - docker-sbom
       - docker-tagged
+      - docker-publish
     runs-on: ubuntu-latest
     name: Release Files
     steps:
