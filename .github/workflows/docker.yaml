@@ -69,8 +69,6 @@ jobs:
   docker-build:
     if:
       (${{
-        github.event.pull_request
-          ||
         github.event.push
           ||
         github.ref_type == 'tag'
@@ -176,8 +174,6 @@ jobs:
     if:
       (${{
         (
-          github.event.pull_request
-            ||
           github.event.push
             ||
           github.ref_type == 'tag'
@@ -400,8 +396,6 @@ jobs:
     if:
       (${{
         (
-          github.event.pull_request
-            ||
           github.event.push
             ||
           github.ref_type == 'tag'
@@ -481,8 +475,6 @@ jobs:
     if:
       (${{
         (
-          github.event.pull_request
-            ||
           github.event.push
             ||
           github.ref_type == 'tag'
@@ -564,7 +556,7 @@ jobs:
 
 
   docker-pr-comment:
-    # if: ${{ github.event.pull_request }}
+    if: ${{ github.event.pull_request }}
     # if: ${{ inputs.DOCKER_SCAN_IMAGE_VULNERABILITY }}
     needs:
       - docker-scan-vulnerability

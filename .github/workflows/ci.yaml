@@ -16,12 +16,12 @@ on:
       - '**'        # matches every branch
     tags:
       - '*'
-  # pull_request:
+  pull_request:
   #   branches:
   #     - '**'
-  #   types:
+    types:
   #     - opened
-  #     - synchronize
+      - synchronize
   #     - closed
   #     - reopened
 
