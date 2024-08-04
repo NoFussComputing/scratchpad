@@ -160,6 +160,14 @@ jobs:
 
 
       - name: Attest
+        if:
+          (${{
+            github.ref_name == 'development'
+              ||
+            github.ref_name == 'master'
+              ||
+            github.ref_type == 'tag'
+          }})
         uses: actions/attest-build-provenance@v1
         id: image-attest
         with:
@@ -169,6 +177,14 @@ jobs:
 
 
       - name: Upload Image Attestation Artifact
+        if:
+          (${{
+            github.ref_name == 'development'
+              ||
+            github.ref_name == 'master'
+              ||
+            github.ref_type == 'tag'
+          }})
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image
@@ -445,6 +461,10 @@ jobs:
       - name: Log into registry ghcr.io
         if: 
           (${{
+            github.ref_name == 'development'
+              ||
+            github.ref_name == 'master'
+              ||
             github.ref_type != 'tag'
           }})
         uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
@@ -455,6 +475,14 @@ jobs:
 
 
       - name: Generate SBOM Attestation
+        if:
+          (${{
+            github.ref_name == 'development'
+              ||
+            github.ref_name == 'master'
+              ||
+            github.ref_type == 'tag'
+          }})
         id: sbom-attest
         uses: actions/attest-sbom@v1
         with:
@@ -465,6 +493,14 @@ jobs:
 
 
       - name: Upload SBOM Attestation Artifact
+        if:
+          (${{
+            github.ref_name == 'development'
+              ||
+            github.ref_name == 'master'
+              ||
+            github.ref_type == 'tag'
+          }})
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image-sbom
