@@ -646,42 +646,42 @@ jobs:
       #     github-token: ${{ secrets.GITHUB_TOKEN }}
       #     release-url: https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }}
 
+      # - name: Upload created artifact to release assets
+      #   id: upload-assets
+      #   uses: mkatanski/release-files-action@v1.0.1
+      #   with:
+      #     token: ${{ secrets.GITHUB_TOKEN }}
+      #     release-tag: ${{ github.ref_name }}
+      #     file-path: >
+      #       attestation-image.jsonl
+      #       attestation-sbom.jsonl
+
+
+      # - name: Upload created artifact to release assets
+      #   if: failure()
+      #   # id: upload-assets
+      #   uses: mkatanski/release-files-action@v1.0.1
+      #   with:
+      #     token: ${{ secrets.GITHUB_TOKEN }}
+      #     release-tag: ${{ github.ref_name }}
+      #     file-path: |
+      #       attestation-image.jsonl
+      #       attestation-sbom.jsonl
+
+
+      # - name: Upload created artifact to release assets
+      #   if: failure()
+      #   # id: upload-assets
+      #   uses: mkatanski/release-files-action@v1.0.1
+      #   with:
+      #     token: ${{ secrets.GITHUB_TOKEN }}
+      #     release-tag: ${{ github.ref_name }}
+      #     file-path: attestation-image.jsonl,attestation-sbom.jsonl
+
+
+
       - name: Upload created artifact to release assets
-        id: upload-assets
-        uses: mkatanski/release-files-action@v1.0.1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          release-tag: ${{ github.ref_name }}
-          file-path: >
-            attestation-image.jsonl
-            attestation-sbom.jsonl
-
-
-      - name: Upload created artifact to release assets
-        if: failure()
-        # id: upload-assets
-        uses: mkatanski/release-files-action@v1.0.1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          release-tag: ${{ github.ref_name }}
-          file-path: |
-            attestation-image.jsonl
-            attestation-sbom.jsonl
-
-
-      - name: Upload created artifact to release assets
-        if: failure()
-        # id: upload-assets
-        uses: mkatanski/release-files-action@v1.0.1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          release-tag: ${{ github.ref_name }}
-          file-path: attestation-image.jsonl,attestation-sbom.jsonl
-
-
-
-      - name: Upload created artifact to release assets
-        if: failure()
+        # if: failure()
         # id: upload-assets
         uses: mkatanski/release-files-action@v1.0.1
         with:
@@ -692,7 +692,7 @@ jobs:
 
 
       - name: Upload created artifact to release assets
-        if: success()
+        # if: success()
         # id: upload-assets
         uses: mkatanski/release-files-action@v1.0.1
         with:
