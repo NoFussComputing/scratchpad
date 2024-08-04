@@ -575,7 +575,7 @@ jobs:
         with:
           name: Docker Vulnerability Report
           title: Vulnerability Report
-          body-file: docker-full-vulnerability-report.md
+          body-file: full-vulnerability-report.md
 
 
 
