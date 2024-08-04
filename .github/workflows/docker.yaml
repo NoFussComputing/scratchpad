@@ -46,11 +46,16 @@ on:
         description: Create image with tag 'Latest'
         required: false
         type: boolean
+      DOCKER_TAG_IMAGE_TAG_SHA:
+        default: true
+        description: Create image with tag that is the git commit
+        required: false
+        type: boolean
 
 
 permissions:
   pull-requests: write
-  contents: read
+  contents: write
   actions: read
   checks: write
   packages: write
@@ -63,13 +68,11 @@ jobs:
 
   docker-build:
     if:
-      (
-        github.event.pull_request
-          ||
+      (${{
         github.event.push
           ||
         github.ref_type == 'tag'
-      )
+      }})
     runs-on: ubuntu-latest
     name: Build Image
     outputs:
@@ -77,23 +80,28 @@ jobs:
     steps:
 
 
+      - name: Debug
+        run: |
+          echo "${{ github.event.pull_request.head.repo.full_name || github.repository }}";
+          echo "**************************";
+          echo "${{ github.event.pull_request.head.repo.full_name }}";
+          echo "**************************";
+          echo "${{ github.repository }}";
+          echo "**************************";
+          echo "${{ github.event.pull_request.head.repo }}";
+          echo "**************************";
+          echo "${{ github.event.push }}";
+          echo "**************************";
       - uses: actions/checkout@v4
 
       - name: Dummy Task
-        if: 
-          (
-            github.ref_type == 'tag'
-          )
+        if: ${{ github.ref_type == 'tag' }}
         run: |
           echo "This Job does nothing however as 'docker-build' is a dependency job, must do something.";
 
 
 
       - name: Log into registry ghcr.io
-        if: 
-          (
-            github.ref_type != 'tag'
-          )
         uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
         with:
           registry: ghcr.io
@@ -102,20 +110,14 @@ jobs:
 
 
       - name: Setup BuildX
-        if: 
-          (
-            github.ref_type != 'tag'
-          )
+        if: ${{ github.ref_type != 'tag' }}
         run: |
           docker buildx create --name project-v3-builder;
           docker buildx use project-v3-builder;
 
 
       - name: build image
-        if: 
-          (
-            github.ref_type != 'tag'
-          )
+        if: ${{ github.ref_type != 'tag' }}
         run: |
           docker buildx build --platform="linux/amd64,linux/arm64" . \
             --label "org.opencontainers.image.created=$(date '+%Y-%m-%dT%H:%M:%S%:z')" \
@@ -135,10 +137,7 @@ jobs:
 
 
       - name: Remove "Unknown" Image from Manifest
-        if: 
-          (
-            github.ref_type != 'tag'
-          )
+        if: ${{ github.ref_type != 'tag' }}
         run: |
 
           DOCKER_MULTI_ARCH_IMAGES=$(docker buildx imagetools inspect "${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}" --format "{{ range .Manifest.Manifests }}{{ if ne (print .Platform) \"&{unknown unknown  [] }\" }}${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}@{{ println .Digest }}{{end}} {{end}}");
@@ -160,10 +159,6 @@ jobs:
 
 
       - name: Attest
-        if: 
-          (
-            github.ref_type != 'tag'
-          )
         uses: actions/attest-build-provenance@v1
         id: image-attest
         with:
@@ -175,15 +170,12 @@ jobs:
       - name: Upload Image Attestation Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: docker-image-attestation
+          name: ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image
           path: ${{ steps.image-attest.outputs.bundle-path }}
 
 
       - name: Cleanup BuildX
-        if: 
-          (
-            github.ref_type != 'tag'
-          )
+        if: ${{ github.ref_type != 'tag' }}
         run: |
           docker buildx rm project-v3-builder;
 
@@ -191,17 +183,15 @@ jobs:
 
   docker-scan-vulnerability:
     if:
-      (
+      (${{
         (
-          github.event.pull_request
-            ||
           github.event.push
             ||
           github.ref_type == 'tag'
         )
           &&
         inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-      )
+      }})
 
     needs:
       - docker-build
@@ -213,18 +203,18 @@ jobs:
 
       - name: Dummy Task
         if:
-          (
+          (${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY == false
-          )
+          }})
         run: |
           echo "Scanning image turned off.This Job does nothing however as 'docker-scan-vulnerability' is a dependency job, must do something.";
 
 
       - name: Log into registry ghcr.io
         if:
-          (
+          (${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          )
+          }})
         uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
         with:
           registry: ghcr.io
@@ -234,9 +224,9 @@ jobs:
 
       - name: Run Trivy vulnerability scanner (sarif Report)
         if:
-          (
+          (${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          )
+          }})
         uses: aquasecurity/trivy-action@0.20.0
         with:
           image-ref: '${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}'
@@ -244,17 +234,25 @@ jobs:
           output: 'trivy-results.sarif'
           severity: 'LOW,MEDIUM,HIGH,CRITICAL'
           vuln-type: 'os,library'
-          # list-all-pkgs: true
           scanners: vuln
-          # trivy-config: .trivy.yaml
           ignore-unfixed: true
+
+
+      - name: Upload Trivy Vulnerability Scan as a release asset
+        if: ${{ github.ref_type == 'tag' }}
+        uses: mkatanski/release-files-action@v1.1.3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release-tag: ${{ github.ref_name }}
+          name: "trivy-vulnerability-scan.sarif"
+          file-path: trivy-results.sarif
 
 
       - name: Upload Trivy scan results to GitHub Security tab
         if:
-          (
+          (${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          )
+          }})
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: 'trivy-results.sarif'
@@ -262,9 +260,9 @@ jobs:
 
       - name: Run Trivy vulnerability scanner (json Report)
         if:
-          (
+          (${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          )
+          }})
         uses: aquasecurity/trivy-action@0.20.0
         with:
           image-ref: '${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}'
@@ -272,18 +270,15 @@ jobs:
           output: 'scan-results.json'
           severity: 'LOW,MEDIUM,HIGH,CRITICAL'
           vuln-type: 'os,library'
-          # list-all-pkgs: true
           scanners: vuln
-          # trivy-config: .trivy.yaml
           ignore-unfixed: false
 
       - name: Upload scan results
         if:
-          (
+          (${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          )
+          }})
         uses: actions/upload-artifact@v4
-        # if: success() || failure()
         with:
           name: container-scan-results-json
           path: scan-results.json
@@ -294,10 +289,9 @@ jobs:
 
       - name: Create Vulnerabilities (Critical/High)
         if:
-          (
+          (${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          )
-        # id: extract_vulnerabilities_orig
+          }})
         run: |
           not_empty="$(jq -r '.Results[] | .Vulnerabilities[]' scan-results.json)"
 
@@ -338,9 +332,9 @@ jobs:
 
       - name: Create Full Vulnerabilities
         if:
-          (
+          (${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          )
+          }})
         run: |
           not_empty="$(jq -r '.Results[] | .Vulnerabilities[]' scan-results.json)"
 
@@ -380,9 +374,9 @@ jobs:
 
       - name: Upload scan results
         if:
-          (
+          (${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          )
+          }})
         uses: actions/upload-artifact@v4
         with:
           name: vulnerability-report
@@ -390,9 +384,9 @@ jobs:
 
       - name: Upload scan results
         if:
-          (
+          (${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          )
+          }})
         uses: actions/upload-artifact@v4
         with:
           name: vulnerability-report-full
@@ -402,15 +396,13 @@ jobs:
 
   docker-sbom:
     if:
-      (
+      (${{
         (
-          github.event.pull_request
-            ||
           github.event.push
             ||
           github.ref_type == 'tag'
         )
-      )
+      }})
     needs: 
       - docker-build
     runs-on: ubuntu-latest
@@ -439,11 +431,21 @@ jobs:
           path: '${{ github.workspace }}/dependency-results.sbom.json'
 
 
+      - name: Upload Trivy SBOM as a release asset
+        if: ${{ github.ref_type == 'tag' }}
+        uses: mkatanski/release-files-action@v1.1.3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release-tag: ${{ github.ref_name }}
+          name: "dependency-scan.sbom.json"
+          file-path: dependency-results.sbom.json
+
+
       - name: Log into registry ghcr.io
         if: 
-          (
+          (${{
             github.ref_type != 'tag'
-          )
+          }})
         uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
         with:
           registry: ghcr.io
@@ -464,21 +466,19 @@ jobs:
       - name: Upload SBOM Attestation Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: docker-image-attestation-sbom
+          name: ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image-sbom
           path: ${{ steps.sbom-attest.outputs.bundle-path }}
 
 
   docker-reports:
     if:
-      (
+      (${{
         (
-          github.event.pull_request
-            ||
           github.event.push
             ||
           github.ref_type == 'tag'
         )
-      )
+      }})
     needs: 
       - docker-scan-vulnerability
       - docker-build
@@ -489,18 +489,18 @@ jobs:
 
       - name: Dummy Task
         if:
-          (
+          (${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY == false
-          )
+          }})
         run: |
           echo "Scanning image turned off.This Job does nothing however as 'docker-scan-vulnerability' is a dependency job, must do something.";
 
 
       - name: Fetch Scan Results
         if:
-          (
+          (${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          )
+          }})
         uses: actions/download-artifact@v4
         with:
           name: vulnerability-report-full
@@ -508,9 +508,9 @@ jobs:
 
       - uses: dtinth/markdown-report-action@v1
         if:
-          (
+          (${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          )
+          }})
         with:
           name: Docker Vulnerability Report
           title: Vulnerability Report
@@ -519,17 +519,26 @@ jobs:
 
 
   docker-tagged:
-    if: 
-      (
-        github.ref_type == 'tag'
-      )
+    if: ${{ github.ref_type == 'tag' }}
     needs: 
       - docker-scan-vulnerability
       - docker-reports
     runs-on: ubuntu-latest
     name: Tagged Image
     steps:
-    
+
+
+      - name: Log into registry ghcr.io
+        if: 
+          (${{
+            github.ref_type != 'tag'
+          }})
+        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
 
       - name: Create Image Tag '${{ github.ref_name }}'
         run: |
@@ -538,10 +547,7 @@ jobs:
 
 
       - name: Create Image Tag 'latest'
-        if:
-          (
-            inputs.DOCKER_TAG_IMAGE_TAG_LATEST
-          )
+        if: ${{ inputs.DOCKER_TAG_IMAGE_TAG_LATEST }}
         run: |
           docker buildx imagetools create ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_TAG_IMAGE_TAG_SOURCE }} \
             --tag ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:latest;
@@ -549,10 +555,7 @@ jobs:
 
 
   docker-pr-comment:
-    if: 
-      (
-        github.event.pull_request
-      )
+    if: ${{ github.ref_type != 'tag' }}
     needs:
       - docker-scan-vulnerability
     runs-on: ubuntu-latest
@@ -561,35 +564,28 @@ jobs:
 
 
       - name: Fetch Vulnerability Report
-        if:
-          (
-            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          )
+        if: ${{ inputs.DOCKER_SCAN_IMAGE_VULNERABILITY }}
         uses: actions/download-artifact@v4
         with:
           name: vulnerability-report
 
 
       - name: Capture scan results
-        if:
-          (
-            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          )
-        # id: capture_results
+        if: ${{ inputs.DOCKER_SCAN_IMAGE_VULNERABILITY }}
         run: |
           content=$(cat vulnerability-report.md | head -c 65000)
           echo "report<<EOF" >> $GITHUB_ENV
           echo "$content" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
+      - uses: jwalton/gh-find-current-pr@v1
+        id: finder
 
       - name: Comment scan results on PR
-        if:
-          (
-            inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          )
+        if: ${{ inputs.DOCKER_SCAN_IMAGE_VULNERABILITY }}
         uses: marocchino/sticky-pull-request-comment@v2
         with:
+          number: ${{ steps.finder.outputs.pr }}
           header: Image Scan Results
           message: |
             ${{ env.report }}
@@ -597,11 +593,9 @@ jobs:
 
 
   docker-publish:
-    if: 
-      (
-        github.ref_type == 'tag'
-      )
+    if: ${{ github.ref_type == 'tag' }}
     needs: 
+      - docker-build
       - docker-scan-vulnerability
       - docker-reports
       - docker-tagged
@@ -610,65 +604,213 @@ jobs:
     steps:
 
 
-      - name: Create Image Tag '${{ github.ref_name }}'
+      - name: Log into registry ghcr.io
+        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+        with:
+          registry: ${{ inputs.DOCKER_PUBLISH_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+
+      - name: Tag Image with GIT Tag '${{ github.ref_name }}'
         run: |
           docker buildx imagetools create ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_TAG_IMAGE_TAG_SOURCE }} \
-            --tag ${{ inputs.DOCKER_PUBLISH_REGISTRY }}/${{ inputs.DOCKER_PUBLISH_IMAGE_NAME }}:${{ github.ref_name }};
+            --tag ${{ inputs.DOCKER_PUBLISH_REGISTRY }}/${{ inputs.DOCKER_PUBLISH_IMAGE_NAME }}:${{ github.ref_name }} \
 
 
-      - name: Create Image Tag 'latest'
-        if:
-          (
-            inputs.DOCKER_TAG_IMAGE_TAG_LATEST
-          )
+
+      - name: Tag Image with GIT commit '${{ inputs.DOCKER_TAG_IMAGE_TAG_SOURCE }}'
+        if: ${{ inputs.DOCKER_TAG_IMAGE_TAG_SHA }}
+        run: |
+          docker buildx imagetools create ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_TAG_IMAGE_TAG_SOURCE }} \
+            --tag ${{ inputs.DOCKER_PUBLISH_REGISTRY }}/${{ inputs.DOCKER_PUBLISH_IMAGE_NAME }}:${{ inputs.DOCKER_TAG_IMAGE_TAG_SOURCE }} \
+
+
+      - name: Fetch image ${{ github.ref_name }}
+        run: |
+          docker pull ${{ inputs.DOCKER_PUBLISH_REGISTRY }}/${{ inputs.DOCKER_PUBLISH_IMAGE_NAME }}:${{ github.ref_name }} >> /dev/null;
+
+
+      - name: Fetch Manifest digest ${{ github.ref_name }}
+        id: image-digest
+        run: |
+          echo "value-out=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ inputs.DOCKER_PUBLISH_REGISTRY }}/${{ inputs.DOCKER_PUBLISH_IMAGE_NAME }}:${{ github.ref_name }} | cut -d '@' -f 2)" >> $GITHUB_OUTPUT
+
+
+      - name: Attest ${{ github.ref_name }}
+        uses: actions/attest-build-provenance@v1
+        id: image-attest
+        with:
+          subject-name: ${{ inputs.DOCKER_PUBLISH_REGISTRY }}/${{ inputs.DOCKER_PUBLISH_IMAGE_NAME }}
+          subject-digest: ${{ steps.image-digest.outputs.value-out }}
+          push-to-registry: true
+
+
+      - name: Upload Image Attestation Artifact ${{ github.ref_name }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-image-published
+          path: ${{ steps.image-attest.outputs.bundle-path }}
+
+
+      - name: Download SBOM as a Github artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: trivy-sbom-report
+
+
+      - name: Generate SBOM Attestation (publish)
+        id: sbom-attest
+        uses: actions/attest-sbom@v1
+        with:
+          subject-name: '${{ inputs.DOCKER_PUBLISH_REGISTRY }}/${{ inputs.DOCKER_PUBLISH_IMAGE_NAME }}'
+          subject-digest: ${{ needs.docker-build.outputs.build-image-digest }}
+          sbom-path: 'dependency-results.sbom.json'
+          push-to-registry: true
+
+
+      - name: Upload SBOM Attestation Artifact (publish)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-image-sbom-published
+          path: ${{ steps.sbom-attest.outputs.bundle-path }}
+
+
+
+      - name: Tag Image with GIT 'latest'
+        if: ${{ inputs.DOCKER_TAG_IMAGE_TAG_LATEST }}
         run: |
           docker buildx imagetools create ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_TAG_IMAGE_TAG_SOURCE }} \
             --tag ${{ inputs.DOCKER_PUBLISH_REGISTRY }}/${{ inputs.DOCKER_PUBLISH_IMAGE_NAME }}:latest;
 
 
+      - name: Append GH Release Body
+        if: ${{ github.ref_type == 'tag' }}
+        id: release
+        uses: softprops/action-gh-release@v2
+        with:
+          append_body: true
+          body: |
+            ## Images
+
+            - `docker pull ${{ inputs.DOCKER_PUBLISH_REGISTRY }}/${{ inputs.DOCKER_PUBLISH_IMAGE_NAME }}:latest`
+            - `docker pull ${{ inputs.DOCKER_PUBLISH_REGISTRY }}/${{ inputs.DOCKER_PUBLISH_IMAGE_NAME }}:${{ inputs.DOCKER_TAG_IMAGE_TAG_SOURCE }}`
+            - `docker pull ${{ inputs.DOCKER_PUBLISH_REGISTRY }}/${{ inputs.DOCKER_PUBLISH_IMAGE_NAME }}:${{ github.ref_name }}`
+
+            [another link](https://nofusscomputing.com) does render as markdown works.
+
+
 
   docker-release-files:
-    if: 
-      (
-        github.ref_type == 'tag'
-      )
+    if: ${{ github.ref_type == 'tag' }}
     needs: 
       - docker-build
       - docker-sbom
+      - docker-tagged
+      - docker-publish
     runs-on: ubuntu-latest
     name: Release Files
     steps:
 
 
-      - name: Upload Image Attestation Artifact
+      - name: Fetch Image Attestation Artifact - ${{ inputs.DOCKER_PUBLISH_REGISTRY }}
+        if: ${{ inputs.DOCKER_PUBLISH_REGISTRY != inputs.DOCKER_BUILD_REGISTRY }}
         uses: actions/download-artifact@v4
         with:
-          name: docker-image-attestation
+          name: ${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-image-published
           path: attestation-image/
 
 
-      - run: |
-          mv attestation-image/attestation.jsonl attestation-image.jsonl
+      - 
+        if: ${{ inputs.DOCKER_PUBLISH_REGISTRY != inputs.DOCKER_BUILD_REGISTRY }}
+        run: |
+          mv attestation-image/attestation.jsonl ${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-image.jsonl
 
 
-      - name: Upload SBOM Attestation Artifact
+      - name: Fetch SBOM Attestation Artifact - ${{ inputs.DOCKER_PUBLISH_REGISTRY }}
+        if: ${{ inputs.DOCKER_PUBLISH_REGISTRY != inputs.DOCKER_BUILD_REGISTRY }}
         uses: actions/download-artifact@v4
         with:
-          name: docker-image-attestation-sbom
+          name: ${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-image-sbom-published
           path: attestation-sbom/
 
 
-      - run: |
-          mv attestation-image/attestation.jsonl attestation-sbom.jsonl
+      - if: ${{ inputs.DOCKER_PUBLISH_REGISTRY != inputs.DOCKER_BUILD_REGISTRY }}
+        run: |
+          mv attestation-sbom/attestation.jsonl ${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-sbom.jsonl
 
 
-      - name: Upload multiple assets to release
-        uses: csexton/release-asset-action@v3
+      - if: ${{ inputs.DOCKER_PUBLISH_REGISTRY != inputs.DOCKER_BUILD_REGISTRY }}
+        run: |
+          ls -la;
+
+
+
+      - name: Upload created artifact to release assets - ${{ inputs.DOCKER_PUBLISH_REGISTRY }}
+        if: ${{ inputs.DOCKER_PUBLISH_REGISTRY != inputs.DOCKER_BUILD_REGISTRY }}
+        uses: mkatanski/release-files-action@v1.1.3
         with:
-          files: |
-            attestation-image.jsonl
-            attestation-sbom.jsonl
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release-tag: ${{ github.ref_name }}
+          name: "${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-image.jsonl"
+          file-path: ${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-image.jsonl
+
+
+
+      - name: Upload created artifact to release assets - ${{ inputs.DOCKER_BUILD_REGISTRY }}
+        if: ${{ inputs.DOCKER_PUBLISH_REGISTRY != inputs.DOCKER_BUILD_REGISTRY }}
+        uses: mkatanski/release-files-action@v1.1.3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release-tag: ${{ github.ref_name }}
+          name: "${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-image-sbom.jsonl"
+          file-path: ${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-sbom.jsonl
+
+
+      - name: Fetch Image Attestation Artifact - ${{ inputs.DOCKER_BUILD_REGISTRY }}
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image
+          path: ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image/
+
+
+      - run: |
+          mv ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image/attestation.jsonl ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image.jsonl
+
+
+      - name: Fetch SBOM Attestation Artifact - ${{ inputs.DOCKER_BUILD_REGISTRY }}
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image-sbom
+          path: ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-sbom/
+
+
+      - run: |
+          mv ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-sbom/attestation.jsonl ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-sbom.jsonl
+
+
+      - run: |
+          ls -la;
+
+
+      - name: Upload created artifact to release assets - ${{ inputs.DOCKER_BUILD_REGISTRY }}
+        uses: mkatanski/release-files-action@v1.1.3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release-tag: ${{ github.ref_name }}
+          name: "${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image.jsonl"
+          file-path: ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image.jsonl
+
+
+
+      - name: Upload created artifact to release assets - ${{ inputs.DOCKER_BUILD_REGISTRY }}
+        uses: mkatanski/release-files-action@v1.1.3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release-tag: ${{ github.ref_name }}
+          name: "${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image-sbom.jsonl"
+          file-path: ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-sbom.jsonl
+
 
       # - name: Update Release
       #   uses: nicovince/manage-release@v1

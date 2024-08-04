@@ -11,17 +11,19 @@ on:
   #       type: string
   push:
     branches:
-      - '**'
+      # - '*'         # matches every branch that doesn't contain a '/'
+      # - '*/*'       # matches every branch containing a single '/'
+      - '**'        # matches every branch
     tags:
       - '*'
-  pull_request:
-    branches:
-      - '**'
-    types:
-      - opened
-      - synchronize
-      - closed
-      - reopened
+  # pull_request:
+  # #   branches:
+  # #     - '**'
+  #   types:
+  # #     - opened
+  #     - synchronize
+  # #     - closed
+  # #     - reopened
 
 
 # env:
@@ -43,13 +45,32 @@ jobs:
 
   docker:
     name: 'Docker'
-    uses: nofusscomputing/scratchpad/.github/workflows/docker.yaml@further-testing
+    uses: ./.github/workflows/docker.yaml
     with:
       DOCKER_BUILD_IMAGE_NAME: "${{ github.repository }}"
+      DOCKER_PUBLISH_REGISTRY: "ghcr.io"
+      DOCKER_PUBLISH_IMAGE_NAME: "nofusscomputing/image-publish"
 
 
   release:
     name: 'Release'
-    uses: nofusscomputing/scratchpad/.github/workflows/release.yaml@further-testing
+    uses: ./.github/workflows/release.yaml
     # with:
     #   DOCKER_BUILD_IMAGE_NAME: "${{ github.repository }}"
+
+  # didnt work
+  # generate-release-notes:
+  #   name: Auto Release Notes
+  #   needs:
+  #     - docker
+  #     - release
+  #   runs-on: ubuntu-latest
+  #   steps:
+
+  #     - name: Append GH Release Body
+  #       if: ${{ github.ref_type == 'tag' }}
+  #       id: release
+  #       uses: softprops/action-gh-release@v2
+  #       with:
+  #         append_body: true
+  #         generate_release_notes: true
