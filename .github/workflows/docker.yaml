@@ -161,7 +161,7 @@ jobs:
       - name: Upload Image Attestation Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: docker-image-attestation
+          name: ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image
           path: ${{ steps.image-attest.outputs.bundle-path }}
 
 
@@ -447,7 +447,7 @@ jobs:
       - name: Upload SBOM Attestation Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: docker-image-attestation-sbom
+          name: ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-sbom-image
           path: ${{ steps.sbom-attest.outputs.bundle-path }}
 
 
@@ -577,6 +577,7 @@ jobs:
   docker-publish:
     if: ${{ github.ref_type == 'tag' }}
     needs: 
+      - docker-build
       - docker-scan-vulnerability
       - docker-reports
       - docker-tagged
@@ -631,8 +632,25 @@ jobs:
       - name: Upload Image Attestation Artifact ${{ github.ref_name }}
         uses: actions/upload-artifact@v4
         with:
-          name: docker-image-attestation-published
+          name: ${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-image
           path: ${{ steps.image-attest.outputs.bundle-path }}
+
+
+      - name: Generate SBOM Attestation (publish)
+        id: sbom-attest
+        uses: actions/attest-sbom@v1
+        with:
+          subject-name: '${{ inputs.DOCKER_PUBLISH_REGISTRY }}/${{ inputs.DOCKER_PUBLISH_IMAGE_NAME }}'
+          subject-digest: ${{ needs.docker-build.outputs.build-image-digest }}
+          sbom-path: 'dependency-results-publish.sbom.json'
+          push-to-registry: true
+
+
+      - name: Upload SBOM Attestation Artifact (publish)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-image-sbom
+          path: ${{ steps.sbom-attest.outputs.bundle-path }}
 
 
 
@@ -659,23 +677,23 @@ jobs:
       - name: Fetch Image Attestation Artifact
         uses: actions/download-artifact@v4
         with:
-          name: docker-image-attestation-published
+          name: ${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-image
           path: attestation-image/
 
 
       - run: |
-          mv attestation-image/attestation.jsonl attestation-image.jsonl
+          mv attestation-image/attestation.jsonl ${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-image.jsonl
 
 
       - name: Fetch SBOM Attestation Artifact
         uses: actions/download-artifact@v4
         with:
-          name: docker-image-attestation-sbom
+          name: ${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-image-sbom
           path: attestation-sbom/
 
 
       - run: |
-          mv attestation-sbom/attestation.jsonl attestation-sbom.jsonl
+          mv attestation-sbom/attestation.jsonl ${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-sbom.jsonl
 
 
       - run: |
@@ -690,9 +708,9 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ github.ref_name }}
-          name: "image-attestation.jsonl"
+          name: "${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-image.jsonl"
           # label: "Image Attestation"
-          file-path: attestation-image.jsonl
+          file-path: ${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-image.jsonl
 
 
 
@@ -703,9 +721,61 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ github.ref_name }}
-          name: "image-attestation-sbom.jsonl"
+          name: "${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-image-sbom.jsonl"
           # label: "Image Attestation SBOM"
-          file-path: attestation-sbom.jsonl
+          file-path: ${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-sbom.jsonl
+
+
+      - name: Fetch Image Attestation Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image
+          path: ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image/
+
+
+      - run: |
+          mv ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image/attestation.jsonl ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image.jsonl
+
+
+      - name: Fetch SBOM Attestation Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image-sbom
+          path: attestation-sbom/
+
+
+      - run: |
+          mv ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-sbom/attestation.jsonl ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-sbom.jsonl
+
+
+      - run: |
+          ls -la;
+
+
+      - name: Upload created artifact to release assets
+        # if: failure()
+        # id: upload-assets
+        uses: mkatanski/release-files-action@v1.0.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release-tag: ${{ github.ref_name }}
+          name: "${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image.jsonl"
+          # label: "Image Attestation"
+          file-path: ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image.jsonl
+
+
+
+      - name: Upload created artifact to release assets
+        # if: success()
+        # id: upload-assets
+        uses: mkatanski/release-files-action@v1.0.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release-tag: ${{ github.ref_name }}
+          name: "${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image-sbom.jsonl"
+          # label: "Image Attestation SBOM"
+          file-path: ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-sbom.jsonl
+
 
 
 
