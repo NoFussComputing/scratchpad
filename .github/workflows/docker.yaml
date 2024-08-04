@@ -558,6 +558,7 @@ jobs:
   docker-pr-comment:
     # if: ${{ github.event.pull_request }}
     # if: ${{ inputs.DOCKER_SCAN_IMAGE_VULNERABILITY }}
+    if: ${{ github.ref_type != 'tag' }}
     needs:
       - docker-scan-vulnerability
     runs-on: ubuntu-latest
