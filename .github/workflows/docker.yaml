@@ -748,7 +748,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image-sbom
-          path: attestation-sbom/
+          path: ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-sbom/
 
 
       - run: |
