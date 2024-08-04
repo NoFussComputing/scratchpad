@@ -637,47 +637,6 @@ jobs:
       - run: |
           ls -la;
 
-      # - name: Add assets to release
-      #   uses: csexton/release-asset-action@v3
-      #   with:
-      #     files: |
-      #       attestation-image.jsonl
-      #       attestation-sbom.jsonl
-      #     github-token: ${{ secrets.GITHUB_TOKEN }}
-      #     release-url: https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }}
-
-      # - name: Upload created artifact to release assets
-      #   id: upload-assets
-      #   uses: mkatanski/release-files-action@v1.0.1
-      #   with:
-      #     token: ${{ secrets.GITHUB_TOKEN }}
-      #     release-tag: ${{ github.ref_name }}
-      #     file-path: >
-      #       attestation-image.jsonl
-      #       attestation-sbom.jsonl
-
-
-      # - name: Upload created artifact to release assets
-      #   if: failure()
-      #   # id: upload-assets
-      #   uses: mkatanski/release-files-action@v1.0.1
-      #   with:
-      #     token: ${{ secrets.GITHUB_TOKEN }}
-      #     release-tag: ${{ github.ref_name }}
-      #     file-path: |
-      #       attestation-image.jsonl
-      #       attestation-sbom.jsonl
-
-
-      # - name: Upload created artifact to release assets
-      #   if: failure()
-      #   # id: upload-assets
-      #   uses: mkatanski/release-files-action@v1.0.1
-      #   with:
-      #     token: ${{ secrets.GITHUB_TOKEN }}
-      #     release-tag: ${{ github.ref_name }}
-      #     file-path: attestation-image.jsonl,attestation-sbom.jsonl
-
 
 
       - name: Upload created artifact to release assets
@@ -687,6 +646,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ github.ref_name }}
+          name: "Image Attestation SBOM"
           file-path: attestation-image.jsonl
 
 
@@ -698,6 +658,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ github.ref_name }}
+          name: "Image Attestation SBOM"
           file-path: attestation-sbom.jsonl
 
 
