@@ -422,6 +422,19 @@ jobs:
           path: '${{ github.workspace }}/dependency-results.sbom.json'
 
 
+      - name: Upload created artifact to release assets
+        if: ${{ github.ref_type == 'tag' }}
+        # if: success()
+        # id: upload-assets
+        uses: mkatanski/release-files-action@v1.0.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release-tag: ${{ github.ref_name }}
+          name: "dependency-scan.sbom.json"
+          # label: "Image Attestation SBOM"
+          file-path: dependency-results.sbom.json
+
+
       - name: Log into registry ghcr.io
         if: 
           (${{
