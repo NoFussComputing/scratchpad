@@ -176,14 +176,13 @@ jobs:
 
 
       - name: Upload Image Attestation Artifact
-        if:
-          (${{
+        if: ${{
             github.ref_name == 'development'
               ||
             github.ref_name == 'master'
               ||
             github.ref_type == 'tag'
-          }})
+          }}
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image
@@ -458,14 +457,13 @@ jobs:
 
 
       - name: Log into registry ghcr.io
-        if:
-          (${{
+        if: ${{
             github.ref_name == 'development'
               ||
             github.ref_name == 'master'
               ||
             github.ref_type != 'tag'
-          }})
+          }}
         uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
         with:
           registry: ghcr.io
@@ -474,14 +472,13 @@ jobs:
 
 
       - name: Generate SBOM Attestation
-        if:
-          (${{
+        if: ${{
             github.ref_name == 'development'
               ||
             github.ref_name == 'master'
               ||
             github.ref_type == 'tag'
-          }})
+          }}
         id: sbom-attest
         uses: actions/attest-sbom@v1
         with:
@@ -492,14 +489,13 @@ jobs:
 
 
       - name: Upload SBOM Attestation Artifact
-        if:
-          (${{
+        if: ${{
             github.ref_name == 'development'
               ||
             github.ref_name == 'master'
               ||
             github.ref_type == 'tag'
-          }})
+          }}
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image-sbom
@@ -507,14 +503,13 @@ jobs:
 
 
   docker-reports:
-    if:
-      (${{
+    if: ${{
         (
           github.event.push
             ||
           github.ref_type == 'tag'
         )
-      }})
+      }}
     needs: 
       - docker-scan-vulnerability
       - docker-build
@@ -524,29 +519,26 @@ jobs:
 
 
       - name: Dummy Task
-        if:
-          (${{
+        if: ${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY == false
-          }})
+          }}
         run: |
           echo "Scanning image turned off.This Job does nothing however as 'docker-scan-vulnerability' is a dependency job, must do something.";
 
 
       - name: Fetch Scan Results
-        if:
-          (${{
+        if: ${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          }})
+          }}
         uses: actions/download-artifact@v4
         with:
           name: vulnerability-report-full
 
 
       - uses: dtinth/markdown-report-action@v1
-        if:
-          (${{
+        if: ${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-          }})
+          }}
         with:
           name: Docker Vulnerability Report
           title: Vulnerability Report
