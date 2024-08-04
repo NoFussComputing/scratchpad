@@ -26,42 +26,6 @@ on:
 
 jobs:
 
-  build:
-    name: Build
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Run Trivy vulnerability scanner with rootfs command
-        uses: aquasecurity/trivy-action@0.20.0
-        with:
-          scan-type: 'rootfs'
-          scan-ref: '.'
-          ignore-unfixed: true
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-          severity: 'LOW,MEDIUM,HIGH,CRITICAL'
-
-      - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          sarif_file: 'trivy-results.sarif'
-
-
-      
-      - name: Upload scan results
-        # if:
-        #   (${{
-        #     inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-        #   }})
-        uses: actions/upload-artifact@v4
-        with:
-          name: tester-scan-results-json
-          path: trivy-results.sarif
-
-
-
 
   requirements-scan-vulnerability:
     if:
@@ -135,7 +99,7 @@ jobs:
           format: 'json'
           output: 'scan-results.json'
           severity: 'LOW,MEDIUM,HIGH,CRITICAL'
-          vuln-type: 'os,library'
+          vuln-type: 'library'
           scanners: vuln
           ignore-unfixed: false
 
@@ -146,7 +110,7 @@ jobs:
         #   }})
         uses: actions/upload-artifact@v4
         with:
-          name: container-scan-results-json
+          name: requirements-scan-results-json
           path: scan-results.json
 
 
@@ -293,7 +257,7 @@ jobs:
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           number: ${{ steps.finder.outputs.pr }}
-          header: Image Scan Results
+          header: PIP File Scan Results
           message: |
             ${{ env.report }}
 
