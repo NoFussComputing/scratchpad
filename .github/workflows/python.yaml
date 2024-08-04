@@ -37,7 +37,7 @@ jobs:
         uses: aquasecurity/trivy-action@0.20.0
         with:
           scan-type: 'rootfs'
-          scan-ref: 'rootfs-example-binary'
+          scan-ref: 'requirements.txt'
           ignore-unfixed: true
           format: 'sarif'
           output: 'trivy-results.sarif'
@@ -79,6 +79,7 @@ jobs:
         with:
           # image-ref: '${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}'
           scan-type: 'fs'
+          scan-ref: 'requirements.txt'
           format: 'sarif'
           output: 'trivy-results.sarif'
           severity: 'LOW,MEDIUM,HIGH,CRITICAL'
@@ -116,6 +117,7 @@ jobs:
         with:
           # image-ref: '${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}'
           scan-type: 'fs'
+          scan-ref: 'requirements.txt'
           format: 'json'
           output: 'scan-results.json'
           severity: 'LOW,MEDIUM,HIGH,CRITICAL'
