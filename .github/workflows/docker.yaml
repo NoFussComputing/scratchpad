@@ -80,6 +80,18 @@ jobs:
     steps:
 
 
+      - name: Debug
+        run: |
+          echo "${{ github.event.pull_request.head.repo.full_name || github.repository }}";
+          echo "**************************";
+          echo "${{ github.event.pull_request.head.repo.full_name }}";
+          echo "**************************";
+          echo "${{ github.repository }}";
+          echo "**************************";
+          echo "${{ github.event.pull_request.head.repo }}";
+          echo "**************************";
+          echo "${{ github.event.push }}";
+          echo "**************************";
       - uses: actions/checkout@v4
 
       - name: Dummy Task
@@ -147,7 +159,6 @@ jobs:
 
 
       - name: Attest
-        # if: ${{ github.ref_type != 'tag' }}
         uses: actions/attest-build-provenance@v1
         id: image-attest
         with:
@@ -223,22 +234,17 @@ jobs:
           output: 'trivy-results.sarif'
           severity: 'LOW,MEDIUM,HIGH,CRITICAL'
           vuln-type: 'os,library'
-          # list-all-pkgs: true
           scanners: vuln
-          # trivy-config: .trivy.yaml
           ignore-unfixed: true
 
 
       - name: Upload Trivy Vulnerability Scan as a release asset
         if: ${{ github.ref_type == 'tag' }}
-        # if: success()
-        # id: upload-assets
         uses: mkatanski/release-files-action@v1.1.3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ github.ref_name }}
           name: "trivy-vulnerability-scan.sarif"
-          # label: "Image Attestation SBOM"
           file-path: trivy-results.sarif
 
 
@@ -264,9 +270,7 @@ jobs:
           output: 'scan-results.json'
           severity: 'LOW,MEDIUM,HIGH,CRITICAL'
           vuln-type: 'os,library'
-          # list-all-pkgs: true
           scanners: vuln
-          # trivy-config: .trivy.yaml
           ignore-unfixed: false
 
       - name: Upload scan results
@@ -275,7 +279,6 @@ jobs:
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
           }})
         uses: actions/upload-artifact@v4
-        # if: success() || failure()
         with:
           name: container-scan-results-json
           path: scan-results.json
@@ -289,7 +292,6 @@ jobs:
           (${{
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
           }})
-        # id: extract_vulnerabilities_orig
         run: |
           not_empty="$(jq -r '.Results[] | .Vulnerabilities[]' scan-results.json)"
 
@@ -431,14 +433,11 @@ jobs:
 
       - name: Upload Trivy SBOM as a release asset
         if: ${{ github.ref_type == 'tag' }}
-        # if: success()
-        # id: upload-assets
         uses: mkatanski/release-files-action@v1.1.3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ github.ref_name }}
           name: "dependency-scan.sbom.json"
-          # label: "Image Attestation SBOM"
           file-path: dependency-results.sbom.json
 
 
@@ -556,8 +555,6 @@ jobs:
 
 
   docker-pr-comment:
-    # if: ${{ github.event.pull_request }}
-    # if: ${{ inputs.DOCKER_SCAN_IMAGE_VULNERABILITY }}
     if: ${{ github.ref_type != 'tag' }}
     needs:
       - docker-scan-vulnerability
@@ -575,7 +572,6 @@ jobs:
 
       - name: Capture scan results
         if: ${{ inputs.DOCKER_SCAN_IMAGE_VULNERABILITY }}
-        # id: capture_results
         run: |
           content=$(cat vulnerability-report.md | head -c 65000)
           echo "report<<EOF" >> $GITHUB_ENV
@@ -642,7 +638,6 @@ jobs:
 
 
       - name: Attest ${{ github.ref_name }}
-        # if: ${{ github.ref_type != 'tag' }}
         uses: actions/attest-build-provenance@v1
         id: image-attest
         with:
@@ -662,7 +657,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: trivy-sbom-report
-          # path: '${{ github.workspace }}/dependency-results.sbom.json'
 
 
       - name: Generate SBOM Attestation (publish)
@@ -754,28 +748,22 @@ jobs:
 
       - name: Upload created artifact to release assets - ${{ inputs.DOCKER_PUBLISH_REGISTRY }}
         if: ${{ inputs.DOCKER_PUBLISH_REGISTRY != inputs.DOCKER_BUILD_REGISTRY }}
-        # if: failure()
-        # id: upload-assets
         uses: mkatanski/release-files-action@v1.1.3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ github.ref_name }}
           name: "${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-image.jsonl"
-          # label: "Image Attestation"
           file-path: ${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-image.jsonl
 
 
 
       - name: Upload created artifact to release assets - ${{ inputs.DOCKER_BUILD_REGISTRY }}
         if: ${{ inputs.DOCKER_PUBLISH_REGISTRY != inputs.DOCKER_BUILD_REGISTRY }}
-        # if: success()
-        # id: upload-assets
         uses: mkatanski/release-files-action@v1.1.3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ github.ref_name }}
           name: "${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-image-sbom.jsonl"
-          # label: "Image Attestation SBOM"
           file-path: ${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-sbom.jsonl
 
 
@@ -806,32 +794,22 @@ jobs:
 
 
       - name: Upload created artifact to release assets - ${{ inputs.DOCKER_BUILD_REGISTRY }}
-        # if: failure()
-        # id: upload-assets
         uses: mkatanski/release-files-action@v1.1.3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ github.ref_name }}
           name: "${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image.jsonl"
-          # label: "Image Attestation"
           file-path: ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image.jsonl
 
 
 
       - name: Upload created artifact to release assets - ${{ inputs.DOCKER_BUILD_REGISTRY }}
-        # if: success()
-        # id: upload-assets
         uses: mkatanski/release-files-action@v1.1.3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ github.ref_name }}
           name: "${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image-sbom.jsonl"
-          # label: "Image Attestation SBOM"
           file-path: ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-sbom.jsonl
-
-
-
-
 
 
       # - name: Update Release
