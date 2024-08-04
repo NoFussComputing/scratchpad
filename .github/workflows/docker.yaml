@@ -636,13 +636,20 @@ jobs:
           path: ${{ steps.image-attest.outputs.bundle-path }}
 
 
+      - name: Download SBOM as a Github artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: trivy-sbom-report
+          path: '${{ github.workspace }}/dependency-results.sbom.json'
+
+
       - name: Generate SBOM Attestation (publish)
         id: sbom-attest
         uses: actions/attest-sbom@v1
         with:
           subject-name: '${{ inputs.DOCKER_PUBLISH_REGISTRY }}/${{ inputs.DOCKER_PUBLISH_IMAGE_NAME }}'
           subject-digest: ${{ needs.docker-build.outputs.build-image-digest }}
-          sbom-path: 'dependency-results-publish.sbom.json'
+          sbom-path: 'dependency-results.sbom.json'
           push-to-registry: true
 
 
