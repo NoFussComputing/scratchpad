@@ -604,7 +604,7 @@ jobs:
     steps:
 
 
-      - name: Upload Image Attestation Artifact
+      - name: Fetch Image Attestation Artifact
         uses: actions/download-artifact@v4
         with:
           name: docker-image-attestation
@@ -615,7 +615,7 @@ jobs:
           mv attestation-image/attestation.jsonl attestation-image.jsonl
 
 
-      - name: Upload SBOM Attestation Artifact
+      - name: Fetch SBOM Attestation Artifact
         uses: actions/download-artifact@v4
         with:
           name: docker-image-attestation-sbom
@@ -626,14 +626,24 @@ jobs:
           mv attestation-sbom/attestation.jsonl attestation-sbom.jsonl
 
 
-      - name: Upload multiple assets to release
-        uses: csexton/release-asset-action@v3
+      # - name: Add assets to release
+      #   uses: csexton/release-asset-action@v3
+      #   with:
+      #     files: |
+      #       attestation-image.jsonl
+      #       attestation-sbom.jsonl
+      #     github-token: ${{ secrets.GITHUB_TOKEN }}
+      #     release-url: https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }}
+
+      - name: Upload created artifact to release assets
+        id: upload-assets
+        uses: mkatanski/release-files-action@v1.0.1
         with:
-          files: |
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release-tag: ${{ github.ref_name }}
+          file-path:  |
             attestation-image.jsonl
             attestation-sbom.jsonl
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          release-url: https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }}
 
       # - name: Update Release
       #   uses: nicovince/manage-release@v1
