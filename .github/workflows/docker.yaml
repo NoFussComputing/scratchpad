@@ -427,7 +427,7 @@ jobs:
           }})
         uses: actions/upload-artifact@v4
         with:
-          name: vulnerability-report
+          name: docker-vulnerability-report
           path: vulnerability-report.md
 
       - name: Upload scan results
@@ -437,7 +437,7 @@ jobs:
           }})
         uses: actions/upload-artifact@v4
         with:
-          name: vulnerability-report-full
+          name: docker-vulnerability-report-full
           path: full-vulnerability-report.md
 
 
@@ -565,7 +565,7 @@ jobs:
           }}
         uses: actions/download-artifact@v4
         with:
-          name: vulnerability-report-full
+          name: docker-vulnerability-report-full
 
 
       - uses: dtinth/markdown-report-action@v1
@@ -575,7 +575,7 @@ jobs:
         with:
           name: Docker Vulnerability Report
           title: Vulnerability Report
-          body-file: full-vulnerability-report.md
+          body-file: docker-full-vulnerability-report.md
 
 
 
@@ -628,7 +628,7 @@ jobs:
         if: ${{ inputs.DOCKER_SCAN_IMAGE_VULNERABILITY }}
         uses: actions/download-artifact@v4
         with:
-          name: vulnerability-report
+          name: docker-vulnerability-report
 
 
       - name: Capture scan results
