@@ -707,7 +707,7 @@ jobs:
     steps:
 
 
-      - name: Fetch Image Attestation Artifact
+      - name: Fetch Image Attestation Artifact - ${{ inputs.DOCKER_PUBLISH_REGISTRY }}
         if: ${{ inputs.DOCKER_PUBLISH_REGISTRY != inputs.DOCKER_BUILD_REGISTRY }}
         uses: actions/download-artifact@v4
         with:
@@ -721,7 +721,7 @@ jobs:
           mv attestation-image/attestation.jsonl ${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-image.jsonl
 
 
-      - name: Fetch SBOM Attestation Artifact
+      - name: Fetch SBOM Attestation Artifact - ${{ inputs.DOCKER_PUBLISH_REGISTRY }}
         if: ${{ inputs.DOCKER_PUBLISH_REGISTRY != inputs.DOCKER_BUILD_REGISTRY }}
         uses: actions/download-artifact@v4
         with:
@@ -740,7 +740,7 @@ jobs:
 
 
 
-      - name: Upload created artifact to release assets
+      - name: Upload created artifact to release assets - ${{ inputs.DOCKER_PUBLISH_REGISTRY }}
         if: ${{ inputs.DOCKER_PUBLISH_REGISTRY != inputs.DOCKER_BUILD_REGISTRY }}
         # if: failure()
         # id: upload-assets
@@ -754,7 +754,7 @@ jobs:
 
 
 
-      - name: Upload created artifact to release assets
+      - name: Upload created artifact to release assets - ${{ inputs.DOCKER_BUILD_REGISTRY }}
         if: ${{ inputs.DOCKER_PUBLISH_REGISTRY != inputs.DOCKER_BUILD_REGISTRY }}
         # if: success()
         # id: upload-assets
@@ -767,7 +767,7 @@ jobs:
           file-path: ${{ inputs.DOCKER_PUBLISH_REGISTRY }}-attestation-sbom.jsonl
 
 
-      - name: Fetch Image Attestation Artifact
+      - name: Fetch Image Attestation Artifact - ${{ inputs.DOCKER_BUILD_REGISTRY }}
         uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image
@@ -778,7 +778,7 @@ jobs:
           mv ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image/attestation.jsonl ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image.jsonl
 
 
-      - name: Fetch SBOM Attestation Artifact
+      - name: Fetch SBOM Attestation Artifact - ${{ inputs.DOCKER_BUILD_REGISTRY }}
         uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image-sbom
@@ -793,7 +793,7 @@ jobs:
           ls -la;
 
 
-      - name: Upload created artifact to release assets
+      - name: Upload created artifact to release assets - ${{ inputs.DOCKER_BUILD_REGISTRY }}
         # if: failure()
         # id: upload-assets
         uses: mkatanski/release-files-action@v1.0.1
@@ -806,7 +806,7 @@ jobs:
 
 
 
-      - name: Upload created artifact to release assets
+      - name: Upload created artifact to release assets - ${{ inputs.DOCKER_BUILD_REGISTRY }}
         # if: success()
         # id: upload-assets
         uses: mkatanski/release-files-action@v1.0.1
