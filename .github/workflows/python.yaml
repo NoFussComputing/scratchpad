@@ -263,13 +263,13 @@ jobs:
 
 
   python-reports:
-    if: ${{
-        (
-          github.event.push
-            ||
-          github.ref_type == 'tag'
-        )
-      }}
+    # if: ${{
+    #     (
+    #       github.event.push
+    #         ||
+    #       github.ref_type == 'tag'
+    #     )
+    #   }}
     needs: 
       - requirements-scan-vulnerability
     runs-on: ubuntu-latest
