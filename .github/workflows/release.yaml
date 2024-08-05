@@ -43,7 +43,7 @@ jobs:
 
 
   manage-labels:
-    if: ${{ github.ref_type == 'tag' }}
+    # if: ${{ github.ref_type == 'tag' }}
     permissions:
       contents: read
       issues: write
@@ -61,6 +61,8 @@ jobs:
               description: Relates to package metadata
 
           EOF;
+
+          cat .github/labels.yml;
 
       - uses: oliversalzburg/action-label-manager@v0.0.9
         with:
