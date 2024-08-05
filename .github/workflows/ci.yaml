@@ -66,7 +66,8 @@ jobs:
     name: 'Docker'
     # needs:
     #   - python
-    uses: ./.github/workflows/docker.yaml
+    # uses: ./.github/workflows/docker.yaml
+    uses: nofusscomputing/scratchpad@development
     with:
       DOCKER_BUILD_IMAGE_NAME: "${{ github.repository }}"
       DOCKER_PUBLISH_REGISTRY: "ghcr.io"
