@@ -58,7 +58,7 @@ jobs:
           mkdir -p .github;
           echo "
           labels:
-            ${{ github.ref_name }}:
+            v${{ github.ref_name }}:
               color: "EEE600"
               description: Version Affected.
 
