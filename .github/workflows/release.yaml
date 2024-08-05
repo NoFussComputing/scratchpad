@@ -6,6 +6,7 @@ on:
   #   tags:
   #     - '*'
 
+
 jobs:
   release:
     name: Release
@@ -38,6 +39,37 @@ jobs:
 
             A [link](https://nofusscomputing.com) does render as markdown works.
 
+
+
+
+  manage-labels:
+    if: ${{ github.ref_type == 'tag' }}
+    name: Create Release Label
+    permissions:
+      contents: read
+      issues: write
+    runs-on: ubuntu-latest
+    steps:
+
+      # - uses: actions/checkout@v4
+
+
+      - run: |
+          mkdir -p .github;
+          echo "
+          labels:
+            v${{ github.ref_name }}:
+              color: "EEE600"
+              description: Version Affected.
+
+          " > .github/labels.yml;
+
+          cat .github/labels.yml;
+
+
+      - uses: oliversalzburg/action-label-manager@v0.0.9
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
 
       # - run: | # Use to create env var for use in uploading files
       #     echo "${{ steps.release.outputs.upload_url }}" > release-url.txt

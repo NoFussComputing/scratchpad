@@ -1,0 +1,13 @@
+---
+
+labels:
+  type/feature:
+    color: "FF00FF"
+    description: ""
+  type/documentation:
+    color: "FFFF00"
+    description: ""
+  type/Quality Assurance:
+    color: "00ffFF"
+    description: ""
+

@@ -323,7 +323,16 @@ jobs:
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
           }})
         run: |
-          not_empty="$(jq -r '.Results[] | .Vulnerabilities[]' scan-results.json)"
+          if [ "$(jq -r '.Results')" ]; then
+
+            not_empty="$(jq -r '.Results[] | .Vulnerabilities[]' scan-results.json)";
+
+          else
+
+            not_empty="";
+
+          fi
+
 
           jq -r '
           [
@@ -366,7 +375,16 @@ jobs:
             inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
           }})
         run: |
-          not_empty="$(jq -r '.Results[] | .Vulnerabilities[]' scan-results.json)"
+          if [ "$(jq -r '.Results')" ]; then
+
+            not_empty="$(jq -r '.Results[] | .Vulnerabilities[]' scan-results.json)";
+
+          else
+
+            not_empty="";
+
+          fi
+
 
           jq -r '
           [
@@ -409,7 +427,7 @@ jobs:
           }})
         uses: actions/upload-artifact@v4
         with:
-          name: vulnerability-report
+          name: docker-vulnerability-report
           path: vulnerability-report.md
 
       - name: Upload scan results
@@ -419,7 +437,7 @@ jobs:
           }})
         uses: actions/upload-artifact@v4
         with:
-          name: vulnerability-report-full
+          name: docker-vulnerability-report-full
           path: full-vulnerability-report.md
 
 
@@ -518,13 +536,13 @@ jobs:
 
 
   docker-reports:
-    if: ${{
-        (
-          github.event.push
-            ||
-          github.ref_type == 'tag'
-        )
-      }}
+    # if: ${{
+    #     (
+    #       github.event.push
+    #         ||
+    #       github.ref_type == 'tag'
+    #     )
+    #   }}
     needs: 
       - docker-scan-vulnerability
       - docker-build
@@ -547,7 +565,7 @@ jobs:
           }}
         uses: actions/download-artifact@v4
         with:
-          name: vulnerability-report-full
+          name: docker-vulnerability-report-full
 
 
       - uses: dtinth/markdown-report-action@v1
@@ -610,7 +628,7 @@ jobs:
         if: ${{ inputs.DOCKER_SCAN_IMAGE_VULNERABILITY }}
         uses: actions/download-artifact@v4
         with:
-          name: vulnerability-report
+          name: docker-vulnerability-report
 
 
       - name: Capture scan results
