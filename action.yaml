@@ -96,7 +96,7 @@ runs:
   #   steps:
 
     - name: Docker
-      uses: ./.github/workflows/docker.yaml
+      uses: nofusscomputing/scratchpad/./.github/workflows/docker.yaml
 
       # - name: Debug
       #   shell: bash
