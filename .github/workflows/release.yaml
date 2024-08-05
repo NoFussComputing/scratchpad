@@ -43,7 +43,8 @@ jobs:
 
 
   manage-labels:
-    # if: ${{ github.ref_type == 'tag' }}
+    if: ${{ github.ref_type == 'tag' }}
+    name: Create Release Label
     permissions:
       contents: read
       issues: write
@@ -52,17 +53,19 @@ jobs:
 
       # - uses: actions/checkout@v4
 
+
       - run: |
           mkdir -p .github;
           echo "
           labels:
             ${{ github.ref_name }}:
-              color: "EEEEEE"
-              description: Relates to package metadata
+              color: "EEEE600"
+              description: Version Affected.
 
           " > .github/labels.yml;
 
           cat .github/labels.yml;
+
 
       - uses: oliversalzburg/action-label-manager@v0.0.9
         with:
