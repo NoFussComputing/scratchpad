@@ -13,12 +13,41 @@ jobs:
     steps:
 
 
-      - uses: actions/checkout@v4
+      - name: check-for-cc
+        id: check-for-cc
+        uses: agenthunt/conventional-commit-checker-action@v1.0.0
+        with:
+          pr-title-regex: "^(.+)(?:(([^)s]+)))?: (.+)"
+          # pr-body-regex: "(.*\n)+(.*)" # Default
+          pr-body-regex: "(.*)"
+      # - name: Validate PR title
+      #   uses: lab42/conventional-commit@main
+      #   with:
+      #     # Allowed commit types
+      #     allowed_types: |
+      #         build
+      #         chore
+      #         ci
+      #         docs
+      #         feat
+      #         fix
+      #         perf
+      #         refactor
+      #         revert
+      #         style
+      #         test
+      #     # Regular expression to validate description
+      #     description_regexp: ([\w ]+)
+      #     # Make scope requires (boolean)
+      #     require_scope: "false"
+      #     # Regular expression to validate scope. Only used when require_scope is true or when scope is provided.
+      #     scope_regexp: (\w+)
+      # # - uses: actions/checkout@v4
 
 
-      - uses: actions/setup-node@v4
+      # - uses: actions/setup-node@v4
 
 
-      - uses: beemojs/conventional-pr-action@v3
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - uses: beemojs/conventional-pr-action@v3
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
