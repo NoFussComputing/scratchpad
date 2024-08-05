@@ -96,19 +96,28 @@ jobs:
 
 
 
+      # - name: Debug
+      #   run: |
+      #     echo "${{ github.event.pull_request.head.repo.full_name || github.repository }}";
+      #     echo "**************************";
+      #     echo "${{ github.event.pull_request.head.repo.full_name }}";
+      #     echo "**************************";
+      #     echo "${{ github.repository }}";
+      #     echo "**************************";
+      #     echo "${{ github.event.pull_request.head.repo }}";
+      #     echo "**************************";
+      #     echo "${{ github.event.push }}";
+      #     echo "**************************";
+
       - name: Debug
         run: |
-          echo "${{ github.event.pull_request.head.repo.full_name || github.repository }}";
-          echo "**************************";
-          echo "${{ github.event.pull_request.head.repo.full_name }}";
-          echo "**************************";
-          echo "${{ github.repository }}";
-          echo "**************************";
-          echo "${{ github.event.pull_request.head.repo }}";
-          echo "**************************";
-          echo "${{ github.event.push }}";
-          echo "**************************";
+          ls -la;
+
       - uses: actions/checkout@v4
+
+      - name: Debug
+        run: |
+          ls -la;
 
       - name: Dummy Task
         if: ${{ github.ref_type == 'tag' }}
