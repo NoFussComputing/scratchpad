@@ -43,6 +43,7 @@ jobs:
 
 
   manage-labels:
+    if: ${{ github.ref_type == 'tag' }}
     permissions:
       contents: read
       issues: write
@@ -53,7 +54,7 @@ jobs:
 
       - run: |
           mkdir -p .github
-          cat <<EOF > .github/labels.yaml
+          cat <<EOF > .github/labels.yml
           labels:
             ${{ github.ref_name }}:
               color: "EEEEEE"
