@@ -67,11 +67,19 @@ jobs:
     # needs:
     #   - python
     # uses: ./.github/workflows/docker.yaml
-    uses: nofusscomputing/scratchpad@development
-    with:
-      DOCKER_BUILD_IMAGE_NAME: "${{ github.repository }}"
-      DOCKER_PUBLISH_REGISTRY: "ghcr.io"
-      DOCKER_PUBLISH_IMAGE_NAME: "nofusscomputing/image-publish"
+    # uses: nofusscomputing/scratchpad@development
+    # with:
+    #   DOCKER_BUILD_IMAGE_NAME: "${{ github.repository }}"
+    #   DOCKER_PUBLISH_REGISTRY: "ghcr.io"
+    #   DOCKER_PUBLISH_IMAGE_NAME: "nofusscomputing/image-publish"
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: nofusscomputing/scratchpad@development
+        with:
+          DOCKER_BUILD_IMAGE_NAME: "${{ github.repository }}"
+          DOCKER_PUBLISH_REGISTRY: "ghcr.io"
+          DOCKER_PUBLISH_IMAGE_NAME: "nofusscomputing/image-publish"
 
 
   release:
