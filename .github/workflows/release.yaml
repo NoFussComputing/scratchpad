@@ -40,6 +40,31 @@ jobs:
             A [link](https://nofusscomputing.com) does render as markdown works.
 
 
+
+
+  manage-labels:
+    permissions:
+      contents: read
+      issues: write
+    runs-on: ubuntu-latest
+    steps:
+
+      # - uses: actions/checkout@v4
+
+      - run: |
+          mkdir -p .github
+          cat <<EOF > .github/labels.yaml
+          labels:
+            ${{ github.ref_name }}:
+              color: "EEEEEE"
+              description: Relates to package metadata
+
+          EOF;
+
+      - uses: oliversalzburg/action-label-manager@v0.0.9
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+
       # - run: | # Use to create env var for use in uploading files
       #     echo "${{ steps.release.outputs.upload_url }}" > release-url.txt
 
