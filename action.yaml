@@ -95,125 +95,130 @@ runs:
   #   #   build-image-digest: ${{ steps.image-digest.outputs.value-out }}
   #   steps:
 
+    - name: Docker
+      uses: ./.github/workflows/docker.yaml
+
+      # - name: Debug
+      #   shell: bash
+      #   run: |
+      #     echo "${{ github.event.pull_request.head.repo.full_name || github.repository }}";
+      #     echo "**************************";
+      #     echo "${{ github.event.pull_request.head.repo.full_name }}";
+      #     echo "**************************";
+      #     echo "${{ github.repository }}";
+      #     echo "**************************";
+      #     echo "${{ github.event.pull_request.head.repo }}";
+      #     echo "**************************";
+      #     echo "${{ github.event.push }}";
+      #     echo "**************************";
+      # - uses: actions/checkout@v4
+
+      # - name: Dummy Task
+      #   shell: bash
+      #   if: ${{ github.ref_type == 'tag' }}
+      #   run: |
+      #     echo "This Job does nothing however as 'docker-build' is a dependency job, must do something.";
 
 
-      - name: Debug
-        shell: bash
-        run: |
-          echo "${{ github.event.pull_request.head.repo.full_name || github.repository }}";
-          echo "**************************";
-          echo "${{ github.event.pull_request.head.repo.full_name }}";
-          echo "**************************";
-          echo "${{ github.repository }}";
-          echo "**************************";
-          echo "${{ github.event.pull_request.head.repo }}";
-          echo "**************************";
-          echo "${{ github.event.push }}";
-          echo "**************************";
-      - uses: actions/checkout@v4
 
-      - name: Dummy Task
-        shell: bash
-        if: ${{ github.ref_type == 'tag' }}
-        run: |
-          echo "This Job does nothing however as 'docker-build' is a dependency job, must do something.";
+      # - name: Log into registry ghcr.io
+      #   uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+      #   with:
+      #     registry: ghcr.io
+      #     username: ${{ github.actor }}
+      #     password: ${{ secrets.GITHUB_TOKEN }}
 
 
-
-      - name: Log into registry ghcr.io
-        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-
-      - name: Setup BuildX
-        shell: bash
-        if: ${{ github.ref_type != 'tag' }}
-        run: |
-          docker buildx create --name project-v3-builder;
-          docker buildx use project-v3-builder;
+      # - name: Setup BuildX
+      #   shell: bash
+      #   if: ${{ github.ref_type != 'tag' }}
+      #   run: |
+      #     docker buildx create --name project-v3-builder;
+      #     docker buildx use project-v3-builder;
 
 
-      - name: build image
-        shell: bash
-        if: ${{ github.ref_type != 'tag' }}
-        run: |
-          docker buildx build --platform="linux/amd64,linux/arm64" . \
-            --label "org.opencontainers.image.created=$(date '+%Y-%m-%dT%H:%M:%S%:z')" \
-            --label "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
-            --label "org.opencontainers.image.revision=${{ github.sha }}" \
-            \
-            --label "io.artifacthub.package.readme-url=${{ inputs.DOCKER_LABEL_ARTIFACTHUB_README }}" \
-            --label 'io.artifacthub.package.maintainers=${{ inputs.DOCKER_LABEL_ARTIFACTHUB_MAINTAINER }}' \
-            \
-            --annotation "org.opencontainers.image.description=a DESCRIPTION for multi-arch images" \
-            --annotation "org.opencontainers.image.created=$(date '+%Y-%m-%dT%H:%M:%S%:z')" \
-            --annotation "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
-            --annotation "org.opencontainers.image.revision=${{ github.sha }}" \
-          --push \
-          --file ${{ inputs.DOCKER_FILE }} \
-          --tag ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }};
+      # - name: build image
+      #   shell: bash
+      #   if: ${{ github.ref_type != 'tag' }}
+      #   run: |
+      #     docker buildx build --platform="linux/amd64,linux/arm64" . \
+      #       --label "org.opencontainers.image.created=$(date '+%Y-%m-%dT%H:%M:%S%:z')" \
+      #       --label "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
+      #       --label "org.opencontainers.image.revision=${{ github.sha }}" \
+      #       \
+      #       --label "io.artifacthub.package.readme-url=${{ inputs.DOCKER_LABEL_ARTIFACTHUB_README }}" \
+      #       --label 'io.artifacthub.package.maintainers=${{ inputs.DOCKER_LABEL_ARTIFACTHUB_MAINTAINER }}' \
+      #       \
+      #       --annotation "org.opencontainers.image.description=a DESCRIPTION for multi-arch images" \
+      #       --annotation "org.opencontainers.image.created=$(date '+%Y-%m-%dT%H:%M:%S%:z')" \
+      #       --annotation "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
+      #       --annotation "org.opencontainers.image.revision=${{ github.sha }}" \
+      #     --push \
+      #     --file ${{ inputs.DOCKER_FILE }} \
+      #     --tag ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }};
 
 
-      - name: Remove "Unknown" Image from Manifest
-        shell: bash
-        if: ${{ github.ref_type != 'tag' }}
-        run: |
+      # - name: Remove "Unknown" Image from Manifest
+      #   shell: bash
+      #   if: ${{ github.ref_type != 'tag' }}
+      #   run: |
 
-          DOCKER_MULTI_ARCH_IMAGES=$(docker buildx imagetools inspect "${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}" --format "{{ range .Manifest.Manifests }}{{ if ne (print .Platform) \"&{unknown unknown  [] }\" }}${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}@{{ println .Digest }}{{end}} {{end}}");
+      #     DOCKER_MULTI_ARCH_IMAGES=$(docker buildx imagetools inspect "${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}" --format "{{ range .Manifest.Manifests }}{{ if ne (print .Platform) \"&{unknown unknown  [] }\" }}${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}@{{ println .Digest }}{{end}} {{end}}");
 
-          docker buildx imagetools create $DOCKER_MULTI_ARCH_IMAGES \
-            --tag ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }} \
-            --tag ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:dev;
-
-
-      - name: Fetch image
-        shell: bash
-        run: |
-          docker pull ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }} >> /dev/null;
+      #     docker buildx imagetools create $DOCKER_MULTI_ARCH_IMAGES \
+      #       --tag ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }} \
+      #       --tag ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:dev;
 
 
-      - name: Fetch Manifest digest
-        shell: bash
-        id: image-digest
-        run: |
-          echo "value-out=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }} | cut -d '@' -f 2)" >> $GITHUB_OUTPUT
+      # - name: Fetch image
+      #   shell: bash
+      #   run: |
+      #     docker pull ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }} >> /dev/null;
 
 
-      - name: Attest
-        if: ${{
-            github.ref_name == 'development'
-              ||
-            github.ref_name == 'master'
-              ||
-            github.ref_type == 'tag'
-          }}
-        uses: actions/attest-build-provenance@v1
-        id: image-attest
-        with:
-          subject-name: ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}
-          subject-digest: ${{ steps.image-digest.outputs.value-out }}
-          push-to-registry: true
+      # - name: Fetch Manifest digest
+      #   shell: bash
+      #   id: image-digest
+      #   run: |
+      #     echo "value-out=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }} | cut -d '@' -f 2)" >> $GITHUB_OUTPUT
 
 
-      - name: Upload Image Attestation Artifact
-        if: ${{
-            github.ref_name == 'development'
-              ||
-            github.ref_name == 'master'
-              ||
-            github.ref_type == 'tag'
-          }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image
-          path: ${{ steps.image-attest.outputs.bundle-path }}
+      # - name: Attest
+      #   if: ${{
+      #       github.ref_name == 'development'
+      #         ||
+      #       github.ref_name == 'master'
+      #         ||
+      #       github.ref_type == 'tag'
+      #     }}
+      #   uses: actions/attest-build-provenance@v1
+      #   id: image-attest
+      #   with:
+      #     subject-name: ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}
+      #     subject-digest: ${{ steps.image-digest.outputs.value-out }}
+      #     push-to-registry: true
 
 
-      - name: Cleanup BuildX
-        shell: bash
-        if: ${{ github.ref_type != 'tag' }}
-        run: |
-          docker buildx rm project-v3-builder;
+      # - name: Upload Image Attestation Artifact
+      #   if: ${{
+      #       github.ref_name == 'development'
+      #         ||
+      #       github.ref_name == 'master'
+      #         ||
+      #       github.ref_type == 'tag'
+      #     }}
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: ${{ inputs.DOCKER_BUILD_REGISTRY }}-attestation-image
+      #     path: ${{ steps.image-attest.outputs.bundle-path }}
+
+
+      # - name: Cleanup BuildX
+      #   shell: bash
+      #   if: ${{ github.ref_type != 'tag' }}
+      #   run: |
+      #     docker buildx rm project-v3-builder;
+
+branding:
+  icon: 'activity'
+  color: 'blue'

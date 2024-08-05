@@ -64,8 +64,8 @@ jobs:
 
   docker:
     name: 'Docker'
-    needs:
-      - python
+    # needs:
+    #   - python
     uses: ./.github/workflows/docker.yaml
     with:
       DOCKER_BUILD_IMAGE_NAME: "${{ github.repository }}"
