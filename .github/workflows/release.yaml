@@ -59,7 +59,7 @@ jobs:
           echo "
           labels:
             ${{ github.ref_name }}:
-              color: "EEEE600"
+              color: "EEE600"
               description: Version Affected.
 
           " > .github/labels.yml;
