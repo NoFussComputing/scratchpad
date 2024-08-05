@@ -157,7 +157,7 @@ jobs:
             --annotation "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
             --annotation "org.opencontainers.image.revision=${{ github.sha }}" \
           --push \
-          --file ${{ inputs.DOCKER_FILE }} \
+          --file ${{ github.workspace }}/${{ inputs.DOCKER_FILE }} \
           --tag ${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }};
 
 
