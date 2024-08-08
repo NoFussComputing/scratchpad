@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2024-08-08
+### :bug: Bug Fixes
+- [`e848af1`](https://github.com/nofusscomputing/scratchpad/commit/e848af1b3b3b2370ad403794393341261669239a) - dont include *(commit by [@jon-nfc](https://github.com/jon-nfc))*
+
+
 ## [development] - 2024-08-08
 ### :sparkles: New Features
 - [`83b0f33`](https://github.com/nofusscomputing/scratchpad/commit/83b0f334751695ba313bc8805d5da3067643fca0) - bump be silent *(commit by [@jon-nfc](https://github.com/jon-nfc))*
@@ -18,3 +23,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [conventional-bump]: https://github.com/nofusscomputing/scratchpad/compare/0.51.0...conventional-bump
 [development]: https://github.com/nofusscomputing/scratchpad/compare/1.0.0...development
+[1.0.0]: https://github.com/nofusscomputing/scratchpad/compare/v0.3.0...1.0.0
