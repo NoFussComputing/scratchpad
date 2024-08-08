@@ -94,27 +94,35 @@ jobs:
           ls -la
 
 
-      - name: Update Changelog - (Other Branches)
+      - name: Update Changelog
+        # if: ${{ github.ref_name != 'master' }}
+        shell: bash
+        run: |
+          cz changelog --dry-run --incremental --unreleased-version "${{ steps.get_next_version.outputs.nextStrict }}" > changelog-release.md
+
+
+      - name: Update Changelog
         if: ${{ github.ref_name != 'master' }}
         shell: bash
         run: |
           cz changelog --unreleased-version "${{ steps.get_next_version.outputs.nextStrict }}"
 
 
-      - name: Update Changelog - (Other Branches)
-        if: ${{ github.ref_name != 'master' }}
-        shell: bash
-        run: |
-          cz changelog --dry-run --incremental --unreleased-version "${{ steps.get_next_version.outputs.nextStrict }}" > changelog-release.md
+
+      # - name: Update Changelog - (Master Branch)
+      #   if: ${{ github.ref_name == 'master' }}
+      #   shell: bash
+      #   run: |
+      #     cz changelog --merge-prerelease --unreleased-version ${{ steps.get_next_version.outputs.nextStrict }}"
+      #     cz changelog --dry-run --incremental --unreleased-version "${{ steps.get_next_version.outputs.nextStrict }}" > changelog-release.md
 
 
 
-      - name: Update Changelog - (Master Branch)
-        if: ${{ github.ref_name == 'master' }}
-        shell: bash
-        run: |
-          cz changelog --merge-prerelease --unreleased-version ${{ steps.get_next_version.outputs.nextStrict }}"
-          cz changelog --dry-run --incremental --unreleased-version "${{ steps.get_next_version.outputs.nextStrict }}" > changelog-release.md
+      # - name: Update Changelog - (Master Branch)
+      #   # if: ${{ github.ref_name == 'master' }}
+      #   shell: bash
+      #   run: |
+      #     cz changelog --dry-run --incremental --unreleased-version "${{ steps.get_next_version.outputs.nextStrict }}" > changelog-release.md
 
 
 
