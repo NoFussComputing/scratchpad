@@ -1,3 +1,10 @@
+## 1.12.0-rc3 (2024-08-08)
+
+### Feat
+
+- always bump on master
+- try now non rc
+
 ## 1.12.0-rc2 (2024-08-08)
 
 ### Feat
