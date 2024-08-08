@@ -15,10 +15,14 @@ jobs:
 
 
   docker:
+    # if:
+    #   (${{
+    #     github.event.push
+    #       ||
+    #     github.ref_type == 'tag'
+    #   }})
     if:
       (${{
-        github.event.push
-          ||
         github.ref_type == 'tag'
       }})
     name: 'Docker'
