@@ -19,12 +19,36 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
+      - name: Get next version
+        id: get_next_version
+        uses: thenativeweb/get-next-version@main
+        with:
+          prefix: 'v' # optional, defaults to ''
+
+
+      - name: Show the next version
+        run: |
+          echo ${{ steps.get_next_version.outputs.version }}
+          echo ${{ steps.get_next_version.outputs.hasNextVersion }}
+
+      - name: Get previous tag
+        if: ${{ steps.get_next_version.outputs.hasNextVersion }}
+        id: previousTag
+        run: |
+          name=$(git --no-pager tag --sort=creatordate --merged ${{ github.ref_name }} | tail -2 | head -1)
+          echo "previousTag: $name"
+          echo "previousTag=$name" >> $GITHUB_ENV
+
+
       - name: Update CHANGELOG
+        if: ${{ steps.get_next_version.outputs.hasNextVersion }}
         id: changelog
         uses: requarks/changelog-action@v1
         with:
           token: ${{ github.token }}
           # tag: ${{ github.ref_name }}
+          fromTag: ${{ github.ref_name }}
+          toTag: ${{ env.previousTag }}
           writeToFile: true
           changelogFilePath: CHANGELOG.md
           includeRefIssues: true
@@ -32,12 +56,14 @@ jobs:
 
 
       - name: Create Release Changelog
+        if: ${{ steps.get_next_version.outputs.hasNextVersion }}
         shell: bash
         run: |
           echo "${{ steps.changelog.outputs.changes }}" > changelog-release.md
 
 
       - name: Upload Release Changelog
+        if: ${{ steps.get_next_version.outputs.hasNextVersion }}
         uses: actions/upload-artifact@v4
         with:
           name: changelog-release
@@ -45,6 +71,7 @@ jobs:
 
 
       - name: Commit the changelog
+        if: ${{ steps.get_next_version.outputs.hasNextVersion }}
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           # Optional. Commit message for the created commit.
@@ -78,7 +105,7 @@ jobs:
 
           # Optional. Tag name being created in the local repository and 
           # pushed to remote repository and defined branch.
-          # tagging_message: 'v1.0.0'
+          tagging_message: ${{ steps.get_next_version.outputs.version }}
 
           # Optional. Option used by `git-status` to determine if the repository is 
           # dirty. See https://git-scm.com/docs/git-status#_options
