@@ -30,9 +30,9 @@ on:
   #     WORKFLOW_TOKEN:
   #       description: Token used to create the tag (required to trigger 'tag' workflow)
   #       required: true
-  # push:
-  #   branches:
-  #     - '**'
+  push:
+    branches:
+      - 'master'
   #   tags:
   #     - '*'
 
