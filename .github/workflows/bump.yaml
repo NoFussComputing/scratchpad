@@ -32,8 +32,8 @@ jobs:
         with:
           token: ${{ github.token }}
           branch: master
-          noVersionBumpBehavior: silent
-          noNewCommitBehavior: silent
+          noVersionBumpBehavior: warn
+          noNewCommitBehavior: warn
 
       # - name: Get next version
       #   id: get_next_version
