@@ -83,7 +83,7 @@ jobs:
         if: ${{ steps.get_next_version.outputs.nextStrict }}
         shell: bash
         run: |
-          echo "${{ steps.changelog.outputs.changes }}" > changelog-release.md
+          echo '${{ steps.changelog.outputs.changes }}' > changelog-release.md
 
 
       - name: Upload Release Changelog
