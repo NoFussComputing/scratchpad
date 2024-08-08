@@ -1,3 +1,13 @@
+## 1.5.1 (2024-08-08)
+
+### Fix
+
+- pr
+
+### Refactor
+
+- update commit msg
+
 ## 1.5.0 (2024-08-08)
 
 ### Feat
