@@ -77,6 +77,13 @@ jobs:
           path: changelog-release.md
 
 
+      - name: Create Release Changelog
+        if: ${{ steps.get_next_version.outputs.hasNextVersion }}
+        shell: bash
+        run: |
+          rm changelog-release.md
+
+
       - name: Commit the changelog
         if: ${{ steps.get_next_version.outputs.hasNextVersion }}
         uses: stefanzweifel/git-auto-commit-action@v5
@@ -99,7 +106,7 @@ jobs:
           # See the `pathspec`-documentation for git
           # - https://git-scm.com/docs/git-add#Documentation/git-add.txt-ltpathspecgt82308203
           # - https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefpathspecapathspec
-          file_pattern: ''
+          file_pattern: '.'
 
           # Optional. Local file path to the repository.
           # Defaults to the root of the repository.
