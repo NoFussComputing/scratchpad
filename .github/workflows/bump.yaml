@@ -150,7 +150,7 @@ jobs:
 
             echo "[debug] Pre-Release detected: ${{ inputs.CZ_PRE_RELEASE }}";
 
-            pre-release="--prerelease ${{ inputs.CZ_PRE_RELEASE }}";
+            export pre_release="--prerelease ${{ inputs.CZ_PRE_RELEASE }}";
 
           fi;
 
@@ -158,13 +158,13 @@ jobs:
 
             echo "[debug] Pre-Release detected: ${{ inputs.CZ_INCREMENT }}";
 
-            increment="--increment ${{ inputs.CZ_INCREMENT }}";
+            export increment="--increment ${{ inputs.CZ_INCREMENT }}";
 
           fi;
 
           cz bump \
             --files-only \
-            ${pre-release} \
+            ${pre_release} \
             ${increment} \
             --yes;
 
