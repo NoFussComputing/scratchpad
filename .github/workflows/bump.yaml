@@ -239,7 +239,7 @@ jobs:
         with:
           # Optional. Commit message for the created commit.
           # Defaults to "Apply automatic changes"
-          commit_message: 'build: bump version ${{ steps.get_next_version.outputs.current }} -> ${{ steps.get_next_version.outputs.nextStrict }} [skip ci]'
+          commit_message: 'build: bump version ${{ steps.get_next_version.outputs.current }} -> ${{ steps.get_next_version.outputs.nextStrict }}'
 
           # Optional. Local and remote branch name where commit is going to be pushed
           #  to. Defaults to the current branch.
