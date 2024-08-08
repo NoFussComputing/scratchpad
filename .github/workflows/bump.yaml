@@ -65,7 +65,7 @@ jobs:
           writeToFile: true
           changelogFilePath: CHANGELOG.md
           includeRefIssues: true
-          includeInvalidCommits: true
+          includeInvalidCommits: false
           reverseOrder: false
 
 
