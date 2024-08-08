@@ -80,15 +80,6 @@ jobs:
 
 
 
-      - name: Incremennt version with .cz.yaml
-        shell: bash
-        run: |
-          cz bump \
-            --files-only \
-            --yes
-
-
-
       # - name: Create Release Changelog
       #   shell: bash
       #   run: |
@@ -113,6 +104,13 @@ jobs:
           cz changelog --merge-prerelease --dry-run --unreleased-version "${{ steps.get_next_version.outputs.nextStrict }}" > changelog-release.md
 
 
+
+      - name: Incremennt version with .cz.yaml
+        shell: bash
+        run: |
+          cz bump \
+            --files-only \
+            --yes
 
       # - name: Install Commitizen
       #   shell: bash
