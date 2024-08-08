@@ -5,7 +5,11 @@ name: 'Bump'
 
 on:
   workflow_dispatch:
-    # inputs:
+    inputs:
+      CZ_BUMP_TYPE:
+        default: MINOR
+        required: false
+        description: "Type of bump to conduct"
   # push:
   #   branches:
   #     - '**'
