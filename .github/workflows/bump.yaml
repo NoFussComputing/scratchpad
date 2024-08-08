@@ -10,6 +10,14 @@ on:
         default: MINOR
         required: false
         description: "Type of bump to conduct"
+      CZ_PRE_RELEASE:
+        default: none
+        required: false
+        description: Create Pre-Release {alpha,beta,rc,none}
+      CZ_INCREMENT:
+        default: none
+        required: false
+        description: Type of increment to conduct {MAJOR,MINOR,PATCH,none}
   # push:
   #   branches:
   #     - '**'
@@ -138,22 +146,27 @@ jobs:
       - name: Incremennt version with .cz.yaml
         shell: bash
         run: |
+          if [ "${{ inputs.CZ_PRE_RELEASE }}" != 'none' ]; then
+
+            echo "[debug] Pre-Release detected: ${{ inputs.CZ_PRE_RELEASE }}";
+
+            pre-release="--prerelease ${{ inputs.CZ_PRE_RELEASE }}";
+
+          fi;
+
+          if [ "${{ inputs.CZ_INCREMENT }}" != 'none' ]; then
+
+            echo "[debug] Pre-Release detected: ${{ inputs.CZ_INCREMENT }}";
+
+            increment="--increment ${{ inputs.CZ_INCREMENT }}";
+
+          fi;
+
           cz bump \
             --files-only \
-            --yes
-
-      # - name: Install Commitizen
-      #   shell: bash
-      #   run: |
-          
-
-
-
-      # - name: Install Commitizen
-      #   shell: bash
-      #   run: |
-          
-
+            ${pre-release} \
+            ${increment} \
+            --yes;
 
 
       # - name: Get previous tag
