@@ -30,6 +30,7 @@ jobs:
         with:
           fetch-depth: 0
           fetch-tags: true
+          token: ${{ secrets.WORKFLOW_TOKEN }}
 
       - name: Get Next Version
         id: get_next_version
