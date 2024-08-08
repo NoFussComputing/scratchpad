@@ -1,0 +1,446 @@
+---
+
+name: 'Docker'
+
+
+on:
+  # workflow_call:
+  #   inputs:
+  #     build-branch:         # tag / dev
+  #       required: true
+  #       type: string
+  push:
+    branches:
+      - '*'         # matches every branch that doesn't contain a '/'
+      - '*/*'       # matches every branch containing a single '/'
+      - '**'        # matches every branch
+      # - '!master'
+  pull_request:
+    branches:
+      - '*'         # matches every branch that doesn't contain a '/'
+      - '*/*'       # matches every branch containing a single '/'
+      - '**'        # matches every branch
+  #     branches: [ "development" ]
+env:
+  DOCKER_BUILD_IMAGE: "ghcr.io/${{ github.repository }}:${{ github.sha }}"
+
+
+permissions:
+  pull-requests: write
+  contents: read
+  actions: read
+  checks: write
+  packages: write
+  security-events: write
+  statuses: write
+
+
+jobs:
+
+  docker-build:
+    if: github.event.pull_request
+    runs-on: ubuntu-latest
+    name: Build Current Commit
+    steps:
+
+
+      - uses: actions/checkout@v4
+
+
+      - name: Log into registry ghcr.io
+        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+
+      - name: Setup BuildX
+        run: |
+          docker buildx create --name project-v3-builder;
+          docker buildx use project-v3-builder;
+
+
+      - name: build image
+        run: |
+          docker buildx build --platform="linux/amd64,linux/arm64" . \
+            --label "org.opencontainers.image.created=$(date '+%Y-%m-%dT%H:%M:%S%:z')" \
+            --label "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
+            --label "org.opencontainers.image.revision=${{ github.sha }}" \
+            \
+            --label "io.artifacthub.package.readme-url=https://raw.githubusercontent.com/${{ github.repository }}/development/README.md" \
+            --label 'io.artifacthub.package.maintainers=[{"name":"No Fuss Computing","email":"helpdesk@nofusscomputing.com"}]' \
+            \
+            --annotation "org.opencontainers.image.description=a DESCRIPTION for multi-arch images" \
+            --annotation "org.opencontainers.image.created=$(date '+%Y-%m-%dT%H:%M:%S%:z')" \
+            --annotation "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
+            --annotation "org.opencontainers.image.revision=${{ github.sha }}" \
+          --push \
+          --file dockerfile \
+          --tag ghcr.io/${{ github.repository }}:${{ github.sha }};
+
+
+      - name: Remove "Unknown" Image from Manifest
+        run: |
+
+          DOCKER_MULTI_ARCH_IMAGES=$(docker buildx imagetools inspect "$DOCKER_BUILD_IMAGE" --format "{{ range .Manifest.Manifests }}{{ if ne (print .Platform) \"&{unknown unknown  [] }\" }}$DOCKER_BUILD_IMAGE@{{ println .Digest }}{{end}} {{end}}");
+
+          # if [ "${{ inputs.build-branch }}" == "dev" ]; then
+
+          #   docker buildx imagetools create $DOCKER_MULTI_ARCH_IMAGES \
+          #     --tag ghcr.io/${{ github.repository }}:${{ github.sha }} \
+          #     --tag ghcr.io/${{ github.repository }}:dev;
+
+          # elif [ "${{ inputs.build-branch }}" == "tag" ]; then
+
+          #   docker buildx imagetools create $DOCKER_MULTI_ARCH_IMAGES \
+          #     --tag ghcr.io/${{ github.repository }}:${{ github.sha }} \
+          #     --tag ghcr.io/${{ github.repository }}:${{ github.ref_name }} \
+          #     --tag ghcr.io/${{ github.repository }}:latest;
+
+          # fi;
+
+          docker buildx imagetools create $DOCKER_MULTI_ARCH_IMAGES \
+            --tag ${{ env.DOCKER_BUILD_IMAGE }} \
+            --tag ghcr.io/${{ github.repository }}:dev;
+
+
+      - name: Cleanup BuildX
+        run: |
+          docker buildx rm project-v3-builder;
+
+  docker-scan:
+    if: github.event.pull_request || github.event.push
+    needs: docker-build
+    runs-on: ubuntu-latest
+    # container: aquasec/trivy:latest
+    name: Custom scan
+    steps:
+      - uses: actions/checkout@v4
+
+
+      - name: Log into registry ghcr.io
+        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+
+      - name: Run Trivy vulnerability scanner (Reports)
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          image-ref: '${{ env.DOCKER_BUILD_IMAGE }}'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'LOW,MEDIUM,HIGH,CRITICAL'
+          vuln-type: 'os,library'
+          # list-all-pkgs: true
+          scanners: vuln
+          # trivy-config: .trivy.yaml
+          ignore-unfixed: true
+
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+
+      - name: Run Trivy vulnerability scanner (PR comment)
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          image-ref: '${{ env.DOCKER_BUILD_IMAGE }}'
+          format: 'json'
+          output: 'scan-results.json'
+          severity: 'LOW,MEDIUM,HIGH,CRITICAL'
+          vuln-type: 'os,library'
+          # list-all-pkgs: true
+          scanners: vuln
+          # trivy-config: .trivy.yaml
+          ignore-unfixed: false
+
+      - name: Upload scan results
+        uses: actions/upload-artifact@v4
+        # if: success() || failure()
+        with:
+          name: container-scan-results-json
+          path: scan-results.json
+
+
+      # - name: Extract high and critical vulnerabilities
+      #   id: extract_vulnerabilities_orig
+      #   run: |
+      #     jq -r '
+      #     def hr(severity):
+      #     if severity == "HIGH" or severity == "CRITICAL" then true else false end;
+      #     def to_md:
+      #     "| " + (.VulnerabilityID // "") + " | " + (.PkgName // "") + " | " + (.InstalledVersion // "") + " | " + (.Severity // "") + " | " + (.Title // "") + " |";
+      #     [
+      #     "# Docker Image Scan Results",
+      #     "",
+      #     "## High and Critical Vulnerabilities",
+      #     "",
+      #     "| Vulnerability ID | Package | Version | Severity | Description |",
+      #     "| --------- | -----| -----| ----- | -------|",
+      #     (.Results[] | .Vulnerabilities[] | select(hr(.Severity)) | to_md),
+      #     ""
+      #     ] | join("\n")
+      #     ' scan-results.json > vulnerability-report.md
+
+
+      - run: |
+          ls -la
+
+      - name: Create Vulnerabilities (Critical/High)
+        id: extract_vulnerabilities_orig
+        run: |
+          not_empty="$(jq -r '.Results[] | .Vulnerabilities[]' scan-results.json)"
+
+          jq -r '
+          [
+          "# Image Scan Results",
+          "",
+          "**Scan Date:** _" + ( .CreatedAt // "" ) + "_",
+          "**Image:** _" + ( .ArtifactName // "" ) + "_",
+          "**OS:** _" + ( .Metadata.OS.Family // "" ) + " " + ( .Metadata.OS.Name // "" ) + "_",
+          ""
+          ] | join("\n")
+          ' scan-results.json > vulnerability-report.md
+
+          if [ "$not_empty" ]; then
+            jq -r '
+            def hr(severity):
+            if severity == "HIGH" or severity == "CRITICAL" then true else false end;
+            def to_md:
+            "| " + (.VulnerabilityID // "") + " | " + (.PkgName // "") + " | " + (.InstalledVersion // "") + " | " + (.Severity // "") + " | " + (.Title // "") + " |";
+            [
+            "## High and Critical Vulnerabilities",
+            "",
+            "| Vulnerability ID | Package | Version | Severity | Description |",
+            "| --------- | ----- | ----- | ----- | -------|",
+            (.Results[] | .Vulnerabilities[] | select(hr(.Severity)) | to_md),
+            ""
+            ] | join("\n")
+            ' scan-results.json >> vulnerability-report.md
+
+          else
+
+            echo "**Nothing Found**" >> vulnerability-report.md
+
+          fi;
+
+
+
+      - name: Create Full Vulnerabilities
+        run: |
+          not_empty="$(jq -r '.Results[] | .Vulnerabilities[]' scan-results.json)"
+
+          jq -r '
+          [
+          "# Full Image Scan Results",
+          "",
+          "**Scan Date:** _" + ( .CreatedAt // "" ) + "_",
+          "**Image:** _" + ( .ArtifactName // "" ) + "_",
+          "**OS:** _" + ( .Metadata.OS.Family // "" ) + " " + ( .Metadata.OS.Name // "" ) + "_",
+          ""
+          ] | join("\n")
+          ' scan-results.json > full-vulnerability-report.md
+
+          if [ "$not_empty" ]; then
+            jq -r '
+            def hr(severity):
+            if severity == "HIGH" or severity == "CRITICAL" then true else false end;
+            def to_md:
+            "| " + (.VulnerabilityID // "") + " | " + (.PkgName // "") + " | " + (.InstalledVersion // "") + " | " + (.Severity // "") + " | " + (.Title // "") + " |";
+            [
+            "## Vulnerabilities",
+            "",
+            "| Vulnerability ID | Package | Version | Severity | Description |",
+            "| --------- | ----- | ----- | ----- | -------|",
+            (.Results[] | .Vulnerabilities[] | select(.Severity) | to_md),
+            ""
+            ] | join("\n")
+            ' scan-results.json >> full-vulnerability-report.md
+
+          else
+
+            echo "**Nothing Found**" >> full-vulnerability-report.md
+
+          fi;
+
+
+      - name: Upload scan results
+        uses: actions/upload-artifact@v4
+        with:
+          name: vulnerability-report
+          path: vulnerability-report.md
+
+      - name: Upload scan results
+        uses: actions/upload-artifact@v4
+        with:
+          name: vulnerability-report-full
+          path: full-vulnerability-report.md
+
+      # - uses: dtinth/markdown-report-action@v1
+      #   with:
+      #     name: Vulnerability Report
+      #     title: Vulnerability Report
+      #     body-file: full-vulnerability-report.md
+
+
+
+
+
+
+
+
+
+
+  docker-reports:
+    if: github.event.pull_request || github.event.push
+    needs: 
+      - docker-build
+      - docker-scan
+    runs-on: ubuntu-latest
+    name: Docker Reports
+    steps:
+
+      # - uses: actions/checkout@v4
+
+
+      - name: Fetch Scan Results
+        uses: actions/download-artifact@v4
+        with:
+          name: vulnerability-report-full
+
+
+      - uses: dtinth/markdown-report-action@v1
+        with:
+          name: Vulnerability Report
+          title: Vulnerability Report
+          body-file: full-vulnerability-report.md
+
+
+
+
+
+  pr-scan-comment:
+    if: github.event.pull_request
+    needs: 
+      - docker-build
+      - docker-scan
+    runs-on: ubuntu-latest
+    name: Scan Results PR Comment
+    steps:
+
+
+      - name: Fetch scan results
+        uses: actions/download-artifact@v4
+        with:
+          name: vulnerability-report
+
+
+      - name: Capture scan results
+        id: capture_results
+        run: |
+          content=$(cat vulnerability-report.md | head -c 65000)
+          echo "report<<EOF" >> $GITHUB_ENV
+          echo "$content" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+
+      - name: Comment scan results on PR
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: Image Scan Results
+          message: |
+            ${{ env.report }}
+
+
+
+
+
+
+
+
+
+      # - name: Comment scan results on PR
+      #   uses: marocchino/sticky-pull-request-comment@v2
+      #   with:
+      #     header: Docker Image Scan Results
+      #     message: |
+      #       Trivy scan report:
+      #       ${{ env.report }}
+
+
+      # - run: |
+      #     trivy convert --format sarif --severity CRITICAL,HIGH output.json
+
+      # - run: |
+      #     ls -la
+
+      # - run: |
+      #     cat output.json
+
+
+
+  # docker-scan:
+  #   needs: docker-build
+  #   runs-on: ubuntu-latest
+  #   name: Scan Container
+  #   steps:
+
+
+  #     - uses: actions/checkout@v4
+
+
+  #     - name: Log into registry ghcr.io
+  #       uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+  #       with:
+  #         registry: ghcr.io
+  #         username: ${{ github.actor }}
+  #         password: ${{ secrets.GITHUB_TOKEN }}
+
+
+  #     # - name: Run Trivy vulnerability scanner
+  #     #   uses: aquasecurity/trivy-action@0.20.0
+  #     #   with:
+  #     #     image-ref: '${{ env.DOCKER_BUILD_IMAGE }}'
+  #     #     format: 'sarif'
+  #     #     output: 'trivy-results.sarif'
+  #     #     severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
+  #     #     vuln-type: 'os,library'
+  #     #     list-all-pkgs: true
+  #     #     scanners: vuln
+  #     #     trivy-config: .trivy.yaml
+  #     #     ignore-unfixed: true
+
+
+  #     # - name: Upload Trivy scan results to GitHub Security tab
+  #     #   uses: github/codeql-action/upload-sarif@v3
+  #     #   if: always()
+  #     #   with:
+  #     #     sarif_file: 'trivy-results.sarif'
+
+  #     - name: Run Trivy vulnerability scanner in repo mode
+  #       uses: aquasecurity/trivy-action@master
+  #       with:
+  #         scan-type: 'fs'
+  #         ignore-unfixed: true
+  #         format: 'sarif'
+  #         output: 'trivy-results.sarif'
+  #         severity: 'HIGH,CRITICAL'
+
+  #     - name: Upload Trivy scan results to GitHub Security tab
+  #       uses: github/codeql-action/upload-sarif@v3
+  #       with:
+  #         sarif_file: 'trivy-results.sarif'
+
+  #     - name: Run Trivy vulnerability scanner
+  #       uses: aquasecurity/trivy-action@master
+  #       with:
+  #         image-ref: '${{ env.DOCKER_BUILD_IMAGE }}'
+  #         format: 'table'
+  #         vuln-type: 'os,library'
+  #         severity: 'CRITICAL,HIGH'

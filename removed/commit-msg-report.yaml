@@ -1,0 +1,32 @@
+name: 'Test Report'
+on:
+  workflow_run:
+    workflows: #[]                     # runs after CI workflow
+      - 'Check Commit Messages'
+      - '*/Check Commit Messages'
+    types:
+      - completed
+permissions:
+  contents: read
+  actions: read
+  checks: write
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+    # - uses: dorny/test-reporter@v1
+    #   with:
+    #     artifact: test-results            # artifact name
+    #     name: JEST Tests                  # Name of the check run which will be created
+    #     path: '*.xml'                     # Path to test results (inside artifact .zip)
+    #     reporter: jest-junit              # Format of test results
+
+    - name: Test Report
+      uses: dorny/test-reporter@v1
+      # if: success() || failure()    # run this step even if previous step failed
+      with:
+        artifact: test-results            # artifact name
+        name: Commit Message Test Report            # Name of the check run which will be created
+        # path: cz.junit.xml    # Path to test results
+        path: '*.xml'
+        reporter: java-junit        # Format of test results

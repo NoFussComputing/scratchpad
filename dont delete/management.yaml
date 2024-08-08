@@ -1,0 +1,33 @@
+---
+
+name: Management
+
+
+on:
+  push:
+    branches:
+      - '**'
+    paths:
+      - .github/labels.yml
+  workflow_dispatch:
+
+
+concurrency: manage-labels
+
+
+jobs:
+  manage-labels:
+    name: Manage Labels
+    permissions:
+      contents: read
+      issues: write
+    runs-on: ubuntu-latest
+    steps:
+
+
+      - uses: actions/checkout@v4
+
+
+      - uses: oliversalzburg/action-label-manager@v0.0.9
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
