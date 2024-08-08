@@ -32,7 +32,9 @@ jobs:
     name: 'Bump Version'
     runs-on: ubuntu-latest
     outputs:
-      nextStrict: ${{ steps.get_next_version.outputs.nextStrict }}
+      # nextStrict: ${{ steps.get_next_version.outputs.nextStrict }}
+      version-current: ${{ steps.version-current.outputs.value-out }}
+      version-new: ${{ steps.version-new.outputs.value-out }}
     steps:
 
 
@@ -56,14 +58,14 @@ jobs:
           ref: ${{ github.ref_name }}
 
 
-      - name: Get Next Version
-        id: get_next_version
-        uses: ietf-tools/semver-action@v1
-        with:
-          token: ${{ github.token }}
-          branch: ${{ github.ref_name }}
-          noVersionBumpBehavior: warn
-          noNewCommitBehavior: warn
+      # - name: Get Next Version
+      #   id: get_next_version
+      #   uses: ietf-tools/semver-action@v1
+      #   with:
+      #     token: ${{ github.token }}
+      #     branch: ${{ github.ref_name }}
+      #     noVersionBumpBehavior: warn
+      #     noNewCommitBehavior: warn
 
       # - name: Get next version
       #   id: get_next_version
@@ -72,15 +74,15 @@ jobs:
       #     prefix: 'v' # optional, defaults to ''
 
 
-      - name: Show the next version
-        if: success() || failure()
-        run: |
-          echo ${{ steps.get_next_version.outputs.current }};
-          echo ${{ steps.get_next_version.outputs.next }};
-          echo ${{ steps.get_next_version.outputs.nextMajor }};
-          echo ${{ steps.get_next_version.outputs.nextStrict }};
-          echo ${{ steps.get_next_version.outputs.nextMajorStrict }};
-          echo ${{ steps.get_next_version.outputs.bump }};
+      # - name: Show the next version
+      #   if: success() || failure()
+      #   run: |
+      #     echo ${{ steps.get_next_version.outputs.current }};
+      #     echo ${{ steps.get_next_version.outputs.next }};
+      #     echo ${{ steps.get_next_version.outputs.nextMajor }};
+      #     echo ${{ steps.get_next_version.outputs.nextStrict }};
+      #     echo ${{ steps.get_next_version.outputs.nextMajorStrict }};
+      #     echo ${{ steps.get_next_version.outputs.bump }};
 
 
       - name: Install Commitizen
@@ -88,6 +90,13 @@ jobs:
         run: |
           pip install \
             commitizen==3.28.0
+
+
+      - name: Fetch Current Version
+        id: version-current
+        run: |
+          echo "value-out=$(cz version --project)" >> $GITHUB_OUTPUT
+
 
       # - name: Configure git
       #   shell: bash
@@ -102,48 +111,7 @@ jobs:
       #   run: |
       #     cz changelog  --incremental --dry-run --unreleased-version 
 
-
-
-      - name: ls
-        if: ${{ github.ref_name != 'master' }}
-        shell: bash
-        run: |
-          ls -la
-
-
-      - name: Update Changelog
-        # if: ${{ github.ref_name != 'master' }}
-        shell: bash
-        run: |
-          cz changelog --dry-run --incremental --unreleased-version "${{ steps.get_next_version.outputs.nextStrict }}" > changelog-release.md
-
-
-      - name: Update Changelog
-        if: ${{ github.ref_name != 'master' }}
-        shell: bash
-        run: |
-          cz changelog --unreleased-version "${{ steps.get_next_version.outputs.nextStrict }}"
-
-
-
-      # - name: Update Changelog - (Master Branch)
-      #   if: ${{ github.ref_name == 'master' }}
-      #   shell: bash
-      #   run: |
-      #     cz changelog --merge-prerelease --unreleased-version ${{ steps.get_next_version.outputs.nextStrict }}"
-      #     cz changelog --dry-run --incremental --unreleased-version "${{ steps.get_next_version.outputs.nextStrict }}" > changelog-release.md
-
-
-
-      # - name: Update Changelog - (Master Branch)
-      #   # if: ${{ github.ref_name == 'master' }}
-      #   shell: bash
-      #   run: |
-      #     cz changelog --dry-run --incremental --unreleased-version "${{ steps.get_next_version.outputs.nextStrict }}" > changelog-release.md
-
-
-
-      - name: Incremennt version with .cz.yaml
+      - name: Increment version with .cz.yaml
         shell: bash
         run: |
           if [ "${{ inputs.CZ_PRE_RELEASE }}" != 'none' ]; then
@@ -167,6 +135,79 @@ jobs:
             ${pre_release} \
             ${increment} \
             --yes;
+
+
+      - name: Fetch Current Version
+        id: version-new
+        run: |
+          echo "value-out=$(cz version --project)" >> $GITHUB_OUTPUT
+
+
+      - name: ls
+        if: ${{ github.ref_name != 'master' }}
+        shell: bash
+        run: |
+          ls -la
+
+
+      - name: Update Changelog
+        # if: ${{ github.ref_name != 'master' }}
+        shell: bash
+        run: |
+          cz changelog --dry-run --incremental --unreleased-version "${{ steps.version-new.outputs.value-out }}" > changelog-release.md
+
+
+      - name: Update Changelog
+        # if: ${{ github.ref_name != 'master' }}
+        shell: bash
+        run: |
+          cz changelog --unreleased-version "${{ steps.version-new.outputs.value-out }}"
+
+
+
+
+
+      # - name: Update Changelog - (Master Branch)
+      #   if: ${{ github.ref_name == 'master' }}
+      #   shell: bash
+      #   run: |
+      #     cz changelog --merge-prerelease --unreleased-version ${{ steps.get_next_version.outputs.nextStrict }}"
+      #     cz changelog --dry-run --incremental --unreleased-version "${{ steps.get_next_version.outputs.nextStrict }}" > changelog-release.md
+
+
+
+      # - name: Update Changelog - (Master Branch)
+      #   # if: ${{ github.ref_name == 'master' }}
+      #   shell: bash
+      #   run: |
+      #     cz changelog --dry-run --incremental --unreleased-version "${{ steps.get_next_version.outputs.nextStrict }}" > changelog-release.md
+
+
+
+      # - name: Increment version with .cz.yaml
+      #   shell: bash
+      #   run: |
+      #     if [ "${{ inputs.CZ_PRE_RELEASE }}" != 'none' ]; then
+
+      #       echo "[debug] Pre-Release detected: ${{ inputs.CZ_PRE_RELEASE }}";
+
+      #       export pre_release="--prerelease ${{ inputs.CZ_PRE_RELEASE }}";
+
+      #     fi;
+
+      #     if [ "${{ inputs.CZ_INCREMENT }}" != 'none' ]; then
+
+      #       echo "[debug] Pre-Release detected: ${{ inputs.CZ_INCREMENT }}";
+
+      #       export increment="--increment ${{ inputs.CZ_INCREMENT }}";
+
+      #     fi;
+
+      #     cz bump \
+      #       --files-only \
+      #       ${pre_release} \
+      #       ${increment} \
+      #       --yes;
 
 
       # - name: Get previous tag
@@ -245,7 +286,7 @@ jobs:
 
 
       - name: Upload Release Changelog
-        if: ${{ steps.get_next_version.outputs.nextStrict }}
+        if: ${{ steps.version-new.outputs.value-out }}
         uses: actions/upload-artifact@v4
         with:
           name: changelog-release
@@ -253,7 +294,7 @@ jobs:
 
 
       - name: Create Release Changelog
-        if: ${{ steps.get_next_version.outputs.nextStrict }}
+        if: ${{ steps.version-new.outputs.value-out }}
         shell: bash
         run: |
           rm changelog-release.md;
@@ -261,12 +302,12 @@ jobs:
 
 
       - name: Commit the changelog
-        if: ${{ steps.get_next_version.outputs.nextStrict && github.ref_name == 'master' }}
+        if: ${{ steps.version-new.outputs.value-out && github.ref_name == 'master' }}
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           # Optional. Commit message for the created commit.
           # Defaults to "Apply automatic changes"
-          commit_message: 'build: bump version ${{ steps.get_next_version.outputs.current }} -> ${{ steps.get_next_version.outputs.nextStrict }}'
+          commit_message: 'build: bump version ${{ steps.get_next_version.outputs.current }} -> ${{ steps.version-new.outputs.value-out }}'
 
           # Optional. Local and remote branch name where commit is going to be pushed
           #  to. Defaults to the current branch.
@@ -327,12 +368,12 @@ jobs:
 
 
       - name: Commit the changelog
-        if: ${{ steps.get_next_version.outputs.nextStrict && github.ref_name != 'master'}}
+        if: ${{ steps.version-new.outputs.value-out && github.ref_name != 'master'}}
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           # Optional. Commit message for the created commit.
           # Defaults to "Apply automatic changes"
-          commit_message: 'build: bump version ${{ steps.get_next_version.outputs.current }} -> ${{ steps.get_next_version.outputs.nextStrict }}'
+          commit_message: 'build: bump version ${{ steps.get_next_version.outputs.current }} -> ${{ steps.version-new.outputs.value-out }}'
 
           # Optional. Local and remote branch name where commit is going to be pushed
           #  to. Defaults to the current branch.
@@ -361,7 +402,7 @@ jobs:
 
           # Optional. Tag name being created in the local repository and 
           # pushed to remote repository and defined branch.
-          # tagging_message: ${{ steps.get_next_version.outputs.nextStrict }}
+          tagging_message: ${{ steps.version-new.outputs.value-out }}
 
           # Optional. Option used by `git-status` to determine if the repository is 
           # dirty. See https://git-scm.com/docs/git-status#_options
@@ -393,17 +434,17 @@ jobs:
 
 
 
-      - name: Update Changelog
-        if: ${{ github.ref_name != 'master' }}
-        shell: bash
-        run: |
-          git tag ${{ steps.get_next_version.outputs.nextStrict }}
+      # - name: Update Changelog
+      #   if: ${{ github.ref_name != 'master' }}
+      #   shell: bash
+      #   run: |
+      #     git tag ${{ steps.get_next_version.outputs.nextStrict }}
 
-      - name: Update Changelog
-        if: ${{ github.ref_name != 'master' }}
-        shell: bash
-        run: |
-          git push --tags
+      # - name: Update Changelog
+      #   if: ${{ github.ref_name != 'master' }}
+      #   shell: bash
+      #   run: |
+      #     git push --tags
 
 
 
@@ -411,7 +452,7 @@ jobs:
     needs:
       - bump
     name: Release
-    if: ${{ needs.bump.outputs.nextStrict }}
+    if: ${{ needs.bump.outputs.version-new }}
     runs-on: ubuntu-latest
     steps:
 
@@ -428,8 +469,8 @@ jobs:
         id: release
         uses: softprops/action-gh-release@v2
         with:
-          name: ${{ needs.bump.outputs.nextStrict }}
-          tag_name: ${{ needs.bump.outputs.nextStrict }}
+          name: ${{ needs.bump.outputs.version-new }}
+          tag_name: ${{ needs.bump.outputs.version-new }}
           body_path: changelog-release.md
           make_latest: true
 
@@ -438,7 +479,7 @@ jobs:
     needs:
       - bump
       - release
-    if: ${{ needs.bump.outputs.nextStrict }}
+    if: ${{ needs.bump.outputs.version-new }}
     name: Create Release Label
     permissions:
       contents: read
@@ -450,7 +491,7 @@ jobs:
           mkdir -p .github;
           echo "
           labels:
-            v${{ needs.bump.outputs.nextStrict }}:
+            v${{ needs.bump.outputs.version-new }}:
               color: "EEE600"
               description: Version Affected.
 
