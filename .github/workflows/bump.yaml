@@ -70,8 +70,8 @@ jobs:
         with:
           token: ${{ github.token }}
           # tag: ${{ github.ref_name }}
-          fromTag: ${{ github.ref_name }}
-          toTag: ${{ steps.get_next_version.outputs.current }}
+          fromTag: ${{ steps.get_next_version.outputs.current }}
+          toTag: ${{ github.ref_name }}
           writeToFile: true
           changelogFilePath: CHANGELOG.md
           includeRefIssues: true
