@@ -32,6 +32,9 @@ jobs:
         with:
           token: ${{ github.token }}
           branch: master
+          noVersionBumpBehavior: silent
+          noNewCommitBehavior: silent
+
       # - name: Get next version
       #   id: get_next_version
       #   uses: thenativeweb/get-next-version@main
@@ -40,9 +43,10 @@ jobs:
 
 
       - name: Show the next version
+        if: success() || failure()
         run: |
-          echo ${{ steps.get_next_version.outputs.next }}
-          echo ${{ steps.get_next_version.outputs.current }}
+          echo ${{ steps.get_next_version.outputs }}
+
 
       # - name: Get previous tag
       #   if: ${{ steps.get_next_version.outputs.hasNextVersion }}
