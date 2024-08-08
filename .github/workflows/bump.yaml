@@ -87,18 +87,19 @@ jobs:
 
 
 
-      - name: Update Changelog - (Other Branches)
-        if: ${{ github.ref_name != 'master' }}
-        shell: bash
-        run: |
-          cz changelog --incremental --unreleased-version "${{ steps.get_next_version.outputs.nextStrict }}"
+      # - name: Update Changelog - (Other Branches)
+      #   if: ${{ github.ref_name != 'master' }}
+      #   shell: bash
+      #   run: |
+      #     cz changelog --unreleased-version "${{ steps.get_next_version.outputs.nextStrict }}"
 
 
       - name: Update Changelog - (Other Branches)
         if: ${{ github.ref_name != 'master' }}
         shell: bash
         run: |
-          cz changelog --merge-prerelease --dry-run --incremental --unreleased-version "${{ steps.get_next_version.outputs.nextStrict }}" > changelog-release.md
+          cz changelog --unreleased-version "${{ steps.get_next_version.outputs.nextStrict }}"
+          cz changelog --dry-run --incremental --unreleased-version "${{ steps.get_next_version.outputs.nextStrict }}" > changelog-release.md
 
 
 
@@ -107,7 +108,7 @@ jobs:
         shell: bash
         run: |
           cz changelog --merge-prerelease --unreleased-version ${{ steps.get_next_version.outputs.nextStrict }}"
-          cz changelog --merge-prerelease --dry-run --unreleased-version "${{ steps.get_next_version.outputs.nextStrict }}" > changelog-release.md
+          cz changelog --dry-run --incremental --unreleased-version "${{ steps.get_next_version.outputs.nextStrict }}" > changelog-release.md
 
 
 
