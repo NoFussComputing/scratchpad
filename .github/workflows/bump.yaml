@@ -22,41 +22,46 @@ jobs:
     steps:
 
       - name: Checkout Code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+        uses: actions/checkout@v4
+        # with:
+        #   fetch-depth: 0
 
-
-      - name: Get next version
+      - name: Get Next Version
         id: get_next_version
-        uses: thenativeweb/get-next-version@main
+        uses: ietf-tools/semver-action@v1
         with:
-          prefix: 'v' # optional, defaults to ''
+          token: ${{ github.token }}
+          branch: master
+      # - name: Get next version
+      #   id: get_next_version
+      #   uses: thenativeweb/get-next-version@main
+      #   with:
+      #     prefix: 'v' # optional, defaults to ''
 
 
       - name: Show the next version
         run: |
-          echo ${{ steps.get_next_version.outputs.version }}
-          echo ${{ steps.get_next_version.outputs.hasNextVersion }}
+          echo ${{ steps.get_next_version.outputs.next }}
+          echo ${{ steps.get_next_version.outputs.current }}
 
-      - name: Get previous tag
-        if: ${{ steps.get_next_version.outputs.hasNextVersion }}
-        id: previousTag
-        run: |
-          name=$(git --no-pager tag --sort=creatordate --merged ${{ github.ref_name }} | tail -2 | head -1)
-          echo "previousTag: $name"
-          echo "previousTag=$name" >> $GITHUB_ENV
+      # - name: Get previous tag
+      #   if: ${{ steps.get_next_version.outputs.hasNextVersion }}
+      #   id: previousTag
+      #   run: |
+      #     name=$(git --no-pager tag --sort=creatordate --merged ${{ github.ref_name }} | tail -2 | head -1)
+      #     echo "previousTag: $name"
+      #     echo "previousTag=$name" >> $GITHUB_ENV
 
 
       - name: Update CHANGELOG
-        if: ${{ steps.get_next_version.outputs.hasNextVersion }}
+        if: ${{ steps.get_next_version.outputs.bump != 'none' }}
         id: changelog
         uses: requarks/changelog-action@v1
         with:
           token: ${{ github.token }}
           # tag: ${{ github.ref_name }}
           fromTag: ${{ github.ref_name }}
-          toTag: ${{ env.previousTag }}
+          toTag: ${{ steps.get_next_version.outputs.current }}
           writeToFile: true
           changelogFilePath: CHANGELOG.md
           includeRefIssues: true
@@ -65,14 +70,14 @@ jobs:
 
 
       - name: Create Release Changelog
-        if: ${{ steps.get_next_version.outputs.hasNextVersion }}
+        if: ${{ steps.get_next_version.outputs.bump != 'none' }}
         shell: bash
         run: |
           echo "${{ steps.changelog.outputs.changes }}" > changelog-release.md
 
 
       - name: Upload Release Changelog
-        if: ${{ steps.get_next_version.outputs.hasNextVersion }}
+        if: ${{ steps.get_next_version.outputs.bump != 'none' }}
         uses: actions/upload-artifact@v4
         with:
           name: changelog-release
@@ -80,14 +85,14 @@ jobs:
 
 
       - name: Create Release Changelog
-        if: ${{ steps.get_next_version.outputs.hasNextVersion }}
+        if: ${{ steps.get_next_version.outputs.bump != 'none' }}
         shell: bash
         run: |
           rm changelog-release.md
 
 
       - name: Commit the changelog
-        if: ${{ steps.get_next_version.outputs.hasNextVersion }}
+        if: ${{ steps.get_next_version.outputs.bump != 'none' }}
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           # Optional. Commit message for the created commit.
