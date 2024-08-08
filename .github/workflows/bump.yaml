@@ -98,7 +98,8 @@ jobs:
         if: ${{ steps.get_next_version.outputs.nextStrict }}
         shell: bash
         run: |
-          rm changelog-release.md
+          rm changelog-release.md;
+          git status;
 
 
       - name: Commit the changelog
