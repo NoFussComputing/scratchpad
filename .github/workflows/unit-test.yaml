@@ -98,7 +98,14 @@ jobs:
         if: success() || failure()
         shell: bash
         run: |
-          echo "{"schemaVersion": 1,"label": "Unit Test","message": "${{ steps.test-report.outputs.passed }} passed | ${{ steps.test-report.outputs.skipped }} skipped","namedLogo": "github","color": "#000"}" > endpoint_${{ matrix.python-version }}.json
+          echo '
+          {
+            "schemaVersion": 1,
+            "label": "Unit Test",
+            "message": "${{ steps.test-report.outputs.passed }} passed | ${{ steps.test-report.outputs.skipped }} skipped",
+            "namedLogo": "github",
+            "color": "#000"
+          }' > endpoint_${{ matrix.python-version }}.json
 
 
       - name: Upload Badge Endpoint json
