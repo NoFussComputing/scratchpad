@@ -62,48 +62,60 @@ jobs:
       #     echo "previousTag: $name"
       #     echo "previousTag=$name" >> $GITHUB_ENV
 
+      - name: Create Temp git tag
+        if: ${{ steps.get_next_version.outputs.hasNextVersion }}
+        # id: previousTag
+        run: |
+          git tag ${{ steps.get_next_version.outputs.nextStrict }};
 
-      # - name: Update CHANGELOG
-      #   if: ${{ steps.get_next_version.outputs.nextStrict }}
-      #   id: changelog
-      #   uses: requarks/changelog-action@v1
-      #   with:
-      #     token: ${{ github.token }}
-      #     # tag: ${{ steps.get_next_version.outputs.current }}
-      #     # tag: ${{ github.ref_name }}
-      #     # fromTag: ${{ github.ref_name }}
-      #     fromTag: ${{ steps.get_next_version.outputs.nextStrict }}
-      #     toTag: ${{ steps.get_next_version.outputs.current }}
-      #     writeToFile: true
-      #     changelogFilePath: CHANGELOG.md
-      #     includeRefIssues: true
-      #     includeInvalidCommits: false
-      #     reverseOrder: false
 
-      - name: Conventional Changelog Action
+      - name: Update CHANGELOG
+        if: ${{ steps.get_next_version.outputs.nextStrict }}
         id: changelog
-        uses: TriPSs/conventional-changelog-action@v5
+        uses: requarks/changelog-action@v1
         with:
-          github-token: ${{ secrets.github_token }}
-          # git-message: 'chore(release): {version}'
-          # git-user-name: 'Awesome Changelog Action'
-          # git-user-email: 'awesome_changelog@github.actions.com'
-          preset: 'conventionalcommits'
-          tag-prefix: ''
-          input-file: CHANGELOG.md
-          output-file: 'CHANGELOG.md'
-          # release-count: '10000'
-          pre-changelog-generation: ''    # pre changelog script file
-          # version-file: './my_custom_version_file.json' // or .yml, .yaml, .toml, mix.exs
-          # version-path: 'path.to.version'
-          skip-on-empty: true
-          skip-version-file: true
-          skip-commit: true
-          git-branch: ${{ github.ref_name }}
-          skip-bump: true
-          git-push: true
-          skip-tag: true
-          skip-git-pull: true
+          token: ${{ github.token }}
+          # tag: ${{ steps.get_next_version.outputs.current }}
+          # tag: ${{ github.ref_name }}
+          # fromTag: ${{ github.ref_name }}
+          fromTag: ${{ steps.get_next_version.outputs.nextStrict }}
+          toTag: ${{ steps.get_next_version.outputs.current }}
+          writeToFile: true
+          changelogFilePath: CHANGELOG.md
+          includeRefIssues: true
+          includeInvalidCommits: false
+          reverseOrder: false
+
+      - name: Create Temp git tag
+        if: ${{ steps.get_next_version.outputs.hasNextVersion }}
+        # id: previousTag
+        run: |
+          git tag -d ${{ steps.get_next_version.outputs.nextStrict }};
+
+      # - name: Conventional Changelog Action
+      #   id: changelog
+      #   uses: TriPSs/conventional-changelog-action@v5
+      #   with:
+      #     github-token: ${{ secrets.github_token }}
+      #     # git-message: 'chore(release): {version}'
+      #     # git-user-name: 'Awesome Changelog Action'
+      #     # git-user-email: 'awesome_changelog@github.actions.com'
+      #     preset: 'conventionalcommits'
+      #     tag-prefix: ''
+      #     input-file: CHANGELOG.md
+      #     output-file: 'CHANGELOG.md'
+      #     # release-count: '10000'
+      #     pre-changelog-generation: ''    # pre changelog script file
+      #     # version-file: './my_custom_version_file.json' // or .yml, .yaml, .toml, mix.exs
+      #     # version-path: 'path.to.version'
+      #     skip-on-empty: true
+      #     skip-version-file: true
+      #     skip-commit: true
+      #     git-branch: ${{ github.ref_name }}
+      #     skip-bump: true
+      #     git-push: true
+      #     skip-tag: true
+      #     skip-git-pull: true
 
 
 
