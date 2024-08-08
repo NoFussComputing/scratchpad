@@ -130,7 +130,7 @@ jobs:
 
           # Optional. Tag name being created in the local repository and 
           # pushed to remote repository and defined branch.
-          tagging_message: ${{ steps.get_next_version.outputs.version }}
+          tagging_message: ${{ steps.get_next_version.outputs.nextStrict }}
 
           # Optional. Option used by `git-status` to determine if the repository is 
           # dirty. See https://git-scm.com/docs/git-status#_options
