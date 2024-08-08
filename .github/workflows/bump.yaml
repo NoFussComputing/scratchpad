@@ -344,7 +344,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           name: ${{ needs.bump.outputs.nextStrict }}
-          # body: ''
+          tag_name: ${{ needs.bump.outputs.nextStrict }}
           body_path: changelog-release.md
           make_latest: true
 
