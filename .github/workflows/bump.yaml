@@ -61,19 +61,11 @@ jobs:
           echo ${{ steps.get_next_version.outputs.bump }};
 
 
-
       - name: Install Commitizen
         shell: bash
         run: |
           pip install \
-            commitizen==3.14.1
-
-
-      - name: Install Commitizen
-        shell: bash
-        run: |
-          pip install \
-            commitizen==3.14.1
+            commitizen==3.28.0
 
       # - name: Configure git
       #   shell: bash
@@ -326,7 +318,7 @@ jobs:
     needs:
       - bump
     name: Release
-    # if: ${{ github.ref_type == 'tag' }}
+    if: ${{ needs.bump.outputs.nextStrict }}
     runs-on: ubuntu-latest
     steps:
 
@@ -353,7 +345,7 @@ jobs:
     needs:
       - bump
       - release
-    # if: ${{ github.ref_type == 'tag' }}
+    if: ${{ needs.bump.outputs.nextStrict }}
     name: Create Release Label
     permissions:
       contents: read
