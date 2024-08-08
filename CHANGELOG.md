@@ -1,3 +1,15 @@
+## 1.10.0 (2024-08-08)
+
+### Feat
+
+- add more to bump inputs
+- master/dev branch separation
+- remove skip ci
+
+### Fix
+
+- use export
+
 ## 1.9.1 (2024-08-08)
 
 ### Fix
