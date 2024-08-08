@@ -1,41 +1,170 @@
-##  (2024-08-08)
+## 1.3.0 (2024-08-08)
 
+### Feat
 
-### Features
+- fetch tags
+- use cz file
+- use cz
+- **changelog**: use old with temp tag
 
-* use ref ([7e3ecdc](https://github.com/nofusscomputing/scratchpad/commit/7e3ecdc413f1eaf7cbfd64507fadd57eb009d121)), closes [#21](https://github.com/nofusscomputing/scratchpad/issues/21)
+## 1.2.0 (2024-08-08)
 
-# Changelog
-All notable changes to this project will be documented in this file.
+### Feat
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+- use ref
+- try different changelog
+- try next tag
 
-## [development] - 2024-08-08
-### :bug: Bug Fixes
-- [`5c14c5f`](https://github.com/nofusscomputing/scratchpad/commit/5c14c5f21d750d73b9e63c43434fbf9e8d2c9fa4) - try using ref name *(commit by [@jon-nfc](https://github.com/jon-nfc))*
-- [`0bf4c9d`](https://github.com/nofusscomputing/scratchpad/commit/0bf4c9d424948b5ac34d186ab63a90d7ab66a461) - return *(commit by [@jon-nfc](https://github.com/jon-nfc))*
-- [`a4db6b1`](https://github.com/nofusscomputing/scratchpad/commit/a4db6b12766e4465afb372eb19e0699625af7a18) - remove tag *(commit by [@jon-nfc](https://github.com/jon-nfc))*
+## 1.1.1 (2024-08-08)
 
+### Fix
 
-## [1.0.0] - 2024-08-08
-### :bug: Bug Fixes
-- [`e848af1`](https://github.com/nofusscomputing/scratchpad/commit/e848af1b3b3b2370ad403794393341261669239a) - dont include *(commit by [@jon-nfc](https://github.com/jon-nfc))*
+- remove tag
+- return
+- try using ref name
 
+## 1.1.0 (2024-08-08)
 
-## [development] - 2024-08-08
-### :sparkles: New Features
-- [`83b0f33`](https://github.com/nofusscomputing/scratchpad/commit/83b0f334751695ba313bc8805d5da3067643fca0) - bump be silent *(commit by [@jon-nfc](https://github.com/jon-nfc))*
+### Feat
 
+- add tag to changelog
+- remove tag details
+- turn tag from to around
+- show git status
+- try new branch
+- bump to warn
+- bump be silent
 
-## [conventional-bump] - 2024-08-08
-### :sparkles: New Features
-- [`1b87455`](https://github.com/nofusscomputing/scratchpad/commit/1b8745536082a03f6d4ae1175b7226b3f120bfc1) - add bump *(commit by [@jon-nfc](https://github.com/jon-nfc))*
+### Fix
 
-### :bug: Bug Fixes
-- [`7a212a4`](https://github.com/nofusscomputing/scratchpad/commit/7a212a42edacb802219db544ee85bb25920236fe) - commit all files *(commit by [@jon-nfc](https://github.com/jon-nfc))*
+- try syntax
+- use default file pattern
+- tag to have no v
 
-[conventional-bump]: https://github.com/nofusscomputing/scratchpad/compare/0.51.0...conventional-bump
-[development]: https://github.com/nofusscomputing/scratchpad/compare/1.0.0...development
-[1.0.0]: https://github.com/nofusscomputing/scratchpad/compare/v0.3.0...1.0.0
-[development]: https://github.com/nofusscomputing/scratchpad/compare/1.1.0...development
+## 1.0.0 (2024-08-08)
+
+### Fix
+
+- dont include
+
+## v0.3.0 (2024-08-08)
+
+### Feat
+
+- add bump
+
+### Fix
+
+- commit all files
+
+## 0.52.0 (2024-08-05)
+
+## 0.51.0 (2024-08-05)
+
+## 0.50.0 (2024-08-05)
+
+## 0.49.0 (2024-08-05)
+
+## 0.48.0 (2024-08-05)
+
+## 0.47.0 (2024-08-04)
+
+## 0.46.0 (2024-08-04)
+
+## 0.45.0 (2024-08-04)
+
+## 0.44.0 (2024-08-04)
+
+## 0.43.0 (2024-08-04)
+
+## 0.42.0 (2024-08-04)
+
+## 0.41.0 (2024-08-04)
+
+## 0.40.0 (2024-08-04)
+
+## 0.39.0 (2024-08-04)
+
+## 0.38.0 (2024-08-04)
+
+## 0.37.0 (2024-08-04)
+
+## 0.35.0 (2024-08-04)
+
+## 0.34.0 (2024-08-04)
+
+## 0.33.0 (2024-08-04)
+
+## 0.32.0 (2024-08-04)
+
+## 0.31.0 (2024-08-04)
+
+## 0.30.0 (2024-08-04)
+
+## 0.29.0 (2024-08-04)
+
+## 0.28.0 (2024-08-04)
+
+## 0.27.0 (2024-08-04)
+
+## 0.26.0 (2024-08-04)
+
+## 0.25.0 (2024-08-04)
+
+## 0.24.0 (2024-08-04)
+
+## 0.23.0 (2024-08-04)
+
+## 0.22.0 (2024-08-04)
+
+## 0.21.0 (2024-08-04)
+
+## 0.20.0 (2024-08-04)
+
+## 0.19.0 (2024-08-04)
+
+## 0.18.0 (2024-08-04)
+
+## 0.17.0 (2024-08-04)
+
+## 0.16.0 (2024-08-04)
+
+## 0.14.0 (2024-08-04)
+
+## 0.13.0 (2024-08-04)
+
+## 0.12.0 (2024-08-04)
+
+## 0.11.0 (2024-08-04)
+
+## 0.10.0 (2024-08-04)
+
+## 0.9.0 (2024-08-04)
+
+## 0.8.0 (2024-08-04)
+
+## 0.7.0 (2024-08-04)
+
+## 0.6.0 (2024-08-04)
+
+## 0.0.5 (2024-08-04)
+
+## 0.0.4 (2024-08-04)
+
+## 0.0.3 (2024-08-04)
+
+## 0.0.2 (2024-08-03)
+
+### Fix
+
+- boo close msg
+- try again
+- track current
+- synbtax
+- set var
+- set env
+- var
+
+## 0.2.0 (2024-08-02)
+
+## 0.1.0 (2024-08-02)
