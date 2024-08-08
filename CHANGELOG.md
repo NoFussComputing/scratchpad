@@ -1,3 +1,10 @@
+##  (2024-08-08)
+
+
+### Features
+
+* use ref ([7e3ecdc](https://github.com/nofusscomputing/scratchpad/commit/7e3ecdc413f1eaf7cbfd64507fadd57eb009d121)), closes [#21](https://github.com/nofusscomputing/scratchpad/issues/21)
+
 # Changelog
 All notable changes to this project will be documented in this file.
 
