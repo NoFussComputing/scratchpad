@@ -1,3 +1,10 @@
+## 1.9.0 (2024-08-08)
+
+### Feat
+
+- try no ci on changelog push
+- add checks
+
 ## 1.8.4 (2024-08-08)
 
 ### Fix
