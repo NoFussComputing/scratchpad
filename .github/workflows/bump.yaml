@@ -54,6 +54,64 @@ jobs:
 
 
 
+      - name: Install Commitizen
+        shell: bash
+        run: |
+          pip install \
+            commitizen==3.14.1
+
+
+      - name: Install Commitizen
+        shell: bash
+        run: |
+          pip install \
+            commitizen==3.14.1
+
+      # - name: Configure git
+      #   shell: bash
+      #   run: |
+      #     git config --global user.email "helpdesk@nofusscomputing.com";
+      #     git config --global user.name "nfc_bot";
+
+
+
+      - name: Install Commitizen
+        shell: bash
+        run: |
+          cz bump \
+            --files-only \
+            --yes
+
+
+
+      - name: Install Commitizen
+        shell: bash
+        run: |
+          cz changelog  --incremental --dry-run --unreleased-version "${{ steps.get_next_version.outputs.nextStrict }}" > changelog-release.md
+
+
+
+      # - name: Install Commitizen
+      #   shell: bash
+      #   run: |
+          
+
+
+
+      # - name: Install Commitizen
+      #   shell: bash
+      #   run: |
+          
+
+
+
+      # - name: Install Commitizen
+      #   shell: bash
+      #   run: |
+          
+
+
+
       # - name: Get previous tag
       #   if: ${{ steps.get_next_version.outputs.hasNextVersion }}
       #   id: previousTag
@@ -62,35 +120,38 @@ jobs:
       #     echo "previousTag: $name"
       #     echo "previousTag=$name" >> $GITHUB_ENV
 
-      - name: Create Temp git tag
-        if: ${{ steps.get_next_version.outputs.hasNextVersion }}
-        # id: previousTag
-        run: |
-          git tag ${{ steps.get_next_version.outputs.nextStrict }};
+
+      # - name: Create Temp git tag
+      #   if: ${{ steps.get_next_version.outputs.nextStrict }}
+      #   # id: previousTag
+      #   run: |
+      #     git tag ${{ steps.get_next_version.outputs.nextStrict }};
 
 
-      - name: Update CHANGELOG
-        if: ${{ steps.get_next_version.outputs.nextStrict }}
-        id: changelog
-        uses: requarks/changelog-action@v1
-        with:
-          token: ${{ github.token }}
-          # tag: ${{ steps.get_next_version.outputs.current }}
-          # tag: ${{ github.ref_name }}
-          # fromTag: ${{ github.ref_name }}
-          fromTag: ${{ steps.get_next_version.outputs.nextStrict }}
-          toTag: ${{ steps.get_next_version.outputs.current }}
-          writeToFile: true
-          changelogFilePath: CHANGELOG.md
-          includeRefIssues: true
-          includeInvalidCommits: false
-          reverseOrder: false
+      # - name: Update CHANGELOG
+      #   if: ${{ steps.get_next_version.outputs.nextStrict }}
+      #   id: changelog
+      #   uses: requarks/changelog-action@v1
+      #   with:
+      #     token: ${{ github.token }}
+      #     # tag: ${{ steps.get_next_version.outputs.current }}
+      #     # tag: ${{ github.ref_name }}
+      #     # fromTag: ${{ github.ref_name }}
+      #     fromTag: ${{ steps.get_next_version.outputs.nextStrict }}
+      #     toTag: ${{ steps.get_next_version.outputs.current }}
+      #     writeToFile: true
+      #     changelogFilePath: CHANGELOG.md
+      #     includeRefIssues: true
+      #     includeInvalidCommits: false
+      #     reverseOrder: false
 
-      - name: Create Temp git tag
-        if: ${{ steps.get_next_version.outputs.hasNextVersion }}
-        # id: previousTag
-        run: |
-          git tag -d ${{ steps.get_next_version.outputs.nextStrict }};
+      # - name: Create Temp git tag
+      #   if: ${{ steps.get_next_version.outputs.nextStrict }}
+      #   # id: previousTag
+      #   run: |
+      #     git tag -d ${{ steps.get_next_version.outputs.nextStrict }};
+
+
 
       # - name: Conventional Changelog Action
       #   id: changelog
@@ -119,11 +180,11 @@ jobs:
 
 
 
-      - name: Create Release Changelog
-        if: ${{ steps.get_next_version.outputs.nextStrict }}
-        shell: bash
-        run: |
-          echo '${{ steps.changelog.outputs.clean_changelog }}' > changelog-release.md
+      # - name: Create Release Changelog
+      #   if: ${{ steps.get_next_version.outputs.nextStrict }}
+      #   shell: bash
+      #   run: |
+      #     echo '${{ steps.changelog.outputs.clean_changelog }}' > changelog-release.md
 
 
       - name: Upload Release Changelog
