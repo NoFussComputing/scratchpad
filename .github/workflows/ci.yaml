@@ -3,6 +3,8 @@
 name: 'CI'
 
 
+
+
 on:
   push:
     branches:
@@ -11,10 +13,20 @@ on:
       - '*'
 
 
+
+
 jobs:
 
 
+
   docker:
+    if:
+      (${{
+        github.event.push
+          ||
+        github.ref_type == 'tag'
+      }})
+    # if: ${{github.ref_type == 'tag'}}
     name: 'Docker'
     # needs:
     #   - python

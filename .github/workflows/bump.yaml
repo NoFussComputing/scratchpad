@@ -5,10 +5,34 @@ name: 'Bump'
 
 on:
   workflow_dispatch:
-    # inputs:
-  # push:
-  #   branches:
-  #     - '**'
+    inputs:
+      CZ_PRE_RELEASE:
+        default: none
+        required: false
+        description: Create Pre-Release {alpha,beta,rc,none}
+      CZ_INCREMENT:
+        default: none
+        required: false
+        description: Type of increment to conduct {MAJOR,MINOR,PATCH,none}
+  # workflow_call:
+  #   inputs:
+  #     CZ_PRE_RELEASE:
+  #       default: none
+  #       required: false
+  #       description: Create Pre-Release {alpha,beta,rc,none}
+  #       type: string
+  #     CZ_INCREMENT:
+  #       default: none
+  #       required: false
+  #       description: Type of increment to conduct {MAJOR,MINOR,PATCH,none}
+  #       type: string
+  #   secrets:
+  #     WORKFLOW_TOKEN:
+  #       description: Token used to create the tag (required to trigger 'tag' workflow)
+  #       required: true
+  push:
+    branches:
+      - 'master'
   #   tags:
   #     - '*'
 
@@ -17,141 +41,11 @@ on:
 jobs:
 
   bump:
-    name: 'Bump Version'
-    runs-on: ubuntu-latest
-    steps:
-
-      - name: Checkout Code
-        uses: actions/checkout@v4
-        # with:
-        #   fetch-depth: 0
-
-      - name: Get Next Version
-        id: get_next_version
-        uses: ietf-tools/semver-action@v1
-        with:
-          token: ${{ github.token }}
-          branch: master
-      # - name: Get next version
-      #   id: get_next_version
-      #   uses: thenativeweb/get-next-version@main
-      #   with:
-      #     prefix: 'v' # optional, defaults to ''
-
-
-      - name: Show the next version
-        run: |
-          echo ${{ steps.get_next_version.outputs.next }}
-          echo ${{ steps.get_next_version.outputs.current }}
-
-      # - name: Get previous tag
-      #   if: ${{ steps.get_next_version.outputs.hasNextVersion }}
-      #   id: previousTag
-      #   run: |
-      #     name=$(git --no-pager tag --sort=creatordate --merged ${{ github.ref_name }} | tail -2 | head -1)
-      #     echo "previousTag: $name"
-      #     echo "previousTag=$name" >> $GITHUB_ENV
-
-
-      - name: Update CHANGELOG
-        if: ${{ steps.get_next_version.outputs.bump != 'none' }}
-        id: changelog
-        uses: requarks/changelog-action@v1
-        with:
-          token: ${{ github.token }}
-          # tag: ${{ github.ref_name }}
-          fromTag: ${{ github.ref_name }}
-          toTag: ${{ steps.get_next_version.outputs.current }}
-          writeToFile: true
-          changelogFilePath: CHANGELOG.md
-          includeRefIssues: true
-          includeInvalidCommits: false
-          reverseOrder: false
-
-
-      - name: Create Release Changelog
-        if: ${{ steps.get_next_version.outputs.bump != 'none' }}
-        shell: bash
-        run: |
-          echo "${{ steps.changelog.outputs.changes }}" > changelog-release.md
-
-
-      - name: Upload Release Changelog
-        if: ${{ steps.get_next_version.outputs.bump != 'none' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: changelog-release
-          path: changelog-release.md
-
-
-      - name: Create Release Changelog
-        if: ${{ steps.get_next_version.outputs.bump != 'none' }}
-        shell: bash
-        run: |
-          rm changelog-release.md
-
-
-      - name: Commit the changelog
-        if: ${{ steps.get_next_version.outputs.bump != 'none' }}
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          # Optional. Commit message for the created commit.
-          # Defaults to "Apply automatic changes"
-          commit_message: 'chore: bump version'
-
-          # Optional. Local and remote branch name where commit is going to be pushed
-          #  to. Defaults to the current branch.
-          #  You might need to set `create_branch: true` if the branch does not exist.
-          branch: development
-
-          # Optional. Options used by `git-commit`.
-          # See https://git-scm.com/docs/git-commit#_options
-          # commit_options: '--no-verify --signoff'
-
-          # Optional glob pattern of files which should be added to the commit
-          # Defaults to all (.)
-          # See the `pathspec`-documentation for git
-          # - https://git-scm.com/docs/git-add#Documentation/git-add.txt-ltpathspecgt82308203
-          # - https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefpathspecapathspec
-          file_pattern: '.'
-
-          # Optional. Local file path to the repository.
-          # Defaults to the root of the repository.
-          # repository: .
-
-          # Optional commit user and author settings
-          commit_user_name: nfc-bot # defaults to "github-actions[bot]"
-          commit_user_email: helpdesk@nofusscomputing.com # defaults to "41898282+github-actions[bot]@users.noreply.github.com"
-          commit_author: nfc-bot <helpdesk@nofusscomputing.com> # defaults to "username <username@users.noreply.github.com>", where "username" belongs to the author of the commit that triggered the run
-
-          # Optional. Tag name being created in the local repository and 
-          # pushed to remote repository and defined branch.
-          tagging_message: ${{ steps.get_next_version.outputs.version }}
-
-          # Optional. Option used by `git-status` to determine if the repository is 
-          # dirty. See https://git-scm.com/docs/git-status#_options
-          # status_options: '--untracked-files=no'
-
-          # Optional. Options used by `git-add`.
-          # See https://git-scm.com/docs/git-add#_options
-          # add_options: '-u'
-
-          # Optional. Options used by `git-push`.
-          # See https://git-scm.com/docs/git-push#_options
-          # push_options: '--force'
-          
-          # Optional. Disable dirty check and always try to create a commit and push
-          skip_dirty_check: true    
-          
-          # Optional. Skip internal call to `git fetch`
-          skip_fetch: true    
-          
-          # Optional. Skip internal call to `git checkout`
-          skip_checkout: true
-
-          # Optional. Prevents the shell from expanding filenames. 
-          # Details: https://www.gnu.org/software/bash/manual/html_node/Filename-Expansion.html
-          disable_globbing: true
-
-          # Optional. Create given branch name in local and remote repository.
-          # create_branch: true
+    name: 'Bump'
+    uses: nofusscomputing/github-ci/.github/workflows/bump.yaml@genesis
+    with:
+      CZ_PRE_RELEASE: ${{ inputs.CZ_PRE_RELEASE }}
+      CZ_INCREMENT: ${{ inputs.CZ_INCREMENT }}
+    secrets:
+      WORKFLOW_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+    

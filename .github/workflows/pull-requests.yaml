@@ -11,4 +11,4 @@ jobs:
 
   conventional-commits:
     name: Conventional Commit Checks
-    uses: nofusscomputing/scratchpad/.github/workflows/pull-requests.yaml@development
+    uses: nofusscomputing/github-ci/.github/workflows/pull-requests.yaml@genesis
