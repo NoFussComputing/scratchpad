@@ -1,3 +1,14 @@
+## 1.7.0 (2024-08-08)
+
+### Feat
+
+- git tag only
+
+### Fix
+
+- only git trigger
+- tag only
+
 ## 1.6.1 (2024-08-08)
 
 ### Fix
