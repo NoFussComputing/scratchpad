@@ -330,8 +330,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Upload Release Changelog
-        if: ${{ steps.get_next_version.outputs.nextStrict }}
+      - name: Download Release Changelog
+        # if: ${{ steps.get_next_version.outputs.nextStrict }}
         uses: actions/download-artifact@v4
         with:
           name: changelog-release
@@ -339,7 +339,7 @@ jobs:
 
 
       - name: Create GH Release
-        if: ${{ github.ref_type == 'tag' }}
+        # if: ${{ github.ref_type == 'tag' }}
         id: release
         uses: softprops/action-gh-release@v2
         with:
