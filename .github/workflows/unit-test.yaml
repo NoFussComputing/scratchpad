@@ -40,6 +40,7 @@ jobs:
 
 
       - name: Run Tests
+        shell: bash
         run: |
           cd app;
           pytest --cov --cov-report term --cov-report xml:../coverage.xml --cov-report html:../coverage/ --junit-xml=../unit.JUnit.xml **/tests/unit;
@@ -95,6 +96,7 @@ jobs:
 
       - name: Create Shields.io Endpoint.json
         if: success() || failure()
+        shell: bash
         run: |
           echo "
           {
@@ -127,6 +129,7 @@ jobs:
     steps:
     
       - name: Run Tests
+        shell: bash
         run: |
           ls -l;
 
@@ -139,6 +142,7 @@ jobs:
           github-token: ${{ github.token }}
 
       - name: ls
+        shell: bash
         if: success() || failure()
         run: |
           ls -l;
@@ -166,6 +170,7 @@ jobs:
 
 
       - name: ls
+        shell: bash
         if: success() || failure()
         run: |
           ls -l;
