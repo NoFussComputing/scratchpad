@@ -326,7 +326,7 @@ jobs:
     needs:
       - bump
     name: Release
-    if: ${{ github.ref_type == 'tag' }}
+    # if: ${{ github.ref_type == 'tag' }}
     runs-on: ubuntu-latest
     steps:
 
@@ -353,7 +353,7 @@ jobs:
     needs:
       - bump
       - release
-    if: ${{ github.ref_type == 'tag' }}
+    # if: ${{ github.ref_type == 'tag' }}
     name: Create Release Label
     permissions:
       contents: read
