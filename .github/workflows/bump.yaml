@@ -63,29 +63,51 @@ jobs:
       #     echo "previousTag=$name" >> $GITHUB_ENV
 
 
-      - name: Update CHANGELOG
-        if: ${{ steps.get_next_version.outputs.nextStrict }}
+      # - name: Update CHANGELOG
+      #   if: ${{ steps.get_next_version.outputs.nextStrict }}
+      #   id: changelog
+      #   uses: requarks/changelog-action@v1
+      #   with:
+      #     token: ${{ github.token }}
+      #     # tag: ${{ steps.get_next_version.outputs.current }}
+      #     # tag: ${{ github.ref_name }}
+      #     # fromTag: ${{ github.ref_name }}
+      #     fromTag: ${{ steps.get_next_version.outputs.nextStrict }}
+      #     toTag: ${{ steps.get_next_version.outputs.current }}
+      #     writeToFile: true
+      #     changelogFilePath: CHANGELOG.md
+      #     includeRefIssues: true
+      #     includeInvalidCommits: false
+      #     reverseOrder: false
+
+      - name: Conventional Changelog Action
         id: changelog
-        uses: requarks/changelog-action@v1
+        uses: TriPSs/conventional-changelog-action@v5
         with:
-          token: ${{ github.token }}
-          # tag: ${{ steps.get_next_version.outputs.current }}
-          # tag: ${{ github.ref_name }}
-          # fromTag: ${{ github.ref_name }}
-          fromTag: ${{ steps.get_next_version.outputs.nextStrict }}
-          toTag: ${{ steps.get_next_version.outputs.current }}
-          writeToFile: true
-          changelogFilePath: CHANGELOG.md
-          includeRefIssues: true
-          includeInvalidCommits: false
-          reverseOrder: false
+          github-token: ${{ secrets.github_token }}
+          # git-message: 'chore(release): {version}'
+          # git-user-name: 'Awesome Changelog Action'
+          # git-user-email: 'awesome_changelog@github.actions.com'
+          preset: 'conventionalcommits'
+          tag-prefix: ''
+          input-file: CHANGELOG.md
+          output-file: 'CHANGELOG.md'
+          # release-count: '10000'
+          pre-changelog-generation: ''    # pre changelog script file
+          # version-file: './my_custom_version_file.json' // or .yml, .yaml, .toml, mix.exs
+          # version-path: 'path.to.version'
+          skip-on-empty: true
+          skip-version-file: true
+          skip-commit: true
+          git-branch: 'my-maintenance-branch'
+          skip-bump: true
 
 
       - name: Create Release Changelog
         if: ${{ steps.get_next_version.outputs.nextStrict }}
         shell: bash
         run: |
-          echo '${{ steps.changelog.outputs.changes }}' > changelog-release.md
+          echo '${{ steps.changelog.outputs.clean_changelog }}' > changelog-release.md
 
 
       - name: Upload Release Changelog
