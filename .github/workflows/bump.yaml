@@ -302,3 +302,18 @@ jobs:
 
           # Optional. Create given branch name in local and remote repository.
           # create_branch: true
+
+
+
+      - name: Update Changelog
+        if: ${{ github.ref_name != 'master' }}
+        shell: bash
+        run: |
+          git tag ${{ steps.get_next_version.outputs.nextStrict }}
+
+      - name: Update Changelog
+        if: ${{ github.ref_name != 'master' }}
+        shell: bash
+        run: |
+          git push --tags
+
