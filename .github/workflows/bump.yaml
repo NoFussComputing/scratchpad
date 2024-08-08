@@ -23,6 +23,8 @@ jobs:
   bump:
     name: 'Bump Version'
     runs-on: ubuntu-latest
+    outputs:
+      nextStrict: ${{ steps.get_next_version.outputs.nextStrict }}
     steps:
 
       - name: Checkout Code
@@ -317,4 +319,63 @@ jobs:
         shell: bash
         run: |
           git push --tags
+
+
+
+  release:
+    needs:
+      - bump
+    name: Release
+    if: ${{ github.ref_type == 'tag' }}
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Upload Release Changelog
+        if: ${{ steps.get_next_version.outputs.nextStrict }}
+        uses: actions/download-artifact@v4
+        with:
+          name: changelog-release
+          # path: changelog-release.md
+
+
+      - name: Create GH Release
+        if: ${{ github.ref_type == 'tag' }}
+        id: release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ needs.bump.outputs.nextStrict }}
+          # body: ''
+          body_path: changelog-release.md
+          make_latest: true
+
+
+  release-label:
+    needs:
+      - bump
+      - release
+    if: ${{ github.ref_type == 'tag' }}
+    name: Create Release Label
+    permissions:
+      contents: read
+      issues: write
+    runs-on: ubuntu-latest
+    steps:
+
+      - run: |
+          mkdir -p .github;
+          echo "
+          labels:
+            v${{ needs.bump.outputs.nextStrict }}:
+              color: "EEE600"
+              description: Version Affected.
+
+          " > .github/labels.yml;
+
+          cat .github/labels.yml;
+
+
+      - uses: oliversalzburg/action-label-manager@v0.0.9
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+
 
