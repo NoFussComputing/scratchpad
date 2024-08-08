@@ -1,3 +1,20 @@
+## 1.4.0 (2024-08-08)
+
+### Feat
+
+- add ls
+- add input
+
+### Fix
+
+- correct order for cz
+- rejig
+- bump after changelog update
+
+### Refactor
+
+- spilt command
+
 ## 1.3.0 (2024-08-08)
 
 ### Feat
