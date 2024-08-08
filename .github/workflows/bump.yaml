@@ -71,8 +71,8 @@ jobs:
           token: ${{ github.token }}
           # tag: ${{ steps.get_next_version.outputs.current }}
           tag: ${{ github.ref_name }}
-          # fromTag: ${{ steps.get_next_version.outputs.current }}
-          # toTag: ${{ github.ref_name }}
+          fromTag: ${{ github.ref_name }}
+          toTag: ${{ steps.get_next_version.outputs.current }}
           writeToFile: true
           changelogFilePath: CHANGELOG.md
           includeRefIssues: true
