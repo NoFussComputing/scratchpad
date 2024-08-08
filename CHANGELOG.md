@@ -1,3 +1,10 @@
+## 1.8.0 (2024-08-08)
+
+### Feat
+
+- rtn all
+- ADD WORKFLOW TOKEN
+
 ## 1.7.0 (2024-08-08)
 
 ### Feat
