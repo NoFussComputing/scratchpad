@@ -5,6 +5,7 @@ name: 'Bump'
 
 on:
   workflow_dispatch:
+    # inputs:
   # push:
   #   branches:
   #     - '**'
@@ -59,6 +60,7 @@ jobs:
           writeToFile: true
           changelogFilePath: CHANGELOG.md
           includeRefIssues: true
+          includeInvalidCommits: true
           reverseOrder: false
 
 
