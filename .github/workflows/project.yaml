@@ -2,7 +2,6 @@
 
 name: Project
 
-
 on:
   issues:
     types:
@@ -51,6 +50,37 @@ jobs:
 
   project-add:
     name: Add
+    if: ${{(
+      (
+        github.event_name == 'issues'
+          &&
+        (
+          github.event.action == 'opened'
+            ||
+          github.event.action == 'reopened'
+            ||
+          github.event.action == 'labeled'
+            ||
+          github.event.action == 'milestoned'
+            ||
+          github.event.action == 'demilestoned'
+            ||
+          github.event.action == 'closed'
+            ||
+          github.event.action == 'assigned'
+        )
+      )
+        ||
+      (
+        github.event_name == 'pull_request'
+          &&
+        (
+          github.event.action == 'opened'
+            ||
+          github.event.action == 'reopened'
+        )
+      )
+      )}}
     runs-on: ubuntu-latest
     steps:
 
