@@ -218,7 +218,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: 'nofusscomputing/.github'
-          ref: 'development'
+          # ref: 'development'
+          ref: 'master'
           token: ${{ secrets.WORKFLOW_TOKEN }}
           path: 'endpoint_publish'
           fetch-depth: '1'
