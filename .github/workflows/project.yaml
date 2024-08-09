@@ -215,7 +215,7 @@ jobs:
 
   project-set-end-date:
     name: Set End Date
-    # if: issue closed or re-opened
+    if: ${{ needs.project-fields.outputs.project-start-date != '' }}
     needs:
       - project-fields
     runs-on: ubuntu-latest
