@@ -94,7 +94,7 @@ jobs:
         id: start-date
         with:
           operation: get
-          fields: Start Date
+          fields: Start date
           github_token: ${{ secrets.WORKFLOW_TOKEN }}
           project_url: ${{ env.PROJECT_URL }}
 
@@ -104,7 +104,7 @@ jobs:
         id: end-date
         with:
           operation: get
-          fields: End Date
+          fields: End date
           github_token: ${{ secrets.WORKFLOW_TOKEN }}
           project_url: ${{ env.PROJECT_URL }}
 
@@ -178,9 +178,13 @@ jobs:
 
       - name: Clear Status
         if: ${{(
-            (github.event_name == 'issues' && github.event.action == 'reopened')
-              ||
-            (github.event_name == 'issues' && github.event.action == 'demilestoned')
+            (
+              (github.event_name == 'issues' && github.event.action == 'reopened')
+                ||
+              (github.event_name == 'issues' && github.event.action == 'demilestoned')
+            ) 
+            &&
+            needs.project_fields.project-status != 'Ready to Commence'
           )}}
         uses: EndBug/project-fields@v2
         with:
@@ -215,6 +219,6 @@ jobs:
         uses: EndBug/project-fields@v2
         with:
           operation: clear
-          fields: End Date
+          fields: End date
           github_token: ${{ secrets.WORKFLOW_TOKEN }}
           project_url: ${{ env.PROJECT_URL }}
