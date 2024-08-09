@@ -10,6 +10,7 @@ on:
       - reopened
       - transferred
       - labeled
+      - closed
   pull_request: 
     types:
       - opened
