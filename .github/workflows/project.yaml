@@ -1,0 +1,163 @@
+---
+
+name: Project
+
+
+on:
+  issues:
+    types:
+      - opened
+      - reopened
+      - transferred
+      - labeled
+  pull_request: 
+    types:
+      - opened
+      - reopened
+      - labeled
+
+
+
+env:
+  PROJECT_URL: https://github.com/orgs/nofusscomputing/projects/7
+
+
+jobs:
+
+
+  # project-add:
+  #   name: Add
+  #   runs-on: ubuntu-latest
+  #   steps:
+
+  #     - name: Add To Project
+  #       run: |
+  #         echo todo;
+
+
+
+  project-add:
+    name: Add
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e    # v1.0.2
+        with:
+          project-url: ${{ env.PROJECT_URL }}
+          github-token: ${{ secrets.WORKFLOW_TOKEN }}
+
+
+
+  project-remove:
+    name: Remove
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Remove From Project
+        run: |
+          echo todo;
+
+
+
+  project-fields:
+    name: Field Values
+    # if: (${{
+    #     github.event.issue.type != 'transferred'
+    #   }})
+    needs:
+      - project-add
+    runs-on: ubuntu-latest
+    outputs:
+      project-start-date:  ${{ steps.start-date.outputs.values }}
+      project-end-date:  ${{ steps.end-date.outputs.values }}
+      project-status:  ${{ steps.status.outputs.values }}
+    steps:
+
+
+      - name: Fetch Start Date
+        uses: EndBug/project-fields@v2
+        id: start-date
+        with:
+          operation: get
+          fields: Start Date
+          github_token: ${{ secrets.WORKFLOW_TOKEN }}
+          project_url: ${{ env.PROJECT_URL }}
+
+
+      - name: Fetch End Date
+        uses: EndBug/project-fields@v2
+        id: end-date
+        with:
+          operation: get
+          fields: End Date
+          github_token: ${{ secrets.WORKFLOW_TOKEN }}
+          project_url: ${{ env.PROJECT_URL }}
+
+
+      - name: Fetch Status
+        uses: EndBug/project-fields@v2
+        id: status
+        with:
+          operation: get
+          fields: Status
+          github_token: ${{ secrets.WORKFLOW_TOKEN }}
+          project_url: ${{ env.PROJECT_URL }}
+
+
+  project-set-start-date:
+    name: Set Start Date
+    # if: issue assigned
+    needs:
+      - project-fields
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Set Start Date
+        run: |
+          echo todo;
+
+
+  
+  project-set-status:
+    name: Set Status
+    # if: issue assigned
+    needs:
+      - project-fields
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Set Status underway
+        # if: issue assigned
+        run: |
+          echo set status to underway;
+
+      - name: Set Status done
+        # if: issue closed
+        run: |
+          echo set status to underway;
+
+      - name: Clear Status
+        # if: issue reopened
+        run: |
+          echo set status to underway;
+
+
+
+  project-set-end-date:
+    name: Set End Date
+    # if: issue closed or re-opened
+    needs:
+      - project-fields
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Set End date
+        # if: issue closed
+        run: |
+          echo todo;
+
+      - name: Clear End Date
+        # if: issue reopened
+        run: |
+          echo todo;
+

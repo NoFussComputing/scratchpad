@@ -3,45 +3,88 @@
 name: 'CI'
 
 
+
+
 on:
-  # workflow_call:
-  #   inputs:
-  #     build-branch:         # tag / dev
-  #       required: true
-  #       type: string
   push:
     branches:
-      # - '*'         # matches every branch that doesn't contain a '/'
-      # - '*/*'       # matches every branch containing a single '/'
-      - '**'        # matches every branch
+      - '**'
     tags:
       - '*'
-  # pull_request:
-  # #   branches:
-  # #     - '**'
-  #   types:
-  # #     - opened
-  #     - synchronize
-  # #     - closed
-  # #     - reopened
-
-
-# env:
-#   DOCKER_BUILD_IMAGE: "ghcr.io/${{ github.repository }}-fred:${{ github.sha }}"
-
-
-# permissions:
-#   pull-requests: write
-#   contents: read
-#   actions: read
-#   checks: write
-#   packages: write
-#   security-events: write
-#   statuses: write
 
 
 
 jobs:
+
+
+  # docker:
+  #   runs-on: ubuntu-latest
+  #   name: Docker
+  #   steps:
+  #     - name: Docker
+  #       uses: nofusscomputing/action_docker@genesis
+  #       # uses: nofusscomputing/action_docker/.github/workflows/docker.yaml@genesis
+  #       with:
+  #         DOCKER_BUILD_IMAGE_NAME: "${{ github.repository }}"
+  #         DOCKER_PUBLISH_REGISTRY: "ghcr.io"
+  #         DOCKER_PUBLISH_IMAGE_NAME: "nofusscomputing/image-publish"
+  #         DOCKER_PUBLISH_USERNAME: ${{ github.actor }}
+  #         DOCKER_PUBLISH_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+
+
+  docker:
+    if:
+      (${{
+        github.event.push
+          ||
+        github.ref_type == 'tag'
+      }})
+    # if: ${{github.ref_type == 'tag'}}
+    name: 'Docker'
+    # needs:
+    #   - python
+    uses: nofusscomputing/action_docker/.github/workflows/docker.yaml@development
+    with:
+      DOCKER_BUILD_IMAGE_NAME: "${{ github.repository }}"
+      DOCKER_PUBLISH_REGISTRY: "ghcr.io"
+      DOCKER_PUBLISH_IMAGE_NAME: "nofusscomputing/image-publish"
+    secrets:
+      DOCKER_PUBLISH_USERNAME: ${{ github.actor }}
+      DOCKER_PUBLISH_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+
+
+
+  # docker:
+  #   if:
+  #     (${{
+  #       github.event.push
+  #         ||
+  #       github.ref_type == 'tag'
+  #     }})
+  #   # if: ${{github.ref_type == 'tag'}}
+  #   name: 'Docker'
+  #   # needs:
+  #   #   - python
+  #   uses: nofusscomputing/github-ci/.github/workflows/docker.yaml@genesis
+  #   with:
+  #     DOCKER_BUILD_IMAGE_NAME: "${{ github.repository }}"
+  #     DOCKER_PUBLISH_REGISTRY: "ghcr.io"
+  #     DOCKER_PUBLISH_IMAGE_NAME: "nofusscomputing/image-publish"
+  #   secrets:
+  #     DOCKER_PUBLISH_USERNAME: ${{ github.actor }}
+  #     DOCKER_PUBLISH_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+
+
+  # test:
+  #   name: 'Unit Tests'
+  #   # needs:
+  #   #   - python
+  #   uses: nofusscomputing/github-ci/.github/workflows/unit-test.yaml@genesis
+
+
+
+
+##################################################################################
 
 
   # python:
@@ -62,36 +105,19 @@ jobs:
   #   #   DOCKER_PUBLISH_IMAGE_NAME: "nofusscomputing/image-publish"
 
 
-  docker:
-    name: 'Docker'
-    # needs:
-    #   - python
-    uses: ./.github/workflows/docker.yaml
-    with:
-      DOCKER_BUILD_IMAGE_NAME: "${{ github.repository }}"
-      DOCKER_PUBLISH_REGISTRY: "ghcr.io"
-      DOCKER_PUBLISH_IMAGE_NAME: "nofusscomputing/image-publish"
+  # docker:
+  #   name: 'Docker'
+  #   # needs:
+  #   #   - python
+  #   uses: ./.github/workflows/docker.yaml
+  #   with:
+  #     DOCKER_BUILD_IMAGE_NAME: "${{ github.repository }}"
+  #     DOCKER_PUBLISH_REGISTRY: "docker.io"
+  #     DOCKER_PUBLISH_IMAGE_NAME: "nofusscomputing/centurion-erp"
 
 
-  release:
-    name: 'Release'
-    uses: ./.github/workflows/release.yaml
-    # with:
-    #   DOCKER_BUILD_IMAGE_NAME: "${{ github.repository }}"
-
-  # didnt work
-  # generate-release-notes:
-  #   name: Auto Release Notes
-  #   needs:
-  #     - docker
-  #     - release
-  #   runs-on: ubuntu-latest
-  #   steps:
-
-  #     - name: Append GH Release Body
-  #       if: ${{ github.ref_type == 'tag' }}
-  #       id: release
-  #       uses: softprops/action-gh-release@v2
-  #       with:
-  #         append_body: true
-  #         generate_release_notes: true
+  # release:
+  #   name: 'Release'
+  #   uses: ./.github/workflows/release.yaml
+  #   # with:
+  #   #   DOCKER_BUILD_IMAGE_NAME: "${{ github.repository }}"
