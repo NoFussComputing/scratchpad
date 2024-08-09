@@ -133,9 +133,9 @@ jobs:
 
 
       - name: Set Status Planning
-        if: (${{
-            (github.event_name == 'issue' && github.event.action != 'milestoned')
-          }})
+        if: ${{(
+            github.event_name == 'issue' && github.event.action != 'milestoned'
+          )}}
         uses: EndBug/project-fields@v2
         with:
           operation: set
@@ -146,22 +146,22 @@ jobs:
 
 
       - name: Set Status In Progress
-        if: (${{
+        if: ${{(
             github.event_name == 'issue' && github.event.action != 'assigned'
-          }})
+          )}}
         uses: EndBug/project-fields@v2
         with:
           operation: set
           fields: Status
           github_token: ${{ secrets.WORKFLOW_TOKEN }}
           project_url: ${{ env.PROJECT_URL }}
-          values: 'In Progress'
+          values: 'In progress'
 
 
       - name: Set Status done
-        if: (${{
+        if: ${{(
             github.event_name == 'issue' && github.event.action != 'closed'
-          }})
+          )}}
         uses: EndBug/project-fields@v2
         with:
           operation: set
@@ -172,11 +172,11 @@ jobs:
 
 
       - name: Clear Status
-        if: (${{
+        if: ${{(
             (github.event_name == 'issue' && github.event.action != 'reopened')
               ||
             (github.event_name == 'issue' && github.event.action != 'demilestoned')
-          }})
+          )}}
         uses: EndBug/project-fields@v2
         with:
           operation: clear
@@ -196,17 +196,17 @@ jobs:
 
 
       - name: Set End date
-        if: (${{
+        if: ${{(
             github.event_name == 'issue' && github.event.action != 'closed'
-          }})
+          )}}
         run: |
           echo todo;
 
 
       - name: Clear End Date
-        if: (${{
+        if: ${{(
             github.event_name == 'issue' && github.event.action != 'reopened'
-          }})
+          )}}
         uses: EndBug/project-fields@v2
         with:
           operation: clear
