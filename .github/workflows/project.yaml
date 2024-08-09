@@ -134,7 +134,7 @@ jobs:
 
       - name: Set Status Planning
         if: ${{(
-            github.event_name == 'issue' && github.event.action != 'milestoned'
+            github.event_name == 'issue' && github.event.action == 'milestoned'
           )}}
         uses: EndBug/project-fields@v2
         with:
@@ -147,7 +147,7 @@ jobs:
 
       - name: Set Status In Progress
         if: ${{(
-            github.event_name == 'issue' && github.event.action != 'assigned'
+            github.event_name == 'issue' && github.event.action == 'assigned'
           )}}
         uses: EndBug/project-fields@v2
         with:
@@ -160,7 +160,7 @@ jobs:
 
       - name: Set Status done
         if: ${{(
-            github.event_name == 'issue' && github.event.action != 'closed'
+            github.event_name == 'issue' && github.event.action == 'closed'
           )}}
         uses: EndBug/project-fields@v2
         with:
@@ -173,9 +173,9 @@ jobs:
 
       - name: Clear Status
         if: ${{(
-            (github.event_name == 'issue' && github.event.action != 'reopened')
+            (github.event_name == 'issue' && github.event.action == 'reopened')
               ||
-            (github.event_name == 'issue' && github.event.action != 'demilestoned')
+            (github.event_name == 'issue' && github.event.action == 'demilestoned')
           )}}
         uses: EndBug/project-fields@v2
         with:
