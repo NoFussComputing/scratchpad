@@ -42,10 +42,10 @@ jobs:
 
   bump:
     name: 'Bump'
-    uses: nofusscomputing/github-ci/.github/workflows/bump.yaml@genesis
+    # uses: nofusscomputing/github-ci/.github/workflows/bump.yaml@genesis
+    uses: nofusscomputing/action_bump/.github/workflows/bump.yaml@development
     with:
       CZ_PRE_RELEASE: ${{ inputs.CZ_PRE_RELEASE }}
       CZ_INCREMENT: ${{ inputs.CZ_INCREMENT }}
     secrets:
       WORKFLOW_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
-    

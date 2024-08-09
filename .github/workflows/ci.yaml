@@ -17,6 +17,20 @@ on:
 jobs:
 
 
+  # docker:
+  #   runs-on: ubuntu-latest
+  #   name: Docker
+  #   steps:
+  #     - name: Docker
+  #       uses: nofusscomputing/action_docker@genesis
+  #       # uses: nofusscomputing/action_docker/.github/workflows/docker.yaml@genesis
+  #       with:
+  #         DOCKER_BUILD_IMAGE_NAME: "${{ github.repository }}"
+  #         DOCKER_PUBLISH_REGISTRY: "ghcr.io"
+  #         DOCKER_PUBLISH_IMAGE_NAME: "nofusscomputing/image-publish"
+  #         DOCKER_PUBLISH_USERNAME: ${{ github.actor }}
+  #         DOCKER_PUBLISH_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+
 
   docker:
     if:
@@ -29,7 +43,7 @@ jobs:
     name: 'Docker'
     # needs:
     #   - python
-    uses: nofusscomputing/github-ci/.github/workflows/docker.yaml@genesis
+    uses: nofusscomputing/action_docker/.github/workflows/docker.yaml@development
     with:
       DOCKER_BUILD_IMAGE_NAME: "${{ github.repository }}"
       DOCKER_PUBLISH_REGISTRY: "ghcr.io"
@@ -37,6 +51,28 @@ jobs:
     secrets:
       DOCKER_PUBLISH_USERNAME: ${{ github.actor }}
       DOCKER_PUBLISH_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+
+
+
+  # docker:
+  #   if:
+  #     (${{
+  #       github.event.push
+  #         ||
+  #       github.ref_type == 'tag'
+  #     }})
+  #   # if: ${{github.ref_type == 'tag'}}
+  #   name: 'Docker'
+  #   # needs:
+  #   #   - python
+  #   uses: nofusscomputing/github-ci/.github/workflows/docker.yaml@genesis
+  #   with:
+  #     DOCKER_BUILD_IMAGE_NAME: "${{ github.repository }}"
+  #     DOCKER_PUBLISH_REGISTRY: "ghcr.io"
+  #     DOCKER_PUBLISH_IMAGE_NAME: "nofusscomputing/image-publish"
+  #   secrets:
+  #     DOCKER_PUBLISH_USERNAME: ${{ github.actor }}
+  #     DOCKER_PUBLISH_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
 
 
   # test:
