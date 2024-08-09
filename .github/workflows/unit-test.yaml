@@ -256,19 +256,29 @@ jobs:
         shell: bash
         run: |
           echo "[Debug] PWD[${PWD}]";
-          echo "[Debug] ****************************";
+
+          echo "[Debug] **************************** - cd endpoint_publish";
+
           cd endpoint_publish;
-          echo "[Debug] ****************************";
+
+          echo "[Debug] **************************** - ls -la";
+
           ls -la
+
           echo "[Debug] ****************************";
+
           echo "[Debug] PWD[${PWD}]";
-          echo "[Debug] ****************************";
+
+          echo "[Debug] **************************** - ls -la ../";
+
           ls -la ../
-          echo "[Debug] ****************************";
-          ls -la
-          echo "[Debug] ****************************";
+
+          echo "[Debug] **************************** - cp ../endpoint_${{ matrix.python-version }}.json repositories/${{ github.repository }}/${{ github.ref_name }}/badge_endpoint_unit_test.json";
+
           cp ../endpoint_${{ matrix.python-version }}.json repositories/${{ github.repository }}/${{ github.ref_name }}/badge_endpoint_unit_test.json;
-          echo "[Debug] ****************************";
+
+          echo "[Debug] **************************** - ls -la repositories/${{ github.repository }}/${{ github.ref_name }}/";
+
           ls -la repositories/${{ github.repository }}/${{ github.ref_name }}/;
 
 
