@@ -281,18 +281,43 @@ jobs:
       - name: Git add
         shell: bash
         run: |
+          echo "[Debug] PWD[${PWD}]";
+          echo "[Debug] ****************************";
+          cd endpoint_publish;
+          echo "[Debug] ****************************";
+          ls -la
+          echo "[Debug] ****************************";
+          echo "[Debug] PWD[${PWD}]";
+          echo "[Debug] ****************************";
           git status;
+          echo "[Debug] ****************************";
           git add .
 
       - name: Git commit
         shell: bash
         run: |
+          echo "[Debug] PWD[${PWD}]";
+          echo "[Debug] ****************************";
+          cd endpoint_publish;
+          echo "[Debug] ****************************";
+          ls -la
+          echo "[Debug] ****************************";
+          echo "[Debug] PWD[${PWD}]";
+          echo "[Debug] ****************************";
           git commit -m "chore: add badge endpount file ${{ github.repository }}/${{ github.ref_name }}"
 
 
       - name: git push
         shell: bash
         run: |
+          echo "[Debug] PWD[${PWD}]";
+          echo "[Debug] ****************************";
+          cd endpoint_publish;
+          echo "[Debug] ****************************";
+          ls -la
+          echo "[Debug] ****************************";
+          echo "[Debug] PWD[${PWD}]";
+          echo "[Debug] ****************************";
           git push
 
   # coverage:
