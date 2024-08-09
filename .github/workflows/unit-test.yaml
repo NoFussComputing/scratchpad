@@ -2,6 +2,10 @@ name: 'Unit Test'
 
 on:
   workflow_call:
+    secrets:
+      WORKFLOW_TOKEN:
+        description: "token to clone with"
+        required: true
   # push:
   #   branches:
   #     - "development"
