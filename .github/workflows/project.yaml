@@ -10,6 +10,8 @@ on:
       - reopened
       - transferred
       - labeled
+      - milestoned
+      - demilestoned
       - closed
   pull_request: 
     types:
