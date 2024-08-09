@@ -246,7 +246,7 @@ jobs:
           echo "[Debug] PWD[${PWD}]";
 
 
-      - name: Upload Badge Endpoint json
+      - name: Download Badge Endpoint json
         uses: actions/download-artifact@v4
         with:
           name: unit-test-shield-endpoint-${{ matrix.python-version }}
