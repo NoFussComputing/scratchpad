@@ -87,7 +87,14 @@ jobs:
       project-start-date:  ${{ steps.start-date.outputs.values }}
       project-end-date:  ${{ steps.end-date.outputs.values }}
       project-status:  ${{ steps.status.outputs.values }}
+      date-value:  ${{ steps.date-value.outputs.date }}
     steps:
+
+      - name: Generate Date Value
+        id: date-value
+        shell: bash
+        run: |
+          echo date=$(date '+%Y-%m-%d') > $GITHUB_OUTPUT
 
 
       - name: Fetch Start Date
@@ -124,7 +131,9 @@ jobs:
   project-set-start-date:
     name: Set Start Date
     if: ${{(
-        github.event_name == 'issues' && github.event.action == 'assigned'
+        (github.event_name == 'issues' && github.event.action == 'assigned')
+          &&
+        needs.project-fields.outputs.project-start-date == ''
       )}}
     needs:
       - project-fields
@@ -132,14 +141,20 @@ jobs:
     steps:
 
       - name: Set Start Date
-        run: |
-          echo todo;
+        if: ${{ needs.project-fields.outputs.project-start-date == '' }}
+        uses: EndBug/project-fields@v2
+        with:
+          operation: set
+          fields: Start date
+          github_token: ${{ secrets.WORKFLOW_TOKEN }}
+          project_url: ${{ env.PROJECT_URL }}
+          values: ${{ needs.project-fields.outputs.date-value }} 
 
 
   
   project-set-status:
     name: Set Status
-    if: ${{ needs.project_fields.project-status != 'Awaiting Feedback' }}
+    if: ${{ needs.project-fields.outputs.project-status != 'Awaiting Feedback' }}
     needs:
       - project-fields
     runs-on: ubuntu-latest
@@ -211,8 +226,13 @@ jobs:
         if: ${{(
             github.event_name == 'issues' && github.event.action != 'closed'
           )}}
-        run: |
-          echo todo;
+        uses: EndBug/project-fields@v2
+        with:
+          operation: set
+          fields: End date
+          github_token: ${{ secrets.WORKFLOW_TOKEN }}
+          project_url: ${{ env.PROJECT_URL }}
+          values: ${{ needs.project-fields.outputs.date-value }} 
 
 
       - name: Clear End Date
