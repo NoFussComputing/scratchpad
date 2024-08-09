@@ -35,6 +35,15 @@ jobs:
   #       run: |
   #         echo todo;
 
+  debug:
+    name: Debug
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Add To Project
+        run: |
+          echo "Debug github.event_name=${{ github.event_name }}";
+          echo "Debug github.event.action=${{ github.event.action }}";
 
 
   project-add:
@@ -133,9 +142,7 @@ jobs:
 
 
       - name: Set Status Planning
-        if: ${{(
-            github.event_name == 'issue' && github.event.action == 'milestoned'
-          )}}
+        if: ${{ github.event_name == 'issue' && github.event.action == 'milestoned' }}
         uses: EndBug/project-fields@v2
         with:
           operation: set
@@ -146,9 +153,7 @@ jobs:
 
 
       - name: Set Status In Progress
-        if: ${{(
-            github.event_name == 'issue' && github.event.action == 'assigned'
-          )}}
+        if: ${{ github.event_name == 'issue' && github.event.action == 'assigned' }}
         uses: EndBug/project-fields@v2
         with:
           operation: set
@@ -159,9 +164,7 @@ jobs:
 
 
       - name: Set Status done
-        if: ${{(
-            github.event_name == 'issue' && github.event.action == 'closed'
-          )}}
+        if: ${{ github.event_name == 'issue' && github.event.action == 'closed' }}
         uses: EndBug/project-fields@v2
         with:
           operation: set
