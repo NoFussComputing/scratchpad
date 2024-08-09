@@ -108,7 +108,8 @@ jobs:
             "label": "Unit Test",
             "message": "${{ steps.test-report.outputs.passed }} passed | ${{ steps.test-report.outputs.skipped }} skipped",
             "namedLogo": "github",
-            "color": "#000"
+            "color": "#000",
+            "style": "plastic"
           }' > endpoint_${{ matrix.python-version }}.json
 
 
@@ -266,7 +267,7 @@ jobs:
           echo "[Debug] ****************************";
           ls -la
           echo "[Debug] ****************************";
-          cp ../endpoint_${{ matrix.python-version }}.json repositories/${{ github.repository }}/${{ github.ref_name }}/;
+          cp ../endpoint_${{ matrix.python-version }}.json repositories/${{ github.repository }}/${{ github.ref_name }}/badge_endpoint_unit_test.json;
           echo "[Debug] ****************************";
           ls -la repositories/${{ github.repository }}/${{ github.ref_name }}/;
 
