@@ -43,7 +43,7 @@ jobs:
     name: 'Docker'
     # needs:
     #   - python
-    uses: nofusscomputing/action_docker/.github/workflows/docker.yaml@genesis
+    uses: nofusscomputing/action_docker/.github/workflows/docker.yaml@development
     with:
       DOCKER_BUILD_IMAGE_NAME: "${{ github.repository }}"
       DOCKER_PUBLISH_REGISTRY: "ghcr.io"
