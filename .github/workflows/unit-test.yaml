@@ -199,8 +199,84 @@ jobs:
 
 
 
+  badge-endpoint:
+    name: Publish Badge endpoint files
+    needs:
+      - report
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: ['3.12']
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout Endpoint Repo
+        uses: actions/checkout@v4
+        with:
+          repository: 'nofusscomputing/.github'
+          ref: 'development'
+          token: ${{ secrets.WORKFLOW_TOKEN }}
+          path: 'endpoint_publish'
+          fetch-depth: '1'
+          show-progress: true
+          submodules: false
 
 
+      - name: Create Publish Directories
+        shell: bash
+        run: |
+          echo "[Debug] PWD[${PWD}]";
+          cd endpoint_publish;
+          echo "[Debug] PWD[${PWD}]";
+          mkdir -p repositories/${{ github.repository }}/${{ github.ref_name }};
+          ls -la;
+
+
+      - name: Create Publish Directories
+        shell: bash
+        run: |
+          echo "[Debug] PWD[${PWD}]";
+          # cd repositories/${{ github.repository }}/${{ github.ref_name }};
+          echo "[Debug] PWD[${PWD}]";
+
+
+      - name: Upload Badge Endpoint json
+        uses: actions/download-artifact@v4
+        with:
+          name: unit-test-shield-endpoint-${{ matrix.python-version }}
+
+
+      - name: Add endpoint file
+        shell: bash
+        run: |
+          cp ../endpoint_${{ matrix.python-version }}.json repositories/${{ github.repository }}/${{ github.ref_name }}/;
+          echo "[Debug] ****************************";
+          ls -la repositories/${{ github.repository }}/${{ github.ref_name }}/;
+
+
+      - name: Configure git
+        shell: bash
+        run: |
+          git config --global user.email "helpdesk@nofusscomputing.com";
+          git config --global user.name "nfc-bot";
+
+
+      - name: Git add
+        shell: bash
+        run: |
+          git status;
+          git add .
+
+      - name: Git commit
+        shell: bash
+        run: |
+          git commit -m "chore: add badge endpount file ${{ github.repository }}/${{ github.ref_name }}"
+
+
+      - name: git push
+        shell: bash
+        run: |
+          git push
 
   # coverage:
   #   needs:
