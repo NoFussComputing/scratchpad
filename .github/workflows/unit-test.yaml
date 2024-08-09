@@ -266,7 +266,7 @@ jobs:
           echo "[Debug] ****************************";
           ls -la
           echo "[Debug] ****************************";
-          cp endpoint_${{ matrix.python-version }}.json repositories/${{ github.repository }}/${{ github.ref_name }}/;
+          cp ../endpoint_${{ matrix.python-version }}.json repositories/${{ github.repository }}/${{ github.ref_name }}/;
           echo "[Debug] ****************************";
           ls -la repositories/${{ github.repository }}/${{ github.ref_name }}/;
 
