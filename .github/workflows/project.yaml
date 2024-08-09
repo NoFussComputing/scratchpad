@@ -13,6 +13,7 @@ on:
       - milestoned
       - demilestoned
       - closed
+      - assigned
   pull_request: 
     types:
       - opened
@@ -62,9 +63,9 @@ jobs:
 
   project-remove:
     name: Remove
-    if: (${{
+    if: ${{(
         github.event_name == 'issues' && github.event.action == 'transferred'
-      }})
+      )}}
     runs-on: ubuntu-latest
     steps:
 
@@ -76,9 +77,9 @@ jobs:
 
   project-fields:
     name: Field Values
-    if: (${{
+    if: ${{(
         github.event_name == 'issues' && github.event.action != 'transferred'
-      }})
+      )}}
     needs:
       - project-add
     runs-on: ubuntu-latest
@@ -122,7 +123,9 @@ jobs:
 
   project-set-start-date:
     name: Set Start Date
-    # if: issue assigned
+    if: ${{(
+        github.event_name == 'issues' && github.event.action == 'assigned'
+      )}}
     needs:
       - project-fields
     runs-on: ubuntu-latest
