@@ -184,7 +184,11 @@ jobs:
   
   project-set-status:
     name: Set Status
-    if: ${{ needs.project-fields.outputs.project-status != 'Awaiting Feedback' }}
+    if: ${{(
+        needs.project-fields.outputs.project-status != 'Awaiting Feedback' 
+          &&
+        needs.project-fields.outputs.project-status != 'In progress'
+      )}}
     needs:
       - project-fields
     runs-on: ubuntu-latest
