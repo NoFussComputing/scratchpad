@@ -224,7 +224,7 @@ jobs:
 
       - name: Set End date
         if: ${{(
-            github.event_name == 'issues' && github.event.action != 'closed'
+            github.event_name == 'issues' && github.event.action == 'closed'
           )}}
         uses: EndBug/project-fields@v2
         with:
@@ -237,7 +237,7 @@ jobs:
 
       - name: Clear End Date
         if: ${{(
-            github.event_name == 'issues' && github.event.action != 'reopened'
+            github.event_name == 'issues' && github.event.action == 'reopened'
           )}}
         uses: EndBug/project-fields@v2
         with:
