@@ -206,6 +206,7 @@ jobs:
 
   badge-endpoint:
     name: Publish Badge endpoint files
+    if: ${{ github.ref_name == 'master' || github.ref_name == 'development' }}
     needs:
       - report
     strategy:
