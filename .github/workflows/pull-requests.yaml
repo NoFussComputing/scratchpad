@@ -11,4 +11,4 @@ jobs:
 
   pr:
     name: pr
-    uses: nofusscomputing/action_pull_requests/.github/workflows/pull-requests.yaml@2-fix-dependency-check
+    uses: nofusscomputing/action_pull_requests/.github/workflows/pull-requests.yaml@development
