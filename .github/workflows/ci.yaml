@@ -199,7 +199,8 @@ jobs:
     steps:
 
 
-      - uses: jwalton/gh-find-current-pr@v1
+      - name: Find Current Pull Request
+        uses: jwalton/gh-find-current-pr@v1
         id: finder
 
 
