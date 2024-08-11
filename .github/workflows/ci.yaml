@@ -69,7 +69,7 @@ jobs:
     steps:
 
 
-      - name: Upload scan results (json Report)
+      - name: Fetch scan results (json Report)
         # if:
         #   (${{
         #     inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
@@ -86,6 +86,8 @@ jobs:
         #     inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
         #   }})
         run: |
+          echo "[Debug] jq -r '.Results'=$(jq -r '.Results')";
+
           if [ "$(jq -r '.Results')" ]; then
 
             not_empty="$(jq -r '.Results[] | .Vulnerabilities[]' scan-results.json)";
@@ -96,14 +98,14 @@ jobs:
 
           fi
 
+          echo "[Debug] not_empty=${not_empty}";
 
           jq -r '
           [
-          "# Image Scan Results",
+          "# Scan Results",
           "",
           "**Scan Date:** _" + ( .CreatedAt // "" ) + "_",
-          "**Image:** _" + ( .ArtifactName // "" ) + "_",
-          "**OS:** _" + ( .Metadata.OS.Family // "" ) + " " + ( .Metadata.OS.Name // "" ) + "_",
+          "**File:** _" + ( .ArtifactName // "" ) + "_",
           ""
           ] | join("\n")
           ' scan-results.json > vulnerability-report.md
@@ -138,6 +140,8 @@ jobs:
         #     inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
         #   }})
         run: |
+          echo "[Debug] jq -r '.Results'=$(jq -r '.Results')";
+
           if [ "$(jq -r '.Results')" ]; then
 
             not_empty="$(jq -r '.Results[] | .Vulnerabilities[]' scan-results.json)";
@@ -148,14 +152,15 @@ jobs:
 
           fi
 
+          echo "[Debug] not_empty=${not_empty}";
+
 
           jq -r '
           [
-          "# Full Image Scan Results",
+          "# Full Scan Results",
           "",
           "**Scan Date:** _" + ( .CreatedAt // "" ) + "_",
-          "**Image:** _" + ( .ArtifactName // "" ) + "_",
-          "**OS:** _" + ( .Metadata.OS.Family // "" ) + " " + ( .Metadata.OS.Name // "" ) + "_",
+          "**File:** _" + ( .ArtifactName // "" ) + "_",
           ""
           ] | join("\n")
           ' scan-results.json > full-vulnerability-report.md
@@ -163,7 +168,7 @@ jobs:
           if [ "$not_empty" ]; then
             jq -r '
             def hr(severity):
-            if severity == "HIGH" or severity == "CRITICAL" then true else false end;
+            if severity == "HIGH" or severity == "CRITICAL" then true else true end;
             def to_md:
             "| " + (.VulnerabilityID // "") + " | " + (.PkgName // "") + " | " + (.InstalledVersion // "") + " | " + (.Severity // "") + " | " + (.Title // "") + " |";
             [
