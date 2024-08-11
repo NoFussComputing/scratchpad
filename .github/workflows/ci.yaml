@@ -1,0 +1,40 @@
+---
+name: 'Python'
+
+
+on:
+  push:
+
+jobs:
+
+  vulnerability-scan:
+    name: Repo scan
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Run Trivy vulnerability scanner (sarif Report)
+        # if:
+        #   (${{
+        #     inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
+        #   }})
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+         # image-ref: '${{ inputs.DOCKER_BUILD_REGISTRY }}/${{ inputs.DOCKER_BUILD_IMAGE_NAME }}:${{ inputs.DOCKER_BUILD_IMAGE_TAG }}'
+          scan-type: 'fs'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'LOW,MEDIUM,HIGH,CRITICAL'
+          # vuln-type: 'os'
+          scanners: vuln
+          ignore-unfixed: true
+          scan-ref: requirements.txt
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        # if:
+        #   (${{
+        #     inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
+        #   }})
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
+

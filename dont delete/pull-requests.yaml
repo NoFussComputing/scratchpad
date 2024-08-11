@@ -9,6 +9,6 @@ on:
 
 jobs:
 
-  conventional-commits:
-    name: Conventional Commit Checks
-    uses: nofusscomputing/github-ci/.github/workflows/pull-requests.yaml@genesis
+  pr:
+    name: pr
+    uses: nofusscomputing/action_pull_requests/.github/workflows/pull-requests.yaml@development
