@@ -227,6 +227,6 @@ jobs:
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           number: ${{ steps.finder.outputs.pr }}
-          header: Python Scan Results
+          header: Python requirements.txt Scan Results
           message: |
             ${{ env.report }}
