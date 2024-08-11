@@ -87,7 +87,7 @@ jobs:
 
           jq -r '
           [
-          "# Scan Results",
+          "# Python Scan Results (requirements.txt)",
           "",
           "**Scan Date:** _" + ( .CreatedAt // "" ) + "_",
           "**File:** _" + ( .ArtifactName // "" ) + "_",
