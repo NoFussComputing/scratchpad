@@ -29,10 +29,6 @@ jobs:
 
 
       - name: Upload requirements.txt scan results to GitHub Security tab
-        # if:
-        #   (${{
-        #     inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-        #   }})
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: 'trivy-results.sarif'
@@ -51,10 +47,6 @@ jobs:
 
 
       - name: Upload scan results (json Report)
-        # if:
-        #   (${{
-        #     inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-        #   }})
         uses: actions/upload-artifact@v4
         with:
           name: python-scan-results-json
@@ -70,21 +62,12 @@ jobs:
 
 
       - name: Fetch scan results (json Report)
-        # if:
-        #   (${{
-        #     inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-        #   }})
         uses: actions/download-artifact@v4
         with:
           name: python-scan-results-json
-          # path: scan-results.json
 
 
       - name: Create Vulnerabilities (Critical/High)
-        # if:
-        #   (${{
-        #     inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-        #   }})
         run: |
           echo "[Debug] jq -r '.Results'=$(jq -r '.Results' scan-results.json)";
 
@@ -135,10 +118,6 @@ jobs:
 
 
       - name: Create Full Vulnerabilities
-        # if:
-        #   (${{
-        #     inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-        #   }})
         run: |
           echo "[Debug] jq -r '.Results'=$(jq -r '.Results' scan-results.json)";
 
@@ -189,10 +168,6 @@ jobs:
 
 
       - name: Upload scan results
-        # if:
-        #   (${{
-        #     inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-        #   }})
         uses: actions/upload-artifact@v4
         with:
           name: python-vulnerability-report
@@ -200,10 +175,6 @@ jobs:
 
 
       - name: Upload scan results
-        # if:
-        #   (${{
-        #     inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-        #   }})
         uses: actions/upload-artifact@v4
         with:
           name: python-vulnerability-report-full
@@ -211,9 +182,6 @@ jobs:
 
 
       - uses: dtinth/markdown-report-action@v1
-        # if: ${{
-        #     inputs.DOCKER_SCAN_IMAGE_VULNERABILITY
-        #   }}
         with:
           name: Python Vulnerability Report
           title: Python Vulnerability Report
@@ -231,23 +199,25 @@ jobs:
     steps:
 
 
+      - uses: jwalton/gh-find-current-pr@v1
+        id: finder
+
+
       - name: Fetch Vulnerability Report
-        # if: ${{ inputs.DOCKER_SCAN_IMAGE_VULNERABILITY }}
+        if: ${{ steps.finder.outputs.pr != '' }}
         uses: actions/download-artifact@v4
         with:
           name: python-vulnerability-report
 
 
       - name: Capture scan results
-        # if: ${{ inputs.DOCKER_SCAN_IMAGE_VULNERABILITY }}
+        if: ${{ steps.finder.outputs.pr != '' }}
         run: |
           content=$(cat vulnerability-report.md | head -c 65000)
           echo "report<<EOF" >> $GITHUB_ENV
           echo "$content" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
-      - uses: jwalton/gh-find-current-pr@v1
-        id: finder
 
       - name: Comment scan results on PR
         if: ${{ steps.finder.outputs.pr != '' }}
