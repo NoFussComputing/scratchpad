@@ -38,6 +38,7 @@ jobs:
           output: 'trivy-results.sarif'
           severity: 'LOW,MEDIUM,HIGH,CRITICAL'
           scan-ref: requirements.txt
+          exit-code: 0
 
       - name: Upload Trivy scan results to GitHub Security tab
         # if:
