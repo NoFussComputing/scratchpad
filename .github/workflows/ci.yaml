@@ -1,14 +1,14 @@
----
-name: 'Python'
+# ---
+# name: 'Python'
 
 
-on:
-  push:
+# on:
+#   push:
 
-jobs:
+# jobs:
 
-  collection:
-    name: 'Ansible Collection'
-    uses: nofusscomputing/action_ansible_collection/.github/workflows/reusable_ansible_collection.yaml@genesis
-    # secrets:
-    #   WORKFLOW_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+#   collection:
+#     name: 'Ansible Collection'
+#     uses: nofusscomputing/action_ansible_collection/.github/workflows/reusable_ansible_collection.yaml@genesis
+#     # secrets:
+#     #   WORKFLOW_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
