@@ -1,3 +1,25 @@
+## 2.1.0 (2024-08-15)
+
+### Feat
+
+- test bump
+- fluff
+- project
+- badge on default branches only
+- add secret to unit test
+- use action dev branch
+
+### Fix
+
+- min version
+- add fuerther debug
+- badge_style
+- git paths
+- copy from correct path
+- correct path
+- add debug
+- test to pull master repo
+
 ## 1.21.0-a1 (2024-08-09)
 
 ### Feat
