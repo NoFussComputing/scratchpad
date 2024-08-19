@@ -7,3 +7,5 @@ about: https://gitlab.com/nofusscomputing/projects/ansible/collections/kubernete
 ---
 
 This inventory plugin obtains the data required from [Centurion ERP](../../../../centurion_erp/index.md) to build up an ansible inventory for all devices.
+
+## random

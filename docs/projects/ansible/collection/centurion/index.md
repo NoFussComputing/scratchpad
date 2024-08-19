@@ -6,6 +6,8 @@ template: project.html
 about: https://gitlab.com/nofusscomputing/projects/ansible/collections/kubernetes
 ---
 
+# L1 should fail
+
 <span style="text-align: center;">
 
 ![Project Status - Active](https://img.shields.io/badge/Project%20Status-Active-green?logo=github&style=plastic) 
@@ -20,7 +22,6 @@ about: https://gitlab.com/nofusscomputing/projects/ansible/collections/kubernete
 </span>
 
 This Ansible Collection is intended to compliement [Centurion ERP](../../../centurion_erp/index.md).
-
 
 ## Features
 
